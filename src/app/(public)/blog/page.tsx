@@ -1,10 +1,11 @@
 import { Card } from '@/components/ui/Card'
 import { Calendar, Clock } from 'lucide-react'
 import { getBlogPosts } from '@/lib/services'
+import { BlogPost } from '@/types'
 
 export default async function BlogPage() {
-  let posts = []
-  let error = null
+  let posts: BlogPost[] = []
+  let error: unknown = null
 
   try {
     posts = await getBlogPosts('published', 50)

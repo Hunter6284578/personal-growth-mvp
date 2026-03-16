@@ -141,7 +141,7 @@ async function saveAnalysis(
 
 // 检查数据充足度
 function checkDataSufficiency(type: string, data: AnalysisData): { sufficient: boolean; message?: string } {
-  const { stats, dailyLogs, events } = data
+  const { stats = [], dailyLogs = [], events = [] } = data
   
   switch (type) {
     case 'weekly':
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
     
     // 3. 获取数据
     let data: AnalysisData
-    let targetEvent: AnalysisData['events'][0] | undefined
+    let targetEvent: NonNullable<AnalysisData['events']>[number] | undefined
     
     if (type === 'event') {
       // 验证事件存在性和所有权

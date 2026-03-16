@@ -3,27 +3,12 @@ import {
   Calendar, 
   Activity, 
   Lightbulb,
-  Zap,
-  TrendingUp,
   Award,
   User
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import { 
-  Radar, 
-  RadarChart, 
-  PolarGrid, 
-  PolarAngleAxis, 
-  PolarRadiusAxis,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip
-} from 'recharts'
+import { ChartsPanel } from '@/components/dashboard/ChartsPanel'
 
 // 六维属性配置
 const statConfig = [
@@ -306,7 +291,6 @@ export default async function DashboardPage() {
                       border: '1px solid #374151',
                       borderRadius: '8px'
                     }}
-                    formatter={(value: number) => [value, '评分'] as [number, string]}
                   />
                 </RadarChart>
               </ResponsiveContainer>

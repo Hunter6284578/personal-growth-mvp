@@ -189,7 +189,7 @@ ${dailyLogs.length >= 3 ? '- 基于数据的潜在问题（引用具体日期）
 }
 
 // Event 分析 - 单条事件分析
-export function buildEventPrompt(event: AnalysisData['events'][0], context: AnalysisData): string {
+export function buildEventPrompt(event: NonNullable<AnalysisData['events']>[number], context: AnalysisData): string {
   const { stats = [], dailyLogs = [] } = context;
   
   // 找到事件前后的数据（各最多3条）
@@ -402,7 +402,7 @@ ${!hasEnoughData
 }
 
 // 根据分析类型选择对应的 prompt 构建函数
-export function buildPrompt(type: 'weekly' | 'event' | 'profile', data: AnalysisData, event?: AnalysisData['events'][0]): string {
+export function buildPrompt(type: 'weekly' | 'event' | 'profile', data: AnalysisData, event?: NonNullable<AnalysisData['events']>[number]): string {
   switch (type) {
     case 'weekly':
       return buildWeeklyPrompt(data);

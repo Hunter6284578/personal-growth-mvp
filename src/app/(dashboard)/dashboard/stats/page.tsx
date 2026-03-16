@@ -96,13 +96,11 @@ export default function StatsPage() {
     
     setSaving(true)
     try {
-      const { error } = await createStatScore({
+      await createStatScore({
         user_id: user.id,
         ...stats,
         note: note || undefined,
       })
-      
-      if (error) throw error
       
       alert('保存成功！')
       // 重新加载历史记录
