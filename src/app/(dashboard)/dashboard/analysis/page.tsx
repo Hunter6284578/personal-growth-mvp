@@ -187,6 +187,11 @@ export default function AnalysisPage() {
   }
 
   const handleAnalyze = async () => {
+    if (!user) {
+      setErrorMessage('请先登录')
+      return
+    }
+
     if (selectedType === 'event' && !selectedEvent) {
       setErrorMessage('请先选择一个事件')
       return
