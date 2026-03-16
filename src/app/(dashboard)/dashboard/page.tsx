@@ -306,7 +306,7 @@ export default async function DashboardPage() {
                       border: '1px solid #374151',
                       borderRadius: '8px'
                     }}
-                    formatter={(value: number) => [value, '评分']}
+                    formatter={(value: number) => [value, '评分'] as [number, string]}
                   />
                 </RadarChart>
               </ResponsiveContainer>
