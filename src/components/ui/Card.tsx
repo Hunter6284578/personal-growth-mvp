@@ -3,8 +3,8 @@ import { ReactNode } from 'react'
 interface CardProps {
   children: ReactNode
   className?: string
-  title?: string
-  subtitle?: string
+  title?: ReactNode
+  subtitle?: ReactNode
 }
 
 export function Card({ children, className = '', title, subtitle }: CardProps) {
@@ -12,8 +12,8 @@ export function Card({ children, className = '', title, subtitle }: CardProps) {
     <div className={`bg-gray-800 border border-gray-700 rounded-lg p-6 ${className}`}>
       {(title || subtitle) && (
         <div className="mb-4">
-          {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
-          {subtitle && <p className="text-sm text-gray-400 mt-1">{subtitle}</p>}
+          {title && <div className="text-lg font-semibold text-white">{title}</div>}
+          {subtitle && <div className="text-sm text-gray-400 mt-1">{subtitle}</div>}
         </div>
       )}
       {children}
