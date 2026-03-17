@@ -90,7 +90,10 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              仅管理员可登录
+              还没有账号？{' '}
+              <Link href="/register" className="text-blue-400 hover:text-blue-300">
+                去注册
+              </Link>
             </p>
           </div>
         </Card>
