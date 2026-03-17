@@ -425,7 +425,7 @@ export default function AnalysisPage() {
                 <div>
                   <p className="text-yellow-400 font-medium text-sm">无法进行事件分析</p>
                   <p className="text-yellow-300/70 text-xs mt-1">
-                    你还没有记录任何事件。请先前往"经历事件"页面添加至少一个事件。
+                    你还没有记录任何事件。请先前往&quot;经历事件&quot;页面添加至少一个事件。
                   </p>
                   <a 
                     href="/dashboard/events"
