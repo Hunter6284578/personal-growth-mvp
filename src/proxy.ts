@@ -23,7 +23,11 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  try {
+    await supabase.auth.getUser()
+  } catch {
+    // ignore errors, don't block the request
+  }
 
   return supabaseResponse
 }
