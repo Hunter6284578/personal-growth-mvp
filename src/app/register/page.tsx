@@ -37,14 +37,20 @@ export default function RegisterPage() {
     }
 
     // @ts-ignore - signUp function added in previous step but type inference might lag
-    const { error } = await signUp(email, password)
+    const { data, error } = await signUp(email, password)
 
     if (error) {
       setError(error.message || '注册失败，请稍后重试')
       setLoading(false)
     } else {
-      setSuccess(true)
-      setLoading(false)
+      // 如果有会话，说明不需要邮箱验证或已自动登录
+      if (data?.session) {
+        router.push('/dashboard')
+      } else {
+        // 需要邮箱验证
+        setSuccess(true)
+        setLoading(false)
+      }
     }
   }
 

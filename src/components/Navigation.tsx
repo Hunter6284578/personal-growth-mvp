@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from './ui/Button'
-import { Home, BookOpen, Lightbulb, User, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
+import { Home, BookOpen, Lightbulb, User, LayoutDashboard, LogOut, Menu, X, FileText, Sparkles, Calendar, Activity } from 'lucide-react'
 import { useState } from 'react'
 
 const publicNavItems = [
@@ -17,9 +17,11 @@ const publicNavItems = [
 const dashboardNavItems = [
   { href: '/dashboard', label: '总览', icon: LayoutDashboard },
   { href: '/dashboard/stats', label: '属性', icon: User },
-  { href: '/dashboard/daily', label: '每日', icon: BookOpen },
-  { href: '/dashboard/events', label: '经历', icon: Lightbulb },
+  { href: '/dashboard/daily', label: '每日', icon: Calendar },
+  { href: '/dashboard/events', label: '经历', icon: Activity },
   { href: '/dashboard/fitness', label: '体测', icon: User },
+  { href: '/dashboard/thoughts', label: '想法', icon: Sparkles },
+  { href: '/dashboard/blog', label: '博客', icon: FileText },
   { href: '/dashboard/analysis', label: 'AI分析', icon: LayoutDashboard },
   { href: '/dashboard/settings', label: '设置', icon: User },
 ]

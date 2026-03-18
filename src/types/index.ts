@@ -73,6 +73,7 @@ export interface FitnessRecord {
 // 博客文章
 export interface BlogPost {
   id: string
+  user_id: string
   title: string
   slug: string
   summary: string | null
@@ -87,6 +88,7 @@ export interface BlogPost {
 // 想法/短内容
 export interface Thought {
   id: string
+  user_id: string
   content: string
   tags: string[] | null
   created_at: string
