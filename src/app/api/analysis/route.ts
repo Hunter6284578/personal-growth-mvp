@@ -5,7 +5,7 @@ import { callAI } from '@/lib/ai-service'
 import { buildPrompt, AnalysisData } from '@/lib/prompts'
 
 // 验证请求体的函数
-function validateRequest(body: unknown): { valid: boolean; error?: string; data?: { type: 'weekly' | 'event' | 'profile'; eventId?: string } } {
+function validateRequest(body: unknown): { valid: boolean; error?: string; data?: { type: 'weekly' | 'event' | 'profile' | 'attribute_eval'; eventId?: string } } {
   if (!body || typeof body !== 'object') {
     return { valid: false, error: '请求体必须是 JSON 对象' }
   }
@@ -17,8 +17,8 @@ function validateRequest(body: unknown): { valid: boolean; error?: string; data?
     return { valid: false, error: '缺少必需字段: type' }
   }
 
-  if (typeof type !== 'string' || !['weekly', 'event', 'profile'].includes(type)) {
-    return { valid: false, error: '无效的分析类型，必须是 weekly、event 或 profile' }
+  if (typeof type !== 'string' || !['weekly', 'event', 'profile', 'attribute_eval'].includes(type)) {
+    return { valid: false, error: '无效的分析类型，必须是 weekly、event、profile 或 attribute_eval' }
   }
 
   // 验证 eventId（当 type 为 event 时）
@@ -34,7 +34,7 @@ function validateRequest(body: unknown): { valid: boolean; error?: string; data?
   return { 
     valid: true, 
     data: { 
-      type: type as 'weekly' | 'event' | 'profile', 
+      type: type as 'weekly' | 'event' | 'profile' | 'attribute_eval', 
       eventId: eventId as string | undefined 
     } 
   }
@@ -53,7 +53,9 @@ async function getAnalysisData(userId: string, days: number): Promise<AnalysisDa
     { data: stats },
     { data: dailyLogs },
     { data: events },
-    { data: fitness }
+    { data: fitness },
+    { data: blogPosts },
+    { data: thoughts }
   ] = await Promise.all([
     supabase
       .from('stat_scores')
@@ -78,14 +80,28 @@ async function getAnalysisData(userId: string, days: number): Promise<AnalysisDa
       .select('*')
       .eq('user_id', userId)
       .gte('record_date', startDateStr)
-      .order('record_date', { ascending: false })
+      .order('record_date', { ascending: false }),
+    supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('created_at', startDateStr)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('thoughts')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('created_at', startDateStr)
+      .order('created_at', { ascending: false })
   ])
   
   return {
     stats: stats || [],
     dailyLogs: dailyLogs || [],
     events: events || [],
-    fitness: fitness || []
+    fitness: fitness || [],
+    blogPosts: blogPosts || [],
+    thoughts: thoughts || []
   }
 }
 
@@ -178,6 +194,9 @@ function checkDataSufficiency(type: string, data: AnalysisData): { sufficient: b
       }
       return { sufficient: true }
       
+    case 'attribute_eval':
+      return { sufficient: true } // 允许尝试评估，即使数据较少
+
     default:
       return { sufficient: false, message: '未知的分析类型' }
   }
@@ -237,6 +256,8 @@ export async function POST(request: NextRequest) {
       data = await getAnalysisData(user.id, 15)
     } else if (type === 'weekly') {
       data = await getAnalysisData(user.id, 7)
+    } else if (type === 'attribute_eval') {
+      data = await getAnalysisData(user.id, 90) // 获取最近90天的数据进行评估
     } else {
       data = await getAnalysisData(user.id, 30)
     }
@@ -307,6 +328,45 @@ export async function POST(request: NextRequest) {
         { error: 'AI 返回了空内容，请重试', code: 'EMPTY_RESPONSE' },
         { status: 500 }
       )
+    }
+
+    // 特殊处理：属性评估需返回 JSON
+    if (type === 'attribute_eval') {
+      let parsedResult;
+      try {
+        // 尝试提取 JSON（处理可能的 markdown 代码块）
+        const content = aiResponse.content;
+        // 匹配 ```json ... ``` 或直接的 { ... }
+        const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
+        const jsonString = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
+        
+        parsedResult = JSON.parse(jsonString);
+        
+        // 验证必需字段
+        const requiredFields = ['physical_score', 'execution_score', 'focus_score', 'emotion_score', 'social_score', 'creativity_score'];
+        for (const field of requiredFields) {
+            if (typeof parsedResult[field] !== 'number') {
+                throw new Error(`缺少或无效字段: ${field}`);
+            }
+        }
+      } catch (e) {
+         console.error('AI JSON 解析失败:', e);
+         return NextResponse.json(
+            { error: 'AI 返回格式错误，无法解析评分', code: 'PARSE_ERROR', details: process.env.NODE_ENV === 'development' ? aiResponse.content : undefined },
+            { status: 500 }
+         );
+      }
+
+      // 保存原始分析结果用于记录
+      const savedAnalysis = await saveAnalysis(user.id, type, prompt, aiResponse.content);
+
+      return NextResponse.json({
+          result: parsedResult,
+          saved: !!savedAnalysis,
+          analysisId: savedAnalysis?.id,
+          usage: aiResponse.usage,
+          warning: sufficiency.message
+      });
     }
     
     // 9. 保存分析结果

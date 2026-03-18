@@ -25,7 +25,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis
 } from 'recharts'
-import { TrendingUp, Target, Calendar } from 'lucide-react'
+import { TrendingUp, Target, Calendar, Sparkles } from 'lucide-react'
 
 const statLabels = [
   { key: 'physical_score', label: '身体素质', color: '#EF4444', shortLabel: '体质' },
@@ -50,6 +50,7 @@ export default function StatsPage() {
   const [history, setHistory] = useState<StatScore[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [evaluating, setEvaluating] = useState(false)
   const [trendDays, setTrendDays] = useState<7 | 30>(7)
 
   // 加载最新数据和历史记录
@@ -85,6 +86,49 @@ export default function StatsPage() {
       console.error('加载数据失败:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAIEval = async () => {
+    if (!user) {
+      alert('请先登录')
+      return
+    }
+    
+    setEvaluating(true)
+    try {
+      const res = await fetch('/api/analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'attribute_eval' })
+      })
+      
+      const data = await res.json()
+      
+      if (!res.ok) {
+        throw new Error(data.error || 'AI 评估失败')
+      }
+      
+      const result = data.result
+      setStats({
+        physical_score: result.physical_score,
+        execution_score: result.execution_score,
+        focus_score: result.focus_score,
+        emotion_score: result.emotion_score,
+        social_score: result.social_score,
+        creativity_score: result.creativity_score,
+      })
+      
+      if (result.note) {
+        setNote(result.note)
+      }
+      
+      alert('AI 评估完成！已自动填入建议数值，请确认后点击保存。')
+    } catch (error) {
+      console.error('AI 评估失败:', error)
+      alert(error instanceof Error ? error.message : 'AI 评估失败，请稍后重试')
+    } finally {
+      setEvaluating(false)
     }
   }
 
@@ -218,9 +262,20 @@ export default function StatsPage() {
           <h1 className="text-3xl font-bold text-white">属性面板</h1>
           <p className="text-gray-400 mt-1">评估和追踪你的六大核心能力</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? '保存中...' : '保存记录'}
-        </Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={handleAIEval} 
+            disabled={evaluating || saving}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            {evaluating ? 'AI 评估中...' : 'AI 评估'}
+          </Button>
+          <Button onClick={handleSave} disabled={saving || evaluating}>
+            {saving ? '保存中...' : '保存记录'}
+          </Button>
+        </div>
       </div>
 
       {/* 统计概览卡片 */}

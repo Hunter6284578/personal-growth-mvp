@@ -42,6 +42,18 @@ export interface AnalysisData {
     push_ups?: number
     sleep_hours?: number
   }[]
+  blogPosts?: {
+    title: string
+    summary?: string | null
+    content?: string
+    created_at: string
+    tags?: string[] | null
+  }[]
+  thoughts?: {
+    content: string
+    created_at: string
+    tags?: string[] | null
+  }[]
 }
 
 // 系统 Prompt - 定义 AI 角色和行为准则
@@ -186,6 +198,81 @@ ${dailyLogs.length >= 3 ? '- 基于数据的潜在问题（引用具体日期）
 
 【重要提醒】
 如果数据不足（少于3天记录），请明确说明"基于现有数据无法得出可靠结论"，并给出记录建议。`;
+}
+
+
+// 属性评估 Prompt
+export function buildAttributeEvalPrompt(data: AnalysisData): string {
+  const { stats = [], dailyLogs = [], events = [], fitness = [], blogPosts = [], thoughts = [] } = data;
+
+  const logsText = dailyLogs.length > 0
+    ? dailyLogs.map(l => `- ${formatDate(l.log_date)}: ${l.summary || ''} ${l.reflection || ''}`).join('\n')
+    : '暂无每日记录';
+
+  const eventsText = events.length > 0
+    ? events.map(e => `- ${formatDate(e.event_date)}: ${e.title} (${e.description || ''})`).join('\n')
+    : '暂无重要事件';
+
+  const fitnessText = fitness.length > 0
+    ? fitness.map(f => `- ${formatDate(f.record_date)}: 体重${f.weight}kg 运动表现: ${f.run_1000m_seconds ? `1000m ${f.run_1000m_seconds}s` : ''} ${f.pull_ups ? `引体${f.pull_ups}` : ''}`).join('\n')
+    : '暂无体测数据';
+
+  const blogsText = blogPosts.length > 0
+    ? blogPosts.map(b => `- ${formatDate(b.created_at)}: [标题]${b.title} [摘要]${b.summary || ''} [内容片段]${b.content?.slice(0, 200)}...`).join('\n')
+    : '暂无博客文章';
+
+  const thoughtsText = thoughts.length > 0
+    ? thoughts.map(t => `- ${formatDate(t.created_at)}: ${t.content}`).join('\n')
+    : '暂无想法记录';
+
+  const previousStats = stats.length > 0
+    ? `最近一次评分 (${formatDate(stats[0].score_date)}): 体质${stats[0].physical_score} 执行${stats[0].execution_score} 专注${stats[0].focus_score} 情绪${stats[0].emotion_score} 社交${stats[0].social_score} 创造${stats[0].creativity_score}`
+    : '暂无历史评分';
+
+  return `${SYSTEM_PROMPT}
+
+请基于用户最近的记录（每日日志、事件、体测、博客、想法），对用户的六维属性进行客观评估。
+
+【参考数据】
+[历史评分]
+${previousStats}
+
+[每日记录]
+${logsText}
+
+[重要事件]
+${eventsText}
+
+[体测数据]
+${fitnessText}
+
+[博客文章]
+${blogsText}
+
+[想法/闪念]
+${thoughtsText}
+
+【评估任务】
+请分析上述数据，给出各项属性的评分（0-100分）和简短评价。
+评分标准：
+- 身体素质：基于体测数据、运动频率、睡眠质量
+- 执行力：基于每日计划完成情况、目标达成
+- 专注力：基于深度工作记录、学习时长
+- 情绪稳定性：基于心情指数、情绪记录
+- 社交状态：基于社交活动、人际互动记录
+- 创造力：基于博客产出、想法数量和质量
+
+【输出格式 - 必须严格遵守】
+请仅返回一个 JSON 对象，不要包含 markdown 代码块标记或其他文字。格式如下：
+{
+  "physical_score": number,
+  "execution_score": number,
+  "focus_score": number,
+  "emotion_score": number,
+  "social_score": number,
+  "creativity_score": number,
+  "note": "string (100字以内的综合评价，解释评分依据)"
+}`;
 }
 
 // Event 分析 - 单条事件分析
@@ -402,16 +489,15 @@ ${!hasEnoughData
 }
 
 // 根据分析类型选择对应的 prompt 构建函数
-export function buildPrompt(type: 'weekly' | 'event' | 'profile', data: AnalysisData, event?: NonNullable<AnalysisData['events']>[number]): string {
-  switch (type) {
-    case 'weekly':
-      return buildWeeklyPrompt(data);
-    case 'event':
-      if (!event) throw new Error('Event 分析需要提供事件数据');
-      return buildEventPrompt(event, data);
-    case 'profile':
-      return buildProfilePrompt(data);
-    default:
-      throw new Error(`未知的分析类型: ${type}`);
+export function buildPrompt(type: 'weekly' | 'event' | 'profile' | 'attribute_eval', data: AnalysisData, targetEvent?: NonNullable<AnalysisData['events']>[number]): string {
+  if (type === 'weekly') {
+    return buildWeeklyPrompt(data);
+  } else if (type === 'event') {
+    if (!targetEvent) throw new Error('Event analysis requires a target event');
+    return buildEventPrompt(targetEvent, data);
+  } else if (type === 'profile') {
+    return buildProfilePrompt(data);
+  } else {
+    return buildAttributeEvalPrompt(data);
   }
 }
