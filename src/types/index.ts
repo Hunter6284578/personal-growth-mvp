@@ -52,7 +52,7 @@ export interface LifeEvent {
   created_at: string
 }
 
-// 体测记录
+// 体测记录 (旧版，保留兼容)
 export interface FitnessRecord {
   id: string
   user_id: string
@@ -66,6 +66,52 @@ export interface FitnessRecord {
   vital_capacity: number | null
   resting_hr: number | null
   sleep_hours: number | null
+  note: string | null
+  created_at: string
+}
+
+// 每日健康记录（睡眠、运动、体重）
+export interface DailyHealth {
+  id: string
+  user_id: string
+  record_date: string
+  sleep_hours: number | null
+  sleep_quality: number | null  // 1-5
+  weight: number | null
+  exercise_type: string | null
+  exercise_minutes: number | null
+  note: string | null
+  created_at: string
+  updated_at: string
+}
+
+// 体测成绩（学校体测/自测）
+export interface FitnessTest {
+  id: string
+  user_id: string
+  test_date: string
+  test_type: 'school_test' | 'self_test'
+  semester: string | null
+  run_1000m_seconds: number | null
+  pull_ups: number | null
+  standing_jump: number | null  // cm
+  sit_and_reach: number | null
+  vital_capacity: number | null
+  total_score: number | null
+  note: string | null
+  created_at: string
+}
+
+// 身体数据（体脂、心率、围度等）
+export interface BodyMetrics {
+  id: string
+  user_id: string
+  record_date: string
+  body_fat: number | null
+  resting_hr: number | null
+  chest: number | null  // cm
+  waist: number | null  // cm
+  hip: number | null    // cm
   note: string | null
   created_at: string
 }
