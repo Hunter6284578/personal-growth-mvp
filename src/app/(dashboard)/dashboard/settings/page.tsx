@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { User, Save } from 'lucide-react'
+import { User, Save, Camera, Loader2 } from 'lucide-react'
 import { getProfile, upsertProfile } from '@/lib/services'
+import { uploadImage } from '@/lib/upload'
 import { useAuth } from '@/hooks/useAuth'
 import type { Profile } from '@/types'
 
@@ -13,6 +14,8 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
 
   // 表单状态
   const [characterName, setCharacterName] = useState('')
@@ -40,6 +43,35 @@ export default function SettingsPage() {
       setCharacterName('主角')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('只能上传图片文件')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('图片大小不能超过 5MB')
+      return
+    }
+
+    setAvatarUploading(true)
+    try {
+      const url = await uploadImage(file)
+      setAvatarUrl(url)
+    } catch (error) {
+      console.error('上传头像失败:', error)
+      alert('上传头像失败，请重试')
+    } finally {
+      setAvatarUploading(false)
+      if (avatarInputRef.current) {
+        avatarInputRef.current.value = ''
+      }
     }
   }
 
@@ -80,28 +112,39 @@ export default function SettingsPage() {
             <div className="text-center py-8 text-gray-500">加载中...</div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* 头像 */}
+              {/* 头像 - 点击上传 */}
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={avatarUploading}
+                  className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden relative group cursor-pointer transition-all hover:ring-2 hover:ring-blue-500 disabled:opacity-50"
+                >
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-10 h-10 text-gray-400" />
                   )}
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    头像 URL
-                  </label>
-                  <input
-                    type="text"
-                    value={avatarUrl}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    placeholder="https://example.com/avatar.jpg"
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    {avatarUploading ? (
+                      <Loader2 className="w-6 h-6 text-white animate-spin" />
+                    ) : (
+                      <Camera className="w-6 h-6 text-white" />
+                    )}
+                  </div>
+                </button>
+                <div>
+                  <p className="text-sm font-medium text-gray-300">头像</p>
+                  <p className="text-xs text-gray-500">点击头像上传图片</p>
                 </div>
               </div>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
