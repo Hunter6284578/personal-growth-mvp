@@ -8,12 +8,12 @@ export default function HomePage() {
     <div className="space-y-16">
       {/* Hero Section */}
       <section className="relative text-center py-32 rounded-2xl overflow-hidden pg-bg-hero">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/60 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/60 via-gray-950/50 to-gray-950" />
         <div className="relative z-10">
-          <h1 className="text-5xl font-bold text-gray-800 mb-6 drop-shadow-lg">
+          <h1 className="text-5xl font-bold text-white mb-6 drop-shadow-lg">
             记录成长，成为更好的自己
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto drop-shadow-md">
+          <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto drop-shadow-md">
             通过数据追踪个人发展，记录每日进步，分析成长轨迹，
             让每一次努力都看得见。
           </p>
@@ -36,52 +36,52 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="grid md:grid-cols-3 gap-8">
         <Card title="博客文章" subtitle="分享学习与思考">
-          <BookOpen className="w-12 h-12 text-blue-500 mb-4" />
-          <p className="text-gray-600">
+          <BookOpen className="w-12 h-12 text-blue-400 mb-4" />
+          <p className="text-gray-400">
             记录技术学习、读书笔记和生活感悟，沉淀知识体系。
           </p>
         </Card>
         <Card title="灵感想法" subtitle="捕捉瞬间的火花">
-          <Lightbulb className="w-12 h-12 text-yellow-500 mb-4" />
-          <p className="text-gray-600">
+          <Lightbulb className="w-12 h-12 text-yellow-400 mb-4" />
+          <p className="text-gray-400">
             随时记录闪现的想法和灵感，不让任何创意溜走。
           </p>
         </Card>
         <Card title="成长追踪" subtitle="数据驱动进步">
-          <TrendingUp className="w-12 h-12 text-green-500 mb-4" />
-          <p className="text-gray-600">
+          <TrendingUp className="w-12 h-12 text-green-400 mb-4" />
+          <p className="text-gray-400">
             通过六大属性维度，量化个人成长，可视化进步轨迹。
           </p>
         </Card>
       </section>
 
       {/* Stats Preview Section */}
-      <section className="bg-gray-100 rounded-2xl p-8 md:p-12">
+      <section className="bg-gray-900 rounded-2xl p-8 md:p-12">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            <h2 className="text-3xl font-bold text-white mb-4">
               游戏化的人物面板
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-400 mb-6">
               将个人成长游戏化，通过六大属性维度全面评估自己：
               身体素质、执行力、专注力、情绪稳定性、社交状态、创造力。
             </p>
-            <ul className="space-y-3 text-gray-600">
+            <ul className="space-y-3 text-gray-300">
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
                 每日记录，追踪习惯养成
               </li>
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
                 体测数据，关注身体健康
               </li>
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                <span className="w-2 h-2 bg-purple-400 rounded-full mr-3"></span>
                 AI 分析，获取成长建议
               </li>
             </ul>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="bg-gray-800 rounded-xl p-6">
             <div className="space-y-4">
               {[
                 { label: '身体素质', value: 75, color: 'bg-red-500' },
@@ -93,10 +93,10 @@ export default function HomePage() {
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">{stat.label}</span>
-                    <span className="text-gray-800">{stat.value}</span>
+                    <span className="text-gray-300">{stat.label}</span>
+                    <span className="text-white">{stat.value}</span>
                   </div>
-                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full ${stat.color} rounded-full transition-all`}
                       style={{ width: `${stat.value}%` }}
