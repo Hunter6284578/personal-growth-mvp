@@ -13,8 +13,8 @@ export function Card({ children, className = '', title, subtitle }: CardProps) {
     <div className={cn('pg-card p-6', className)}>
       {(title || subtitle) && (
         <div className="mb-5">
-          {title && <div className="text-lg font-semibold text-white">{title}</div>}
-          {subtitle && <div className="text-sm text-gray-400 mt-1">{subtitle}</div>}
+          {title && <div className="text-lg font-semibold text-gray-800">{title}</div>}
+          {subtitle && <div className="text-sm text-gray-500 mt-1">{subtitle}</div>}
         </div>
       )}
       {children}

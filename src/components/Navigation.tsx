@@ -32,11 +32,11 @@ export function PublicNavigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <nav className="bg-gray-900 border-b border-gray-800">
+    <nav className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-white">
+            <Link href="/" className="text-xl font-bold text-gray-800">
               成长记录
             </Link>
             <div className="hidden md:ml-10 md:flex md:space-x-8">
@@ -48,8 +48,8 @@ export function PublicNavigation() {
                     href={item.href}
                     className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors ${
                       pathname === item.href
-                        ? 'text-blue-400 border-b-2 border-blue-400'
-                        : 'text-gray-300 hover:text-white'
+                        ? 'text-blue-600 border-b-2 border-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
                     }`}
                   >
                     <Icon className="w-4 h-4 mr-1" />
@@ -82,7 +82,7 @@ export function PublicNavigation() {
           <div className="flex items-center md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-300 hover:text-white p-2"
+              className="text-gray-600 hover:text-gray-800 p-2"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -90,7 +90,7 @@ export function PublicNavigation() {
         </div>
       </div>
       {mobileMenuOpen && (
-        <div className="md:hidden bg-gray-900 border-t border-gray-800">
+        <div className="md:hidden bg-white border-t border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {publicNavItems.map((item) => {
               const Icon = item.icon
@@ -101,8 +101,8 @@ export function PublicNavigation() {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
                     pathname === item.href
-                      ? 'bg-gray-800 text-white'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
                   }`}
                 >
                   <Icon className="w-5 h-5 mr-2" />
@@ -115,14 +115,14 @@ export function PublicNavigation() {
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                 >
                   <LayoutDashboard className="w-5 h-5 mr-2" />
                   后台
                 </Link>
                 <button
                   onClick={() => { signOut(); setMobileMenuOpen(false); }}
-                  className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
+                  className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-800"
                 >
                   <LogOut className="w-5 h-5 mr-2" />
                   退出
@@ -132,7 +132,7 @@ export function PublicNavigation() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-blue-400 hover:bg-gray-800"
+                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50"
               >
                 登录
               </Link>

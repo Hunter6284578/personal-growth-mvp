@@ -41,8 +41,8 @@ body {
 
 @layer components {
   .pg-card {
-    @apply bg-gray-800 border rounded-xl;
-    border-color: var(--pg-border);
+    @apply bg-white border rounded-xl shadow-sm;
+    border-color: #e5e7eb;
   }
 
   .pg-card-soft {
