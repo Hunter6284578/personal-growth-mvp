@@ -88,6 +88,15 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          <div className="mt-4 text-right">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-400 hover:text-blue-300"
+            >
+              忘记密码？
+            </Link>
+          </div>
+
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
               还没有账号？{' '}

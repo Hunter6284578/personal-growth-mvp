@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
-import { Trash2, Edit2, Plus, Loader2, FileText, Globe, Lock } from 'lucide-react'
+import { Trash2, Edit2, Plus, Loader2, FileText } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ImageUpload } from '@/components/ui/ImageUpload'
 
 interface BlogManagerProps {
   initialPosts: BlogPost[]
@@ -28,6 +29,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
   const [summary, setSummary] = useState('')
   const [content, setContent] = useState('')
   const [tagsInput, setTagsInput] = useState('')
+  const [images, setImages] = useState<string[]>([])
   const [status, setStatus] = useState<'draft' | 'published'>('draft')
 
   const resetForm = () => {
@@ -37,6 +39,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
     setSummary('')
     setContent('')
     setTagsInput('')
+    setImages([])
     setStatus('draft')
     setIsEditing(false)
   }
@@ -48,6 +51,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
     setSummary(post.summary || '')
     setContent(post.content)
     setTagsInput(post.tags ? post.tags.join(', ') : '')
+    setImages(post.images || [])
     setStatus(post.status)
     setIsEditing(true)
   }
@@ -66,6 +70,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
       summary: summary.trim() || null,
       content: content.trim(),
       tags: tags.length > 0 ? tags : null,
+      images: images.length > 0 ? images : null,
       status,
       // Only update published_at if status is published
       ...(status === 'published' && { published_at: new Date().toISOString() })
@@ -135,7 +140,6 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
 
   return (
     <div className="space-y-8">
-      {/* 头部操作栏 */}
       {!isEditing && (
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -149,7 +153,6 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
         </div>
       )}
 
-      {/* 编辑/创建表单 */}
       {isEditing && (
         <Card title={currentPostId ? '编辑文章' : '写新文章'}>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -186,6 +189,13 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
               required
               className="font-mono"
             />
+            
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
+                配图 (可选)
+              </label>
+              <ImageUpload images={images} onChange={setImages} maxImages={5} />
+            </div>
             
             <div className="grid md:grid-cols-2 gap-6">
               <Input
@@ -241,7 +251,6 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
         </Card>
       )}
 
-      {/* 文章列表 */}
       {!isEditing && (
         <div className="space-y-4">
           {posts.length > 0 ? (
@@ -249,8 +258,11 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
               {posts.map((post) => (
                 <div 
                   key={post.id} 
-                  className="bg-gray-800 border border-gray-700 rounded-lg p-6 hover:border-gray-600 transition-colors flex flex-col md:flex-row gap-6 justify-between items-start"
+                  className="pg-card p-5 hover:border-gray-600 transition-colors flex flex-col md:flex-row gap-5 justify-between items-start"
                 >
+                  {post.images && post.images.length > 0 && (
+                    <img src={post.images[0]} alt="" className="h-20 w-28 rounded-lg border border-gray-700 object-cover flex-shrink-0" />
+                  )}
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-3">
                       <h3 className="text-lg font-bold text-white">{post.title}</h3>
@@ -283,6 +295,13 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
                         </div>
                       )}
                     </div>
+                    {post.images && post.images.length > 1 && (
+                      <div className="flex gap-2 pt-3 overflow-x-auto">
+                        {post.images.slice(1).map((img, idx) => (
+                          <img key={idx} src={img} alt="" className="h-14 w-14 object-cover rounded border border-gray-700" />
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-2">

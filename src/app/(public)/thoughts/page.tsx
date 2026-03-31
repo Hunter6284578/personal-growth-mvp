@@ -6,6 +6,11 @@ import { Lightbulb, Calendar, Plus, Trash2 } from 'lucide-react'
 import { getThoughts, createThought, deleteThought } from '@/lib/services'
 import { useAuth } from '@/hooks/useAuth'
 import type { Thought } from '@/types'
+import { ImageUpload } from '@/components/ui/ImageUpload'
+import { Button } from '@/components/ui/Button'
+import { Textarea } from '@/components/ui/Textarea'
+
+const quickTemplates = ['今天最大的收获是', '我准备开始做', '一个值得复盘的问题']
 
 export default function ThoughtsPage() {
   const { user } = useAuth()
@@ -13,6 +18,7 @@ export default function ThoughtsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [newThought, setNewThought] = useState('')
+  const [images, setImages] = useState<string[]>([])
   const [showForm, setShowForm] = useState(false)
 
   // 加载数据
@@ -37,8 +43,12 @@ export default function ThoughtsPage() {
 
     setSaving(true)
     try {
-      await createThought({ content: newThought.trim() })
+      await createThought({ 
+        content: newThought.trim(),
+        images: images.length > 0 ? images : null 
+      })
       setNewThought('')
+      setImages([])
       setShowForm(false)
       await loadThoughts()
     } catch (error) {
@@ -61,6 +71,14 @@ export default function ThoughtsPage() {
     }
   }
 
+  const applyTemplate = (template: string) => {
+    if (!newThought.trim()) {
+      setNewThought(`${template} `)
+      return
+    }
+    setNewThought(prev => `${prev}\n${template} `)
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 flex items-center justify-between">
@@ -69,48 +87,58 @@ export default function ThoughtsPage() {
           <p className="text-gray-400">记录瞬间的思考与感悟</p>
         </div>
         {user && (
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-          >
+          <Button onClick={() => setShowForm(!showForm)}>
             <Plus className="w-4 h-4 mr-2" />
             添加想法
-          </button>
+          </Button>
         )}
       </div>
 
-      {/* 添加表单 */}
       {showForm && user && (
         <Card className="mb-8">
           <form onSubmit={handleSubmit}>
-            <textarea
+            <Textarea
               value={newThought}
               onChange={(e) => setNewThought(e.target.value)}
               placeholder="记录你的想法..."
               rows={4}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none mb-4"
+              className="mb-4"
             />
+            <div className="mb-4 flex flex-wrap gap-2">
+              {quickTemplates.map((template) => (
+                <button
+                  key={template}
+                  type="button"
+                  onClick={() => applyTemplate(template)}
+                  className="px-2.5 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:border-blue-500/50 hover:text-blue-300 transition-colors"
+                >
+                  {template}
+                </button>
+              ))}
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-300 mb-2">配图 (可选)</label>
+              <ImageUpload images={images} onChange={setImages} maxImages={9} />
+            </div>
             <div className="flex gap-2">
-              <button
+              <Button
                 type="submit"
                 disabled={saving || !newThought.trim()}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               >
                 {saving ? '保存中...' : '保存'}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                variant="secondary"
               >
                 取消
-              </button>
+              </Button>
             </div>
           </form>
         </Card>
       )}
 
-      {/* 想法列表 */}
       {loading ? (
         <div className="text-center py-8 text-gray-500">加载中...</div>
       ) : thoughts.length === 0 ? (
@@ -118,7 +146,7 @@ export default function ThoughtsPage() {
       ) : (
         <div className="grid gap-6">
           {thoughts.map((thought) => (
-            <Card key={thought.id} className="relative">
+            <Card key={thought.id} className="relative hover:border-gray-600 transition-colors">
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
@@ -129,6 +157,13 @@ export default function ThoughtsPage() {
                   <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
                     {thought.content}
                   </p>
+                  {thought.images && thought.images.length > 0 && (
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {thought.images.map((img, idx) => (
+                        <img key={idx} src={img} alt="" className="w-full aspect-square object-cover rounded-md border border-gray-700" />
+                      ))}
+                    </div>
+                  )}
                   <div className="mt-4 flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-500">
                       <Calendar className="w-4 h-4 mr-1" />

@@ -7,6 +7,7 @@ import { Plus, Star, Trash2, Edit2, X } from 'lucide-react'
 import { getLifeEvents, createLifeEvent, updateLifeEvent, deleteLifeEvent } from '@/lib/services'
 import { useAuth } from '@/hooks/useAuth'
 import type { LifeEvent } from '@/types'
+import { ImageUpload } from '@/components/ui/ImageUpload'
 
 const statOptions = [
   { value: 'physical_score', label: '身体素质' },
@@ -31,7 +32,9 @@ export default function EventsPage() {
   const [eventDate, setEventDate] = useState(new Date().toISOString().split('T')[0])
   const [impactLevel, setImpactLevel] = useState(5)
   const [affectedStats, setAffectedStats] = useState<string[]>([])
-  const [tags, setTags] = useState('')
+  const [tagInput, setTagInput] = useState('')
+  const [tagList, setTagList] = useState<string[]>([])
+  const [images, setImages] = useState<string[]>([])
 
   // 加载数据
   useEffect(() => {
@@ -59,7 +62,9 @@ export default function EventsPage() {
     setEventDate(new Date().toISOString().split('T')[0])
     setImpactLevel(5)
     setAffectedStats([])
-    setTags('')
+    setTagInput('')
+    setTagList([])
+    setImages([])
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,7 +80,8 @@ export default function EventsPage() {
         event_date: eventDate,
         impact_level: impactLevel,
         affected_stats: affectedStats,
-        tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+        tags: tagList.length > 0 ? tagList : null,
+        images: images.length > 0 ? images : null,
       }
 
       if (editingId) {
@@ -115,7 +121,9 @@ export default function EventsPage() {
     setEventDate(event.event_date)
     setImpactLevel(event.impact_level || 5)
     setAffectedStats(event.affected_stats || [])
-    setTags(event.tags?.join(', ') || '')
+    setTagInput('')
+    setTagList(event.tags || [])
+    setImages(event.images || [])
     setShowForm(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -126,6 +134,23 @@ export default function EventsPage() {
         ? prev.filter(s => s !== stat)
         : [...prev, stat]
     )
+  }
+
+  const impactLabel = impactLevel <= 3 ? '轻微影响' : impactLevel <= 7 ? '中等影响' : '重大影响'
+
+  const appendTag = () => {
+    const normalized = tagInput.trim().replace(/^#/, '')
+    if (!normalized) return
+    if (tagList.includes(normalized)) {
+      setTagInput('')
+      return
+    }
+    setTagList((prev) => [...prev, normalized])
+    setTagInput('')
+  }
+
+  const removeTag = (tag: string) => {
+    setTagList((prev) => prev.filter((item) => item !== tag))
   }
 
   return (
@@ -141,23 +166,22 @@ export default function EventsPage() {
         </Button>
       </div>
 
-      {/* 添加/编辑表单 */}
       {showForm && (
         <Card title={editingId ? '编辑事件' : '添加新事件'}>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">事件标题 *</label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="输入事件名称..."
-                required
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="pg-card-soft p-4 space-y-4">
+              <div className="text-sm font-medium text-gray-300">基础信息</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">事件标题 *</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="输入事件名称..."
+                  required
+                  className="pg-input"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">发生日期 *</label>
                 <input
@@ -165,13 +189,15 @@ export default function EventsPage() {
                   value={eventDate}
                   onChange={(e) => setEventDate(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pg-input"
                 />
               </div>
+            </div>
+
+            <div className="pg-card-soft p-4 space-y-4">
+              <div className="text-sm font-medium text-gray-300">影响评估</div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  影响程度: {impactLevel}/10
-                </label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">影响程度: {impactLevel}/10</label>
                 <input
                   type="range"
                   min="1"
@@ -183,49 +209,78 @@ export default function EventsPage() {
                     background: `linear-gradient(to right, #8B5CF6 0%, #8B5CF6 ${impactLevel * 10}%, #374151 ${impactLevel * 10}%, #374151 100%)`,
                   }}
                 />
+                <div className="mt-2 text-xs text-purple-300">{impactLabel}</div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">影响的属性</label>
+                <div className="flex flex-wrap gap-2">
+                  {statOptions.map((stat) => (
+                    <button
+                      key={stat.value}
+                      type="button"
+                      onClick={() => toggleStat(stat.value)}
+                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                        affectedStats.includes(stat.value)
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                    >
+                      {stat.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">影响的属性</label>
-              <div className="flex flex-wrap gap-2">
-                {statOptions.map((stat) => (
-                  <button
-                    key={stat.value}
-                    type="button"
-                    onClick={() => toggleStat(stat.value)}
-                    className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                      affectedStats.includes(stat.value)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                    }`}
-                  >
-                    {stat.label}
-                  </button>
-                ))}
+            <div className="pg-card-soft p-4 space-y-4">
+              <div className="text-sm font-medium text-gray-300">内容与素材</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">标签</label>
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                      e.preventDefault()
+                      appendTag()
+                    }
+                  }}
+                  onBlur={appendTag}
+                  placeholder="输入后按回车，如：里程碑"
+                  className="pg-input"
+                />
+                {tagList.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {tagList.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="px-2 py-0.5 rounded-full text-xs bg-blue-900/40 border border-blue-700/60 text-blue-300 hover:bg-blue-900/70"
+                      >
+                        #{tag} ×
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">标签</label>
-              <input
-                type="text"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-                placeholder="用逗号分隔，如：工作, 成就, 里程碑"
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">事件描述</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="详细描述这个事件..."
+                  rows={4}
+                  className="pg-input resize-none"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">事件描述</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="详细描述这个事件..."
-                rows={4}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">图片记录 (可选)</label>
+                <ImageUpload images={images} onChange={setImages} maxImages={6} />
+              </div>
             </div>
 
             <div className="flex gap-2">
@@ -242,7 +297,6 @@ export default function EventsPage() {
         </Card>
       )}
 
-      {/* 事件列表 */}
       <Card title="事件列表" subtitle={`共 ${events.length} 条记录`}>
         {loading ? (
           <div className="text-center py-8 text-gray-500">加载中...</div>
@@ -256,38 +310,63 @@ export default function EventsPage() {
                 className="p-4 bg-gray-900 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-white">{event.title}</h3>
-                      <span className="text-sm text-gray-400">{event.event_date}</span>
-                    </div>
-                    {event.description && (
-                      <p className="text-gray-400 mb-3">{event.description}</p>
+                  <div className="flex-1 flex gap-4">
+                    {event.images && event.images.length > 0 && (
+                      <img
+                        src={event.images[0]}
+                        alt=""
+                        className="h-20 w-20 object-cover rounded-lg border border-gray-700 flex-shrink-0"
+                      />
                     )}
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="flex items-center text-purple-400">
-                        <Star className="w-4 h-4 mr-1" />
-                        <span className="text-sm">影响 {event.impact_level}/10</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-white">{event.title}</h3>
+                        <span className="text-sm text-gray-400">{event.event_date}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full border border-purple-600/50 text-purple-300 bg-purple-900/20">
+                          影响 {event.impact_level}/10
+                        </span>
                       </div>
-                      {event.affected_stats && event.affected_stats.length > 0 && (
-                        <div className="flex gap-1">
-                          {event.affected_stats.map((stat) => (
-                            <span key={stat} className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">
-                              {statOptions.find(s => s.value === stat)?.label}
-                            </span>
-                          ))}
-                        </div>
+                      {event.description && (
+                        <p className="text-gray-400 mb-3 line-clamp-2">{event.description}</p>
                       )}
-                      {event.tags && event.tags.length > 0 && (
-                        <div className="flex gap-1">
-                          {event.tags.map((tag) => (
-                            <span key={tag} className="px-2 py-0.5 bg-blue-900/50 rounded text-xs text-blue-300">
-                              {tag}
-                            </span>
-                          ))}
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center text-purple-400">
+                          <Star className="w-4 h-4 mr-1" />
+                          <span className="text-sm">
+                            {event.impact_level && event.impact_level <= 3
+                              ? '轻微影响'
+                              : event.impact_level && event.impact_level <= 7
+                                ? '中等影响'
+                                : '重大影响'}
+                          </span>
                         </div>
-                      )}
+                        {event.affected_stats && event.affected_stats.length > 0 && (
+                          <div className="flex gap-1 flex-wrap">
+                            {event.affected_stats.map((stat) => (
+                              <span key={stat} className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">
+                                {statOptions.find(s => s.value === stat)?.label}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {event.tags && event.tags.length > 0 && (
+                          <div className="flex gap-1 flex-wrap">
+                            {event.tags.map((tag) => (
+                              <span key={tag} className="px-2 py-0.5 bg-blue-900/50 rounded text-xs text-blue-300">
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    {event.images && event.images.length > 1 && (
+                      <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+                        {event.images.slice(1).map((img, idx) => (
+                          <img key={idx} src={img} alt="" className="h-14 w-14 object-cover rounded border border-gray-700" />
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2 ml-4">
                     <button

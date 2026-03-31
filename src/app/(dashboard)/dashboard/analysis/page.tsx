@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { 
   Sparkles, 
   MessageSquare, 
@@ -22,6 +24,30 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { getLifeEvents, getAIAnalyses } from '@/lib/services'
 import { LifeEvent, AIAnalysis } from '@/types'
+
+const markdownComponents = {
+  h2: ({ children }: { children: React.ReactNode }) => (
+    <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>
+  ),
+  h3: ({ children }: { children: React.ReactNode }) => (
+    <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>
+  ),
+  strong: ({ children }: { children: React.ReactNode }) => (
+    <strong className="text-white">{children}</strong>
+  ),
+  ul: ({ children }: { children: React.ReactNode }) => (
+    <ul className="list-disc ml-4 text-gray-300 space-y-1">{children}</ul>
+  ),
+  ol: ({ children }: { children: React.ReactNode }) => (
+    <ol className="list-decimal ml-4 text-gray-300 space-y-1">{children}</ol>
+  ),
+  li: ({ children }: { children: React.ReactNode }) => (
+    <li className="text-gray-300 mb-1">{children}</li>
+  ),
+  p: ({ children }: { children: React.ReactNode }) => (
+    <p className="text-gray-300 mb-2 leading-relaxed">{children}</p>
+  ),
+}
 
 const analysisTypes = [
   {
@@ -257,26 +283,7 @@ export default function AnalysisPage() {
   // 检查是否可以进行 event 分析
   const canDoEventAnalysis = events.length > 0
 
-  // 渲染 Markdown 内容
-  const renderMarkdown = (content: string) => {
-    return content
-      .replace(/## (.*)/g, '<h2 class="text-xl font-bold text-white mt-6 mb-3">$1</h2>')
-      .replace(/### (.*)/g, '<h3 class="text-lg font-semibold text-white mt-4 mb-2">$1</h3>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
-      .replace(/- (.*)/g, '<li class="ml-4 text-gray-300 mb-1">$1</li>')
-      .replace(/✅/g, '<span class="text-green-400">✅</span>')
-      .replace(/⚠️/g, '<span class="text-yellow-400">⚠️</span>')
-      .replace(/🎯/g, '<span class="text-blue-400">🎯</span>')
-      .replace(/💡/g, '<span class="text-purple-400">💡</span>')
-      .replace(/📊/g, '<span class="text-cyan-400">📊</span>')
-      .replace(/📈/g, '<span class="text-green-400">📈</span>')
-      .replace(/💭/g, '<span class="text-pink-400">💭</span>')
-      .replace(/📝/g, '<span class="text-gray-400">📝</span>')
-      .replace(/⚖️/g, '<span class="text-yellow-400">⚖️</span>')
-      .replace(/🚀/g, '<span class="text-orange-400">🚀</span>')
-      .replace(/❌/g, '<span class="text-red-400">❌</span>')
-      .replace(/🎯/g, '<span class="text-blue-400">🎯</span>')
-  }
+
 
   if (dataLoading) {
     return (
@@ -555,10 +562,9 @@ export default function AnalysisPage() {
                   </button>
                 </div>
                 <div className="prose prose-invert max-w-none">
-                  <div 
-                    className="whitespace-pre-wrap text-gray-300 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }}
-                  />
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                    {result}
+                  </ReactMarkdown>
                 </div>
               </div>
             )}
@@ -622,10 +628,11 @@ export default function AnalysisPage() {
               </button>
             </div>
             <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <div 
-                className="prose prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(selectedHistoryItem.result) }}
-              />
+              <div className="prose prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+                  {selectedHistoryItem.result}
+                </ReactMarkdown>
+              </div>
             </div>
           </div>
         </div>

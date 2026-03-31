@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --pg-bg: #030712;
+  --pg-card: #111827;
+  --pg-card-soft: #1f2937;
+  --pg-border: #374151;
+  --pg-border-strong: #4b5563;
+  --pg-text-muted: #9ca3af;
+  --pg-ring: #3b82f6;
 }
 
 @theme inline {
@@ -16,6 +23,13 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --pg-bg: #030712;
+    --pg-card: #111827;
+    --pg-card-soft: #1f2937;
+    --pg-border: #374151;
+    --pg-border-strong: #4b5563;
+    --pg-text-muted: #9ca3af;
+    --pg-ring: #3b82f6;
   }
 }
 
@@ -23,4 +37,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .pg-card {
+    @apply bg-gray-800 border rounded-xl;
+    border-color: var(--pg-border);
+  }
+
+  .pg-card-soft {
+    @apply rounded-lg border;
+    background-color: rgba(17, 24, 39, 0.72);
+    border-color: rgba(75, 85, 99, 0.45);
+  }
+
+  .pg-input {
+    @apply w-full px-3 py-2 rounded-lg text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: rgba(31, 41, 55, 0.65);
+    border: 1px solid var(--pg-border);
+    --tw-ring-color: var(--pg-ring);
+  }
 }

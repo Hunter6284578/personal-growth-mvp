@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 interface CardProps {
   children: ReactNode
@@ -9,9 +10,9 @@ interface CardProps {
 
 export function Card({ children, className = '', title, subtitle }: CardProps) {
   return (
-    <div className={`bg-gray-800 border border-gray-700 rounded-lg p-6 ${className}`}>
+    <div className={cn('pg-card p-6', className)}>
       {(title || subtitle) && (
-        <div className="mb-4">
+        <div className="mb-5">
           {title && <div className="text-lg font-semibold text-white">{title}</div>}
           {subtitle && <div className="text-sm text-gray-400 mt-1">{subtitle}</div>}
         </div>
@@ -35,18 +36,18 @@ export function StatCard({
   trendUp?: boolean
 }) {
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+    <div className="pg-card p-4">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-gray-400">{label}</p>
           <p className="text-2xl font-bold text-white mt-1">{value}</p>
           {trend && (
-            <p className={`text-sm mt-1 ${trendUp ? 'text-green-400' : 'text-red-400'}`}>
+            <p className={cn('text-sm mt-1', trendUp ? 'text-green-400' : 'text-red-400')}>
               {trendUp ? '↑' : '↓'} {trend}
             </p>
           )}
         </div>
-        {icon && <div className="p-3 bg-gray-700 rounded-lg">{icon}</div>}
+        {icon && <div className="p-3 bg-gray-700/80 rounded-lg border border-gray-600/70">{icon}</div>}
       </div>
     </div>
   )

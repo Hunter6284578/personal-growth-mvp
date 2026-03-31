@@ -49,6 +49,7 @@ export interface LifeEvent {
   tags: string[] | null
   affected_stats: string[] | null
   impact_level: number | null
+  images: string[] | null
   created_at: string
 }
 
@@ -125,6 +126,7 @@ export interface BlogPost {
   summary: string | null
   content: string
   tags: string[] | null
+  images: string[] | null
   status: 'draft' | 'published'
   published_at: string | null
   created_at: string
@@ -137,6 +139,7 @@ export interface Thought {
   user_id: string
   content: string
   tags: string[] | null
+  images: string[] | null
   created_at: string
 }
 

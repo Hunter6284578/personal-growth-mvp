@@ -1,20 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { useAuth } from '@/hooks/useAuth'
-import { UserPlus, ArrowLeft } from 'lucide-react'
+import { Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 
-export default function RegisterPage() {
-  const router = useRouter()
-  const { signUp } = useAuth()
+export default function ForgotPasswordPage() {
+  const { resetPassword } = useAuth()
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -24,32 +20,17 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
-    if (password !== confirmPassword) {
-      setError('两次输入的密码不一致')
-      setLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError('密码长度至少需要6位')
-      setLoading(false)
-      return
-    }
-
-    const { data, error } = await signUp(email, password)
+    const { error } = await resetPassword(email)
 
     if (error) {
-      setError(error.message || '注册失败，请稍后重试')
+      if (error.message.includes('User not found')) {
+        setError('该邮箱未注册')
+      } else {
+        setError('发送重置邮件失败，请稍后再试')
+      }
       setLoading(false)
     } else {
-      // 如果有会话，说明不需要邮箱验证或已自动登录
-      if (data?.session) {
-        router.push('/dashboard')
-      } else {
-        // 需要邮箱验证
-        setSuccess(true)
-        setLoading(false)
-      }
+      setSuccess(true)
     }
   }
 
@@ -57,19 +38,29 @@ export default function RegisterPage() {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="mb-6">
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              返回首页
+            </Button>
+          </Link>
+
           <Card>
-            <div className="text-center py-8">
+            <div className="text-center">
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <UserPlus className="w-8 h-8 text-white" />
+                <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">注册成功！</h1>
-              <p className="text-gray-400 mb-8">
-                请检查你的邮箱 {email} 完成验证，<br />
-                验证后即可登录系统。
+              <h1 className="text-2xl font-bold text-white mb-2">邮件已发送</h1>
+              <p className="text-gray-400 mb-2">
+                重置密码的链接已发送到
+              </p>
+              <p className="text-blue-400 font-medium mb-6">{email}</p>
+              <p className="text-sm text-gray-500 mb-6">
+                请检查你的收件箱（包括垃圾邮件），点击邮件中的链接来重置密码。
               </p>
               <Link href="/login">
-                <Button variant="primary" size="lg" className="w-full">
-                  前往登录
+                <Button variant="primary" className="w-full">
+                  返回登录
                 </Button>
               </Link>
             </div>
@@ -91,11 +82,13 @@ export default function RegisterPage() {
 
         <Card>
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UserPlus className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white">注册账号</h1>
-            <p className="text-gray-400 mt-2">开启你的个人成长之旅</p>
+            <h1 className="text-2xl font-bold text-white">忘记密码</h1>
+            <p className="text-gray-400 mt-2">
+              输入你的邮箱，我们将发送重置密码的链接
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,24 +98,6 @@ export default function RegisterPage() {
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-
-            <Input
-              type="password"
-              label="密码"
-              placeholder="至少6位字符"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
-            <Input
-              type="password"
-              label="确认密码"
-              placeholder="再次输入密码"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
 
@@ -139,15 +114,15 @@ export default function RegisterPage() {
               loading={loading}
               className="w-full"
             >
-              注册
+              发送重置链接
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
-              已有账号？{' '}
+              想起密码了？{' '}
               <Link href="/login" className="text-blue-400 hover:text-blue-300">
-                直接登录
+                返回登录
               </Link>
             </p>
           </div>

@@ -118,12 +118,71 @@ export async function callAI(request: AIRequest): Promise<AIResponse> {
   }
 }
 
-// 流式调用（可选，用于后续扩展）
+// 流式调用 - 使用 SSE 逐块读取 AI 响应
 export async function* callAIStream(request: AIRequest): AsyncGenerator<string, void, unknown> {
-  // 流式实现留作后续扩展
-  const response = await callAI(request)
-  if (response.error) {
-    throw new Error(response.error)
+  try {
+    const config = getAIConfig()
+    const defaults = getProviderDefaults(config.provider)
+
+    const url = config.apiUrl || defaults.url
+    const model = config.model || defaults.model
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: request.messages,
+        temperature: request.temperature ?? 0.7,
+        max_tokens: request.maxTokens ?? 2000,
+        stream: true,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.text()
+      throw new Error(`AI API 错误: ${error}`)
+    }
+
+    if (!response.body) {
+      throw new Error('AI API 未返回可读流')
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        const trimmed = line.trim()
+        if (!trimmed || !trimmed.startsWith('data:')) continue
+
+        const data = trimmed.slice(5).trim()
+        if (data === '[DONE]') return
+
+        try {
+          const parsed = JSON.parse(data)
+          const content = parsed.choices?.[0]?.delta?.content
+          if (content) {
+            yield content
+          }
+        } catch {
+          // 忽略无法解析的行，继续处理后续数据
+        }
+      }
+    }
+  } catch (error) {
+    console.error('AI 流式调用失败:', error)
+    throw error
   }
-  yield response.content
 }

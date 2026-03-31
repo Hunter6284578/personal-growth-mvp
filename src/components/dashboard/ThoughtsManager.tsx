@@ -8,16 +8,20 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
 import { Trash2, Tag, Plus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ImageUpload } from '@/components/ui/ImageUpload'
 
 interface ThoughtsManagerProps {
   initialThoughts: Thought[]
   userId: string
 }
 
+const quickTags = ['复盘', '学习', '灵感', '执行', '情绪', '健康']
+
 export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProps) {
   const [thoughts, setThoughts] = useState<Thought[]>(initialThoughts)
   const [content, setContent] = useState('')
   const [tagsInput, setTagsInput] = useState('')
+  const [images, setImages] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
@@ -36,7 +40,8 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
         .insert({
           user_id: userId,
           content: content.trim(),
-          tags: tags.length > 0 ? tags : null
+          tags: tags.length > 0 ? tags : null,
+          images: images.length > 0 ? images : null
         })
         .select()
         .single()
@@ -47,6 +52,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
         setThoughts([data as Thought, ...thoughts])
         setContent('')
         setTagsInput('')
+        setImages([])
         router.refresh() // Refresh server components if needed
       }
     } catch (error) {
@@ -76,9 +82,17 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
     }
   }
 
+  const appendQuickTag = (tag: string) => {
+    const currentTags = tagsInput
+      .split(/[,，]/)
+      .map(t => t.trim())
+      .filter(Boolean)
+    if (currentTags.includes(tag)) return
+    setTagsInput(currentTags.length > 0 ? `${currentTags.join(', ')}, ${tag}` : tag)
+  }
+
   return (
     <div className="space-y-8">
-      {/* 添加想法表单 */}
       <Card title="记录灵感" subtitle="随时捕捉你的想法">
         <form onSubmit={handleAddThought} className="space-y-4">
           <Textarea
@@ -89,6 +103,13 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
             className="w-full"
             disabled={loading}
           />
+
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
+              配图 (可选)
+            </label>
+            <ImageUpload images={images} onChange={setImages} maxImages={9} />
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="relative w-full sm:w-1/2">
@@ -100,12 +121,12 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
                 placeholder="标签 (用逗号分隔)"
-                className="pl-9 w-full bg-gray-900 border border-gray-700 rounded-md py-2 px-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="pg-input pl-9 text-sm"
                 disabled={loading}
               />
             </div>
             
-            <Button type="submit" disabled={loading || !content.trim()}>
+            <Button type="submit" disabled={loading || !content.trim()} className="w-full sm:w-auto">
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -119,10 +140,22 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
               )}
             </Button>
           </div>
+          <div className="flex flex-wrap gap-2">
+            {quickTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => appendQuickTag(tag)}
+                className="px-2.5 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:border-blue-500/50 hover:text-blue-300 transition-colors"
+                disabled={loading}
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
         </form>
       </Card>
 
-      {/* 想法列表 */}
       <div className="space-y-4">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
           我的想法 
@@ -134,7 +167,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
             {thoughts.map((thought) => (
               <div 
                 key={thought.id} 
-                className="bg-gray-800 border border-gray-700 rounded-lg p-5 flex flex-col hover:border-gray-600 transition-colors group relative"
+                className="pg-card p-5 flex flex-col hover:border-gray-600 transition-colors group relative"
               >
                 <button
                   onClick={() => handleDeleteThought(thought.id)}
@@ -147,6 +180,14 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
                 <p className="text-gray-200 whitespace-pre-wrap flex-grow mb-4">
                   {thought.content}
                 </p>
+
+                {thought.images && thought.images.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {thought.images.map((img, idx) => (
+                      <img key={idx} src={img} alt="" className="w-full aspect-square object-cover rounded-md border border-gray-700" />
+                    ))}
+                  </div>
+                )}
                 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/50">
                   <span className="text-xs text-gray-500">

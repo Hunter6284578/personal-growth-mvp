@@ -9,6 +9,7 @@ import {
   getStatScores, 
   createStatScore 
 } from '@/lib/services'
+import { STAT_CONFIG } from '@/lib/constants'
 import { StatScore } from '@/types'
 import { 
   LineChart, 
@@ -26,15 +27,6 @@ import {
   PolarRadiusAxis
 } from 'recharts'
 import { TrendingUp, Target, Calendar, Sparkles } from 'lucide-react'
-
-const statLabels = [
-  { key: 'physical_score', label: '身体素质', color: '#EF4444', shortLabel: '体质' },
-  { key: 'execution_score', label: '执行力', color: '#3B82F6', shortLabel: '执行' },
-  { key: 'focus_score', label: '专注力', color: '#10B981', shortLabel: '专注' },
-  { key: 'emotion_score', label: '情绪稳定性', color: '#F59E0B', shortLabel: '情绪' },
-  { key: 'social_score', label: '社交状态', color: '#8B5CF6', shortLabel: '社交' },
-  { key: 'creativity_score', label: '创造力', color: '#EC4899', shortLabel: '创造' },
-]
 
 export default function StatsPage() {
   const { user } = useAuth()
@@ -193,7 +185,7 @@ export default function StatsPage() {
       creativity_score: Math.round(history.reduce((a, b) => a + b.creativity_score, 0) / history.length),
     }
     
-    return statLabels.map(stat => ({
+    return STAT_CONFIG.map(stat => ({
       subject: stat.shortLabel,
       当前: latest[stat.key as keyof StatScore] as number,
       平均: avg[stat.key as keyof typeof avg],
@@ -308,7 +300,7 @@ export default function StatsPage() {
         {/* 属性调整 */}
         <Card title="属性调整" subtitle="拖动滑块设置当前数值">
           <div className="space-y-5">
-            {statLabels.map((stat) => (
+            {STAT_CONFIG.map((stat) => (
               <div key={stat.key}>
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-300 text-sm">{stat.label}</span>
@@ -440,7 +432,7 @@ export default function StatsPage() {
                   }}
                 />
                 <Legend />
-                {statLabels.map((stat) => (
+                {STAT_CONFIG.map((stat) => (
                   <Line
                     key={stat.key}
                     type="monotone"
@@ -504,7 +496,7 @@ export default function StatsPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-6 gap-2 text-sm">
-                    {statLabels.map((stat) => (
+                    {STAT_CONFIG.map((stat) => (
                       <div key={stat.key} className="text-center">
                         <span className="text-gray-500 block text-xs">{stat.shortLabel}</span>
                         <span style={{ color: stat.color }}>

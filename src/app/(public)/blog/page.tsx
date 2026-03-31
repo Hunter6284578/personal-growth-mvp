@@ -1,14 +1,23 @@
 import { Card } from '@/components/ui/Card'
 import { Calendar, Clock } from 'lucide-react'
-import { getBlogPosts } from '@/lib/services'
+import { createClient } from '@/lib/supabase-server'
 import { BlogPost } from '@/types'
+import Link from 'next/link'
 
 export default async function BlogPage() {
   let posts: BlogPost[] = []
   let error: unknown = null
 
   try {
-    posts = await getBlogPosts('published', 50)
+    const supabase = await createClient()
+    const { data, error: queryError } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(50)
+    if (queryError) throw queryError
+    posts = data as BlogPost[]
   } catch (err) {
     error = err
     console.error('Error loading blog posts:', err)
@@ -32,18 +41,15 @@ export default async function BlogPage() {
       ) : (
         <div className="space-y-6">
           {posts.map((post) => (
-            <a key={post.id} href={`/blog/${post.slug}`}>
+            <Link key={post.id} href={`/blog/${post.slug}`}>
               <Card className="hover:border-blue-500 transition-colors cursor-pointer">
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-white mb-2 hover:text-blue-400 transition-colors">
-                      {post.title}
-                    </h2>
-                    {post.summary && (
-                      <p className="text-gray-400 mb-4 line-clamp-2">
-                        {post.summary}
-                      </p>
-                    )}
+                <div className="flex flex-col md:flex-row gap-5">
+                  {post.images && post.images.length > 0 && (
+                    <img src={post.images[0]} alt="" className="h-28 md:h-32 w-full md:w-48 object-cover rounded-lg border border-gray-700 flex-shrink-0" />
+                  )}
+                  <div className="flex-1">
+                    <h2 className="text-xl font-semibold text-white mb-2 hover:text-blue-400 transition-colors">{post.title}</h2>
+                    {post.summary && <p className="text-gray-400 mb-4 line-clamp-2">{post.summary}</p>}
                     <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
@@ -51,13 +57,22 @@ export default async function BlogPage() {
                       </span>
                       <span className="flex items-center">
                         <Clock className="w-4 h-4 mr-1" />
-                        5 分钟阅读
+                        {Math.max(1, Math.ceil((post.content?.length || 0) / 300))} 分钟阅读
                       </span>
                     </div>
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {post.tags.slice(0, 4).map((tag) => (
+                          <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 text-blue-300 border border-blue-700/40">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
-            </a>
+            </Link>
           ))}
         </div>
       )}

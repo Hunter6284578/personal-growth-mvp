@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { deleteImage } from './upload'
 import type {
   Profile,
   StatScore,
@@ -159,12 +160,26 @@ export async function updateLifeEvent(id: string, event: Partial<LifeEvent>) {
 }
 
 export async function deleteLifeEvent(id: string) {
+  // First get the event to check for images
+  const { data: event } = await supabase
+    .from('life_events')
+    .select('images')
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('life_events')
     .delete()
     .eq('id', id)
   
   if (error) throw error
+
+  // Delete associated images if they exist
+  if (event?.images && event.images.length > 0) {
+    for (const url of event.images) {
+      await deleteImage(url).catch(console.error)
+    }
+  }
 }
 
 // ==================== Fitness Record Services ====================
@@ -405,12 +420,24 @@ export async function updateBlogPost(id: string, post: Partial<BlogPost>) {
 }
 
 export async function deleteBlogPost(id: string) {
+  const { data: post } = await supabase
+    .from('blog_posts')
+    .select('images')
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('blog_posts')
     .delete()
     .eq('id', id)
   
   if (error) throw error
+
+  if (post?.images && post.images.length > 0) {
+    for (const url of post.images) {
+      await deleteImage(url).catch(console.error)
+    }
+  }
 }
 
 // ==================== Thought Services ====================
@@ -450,12 +477,24 @@ export async function updateThought(id: string, thought: Partial<Thought>) {
 }
 
 export async function deleteThought(id: string) {
+  const { data: thought } = await supabase
+    .from('thoughts')
+    .select('images')
+    .eq('id', id)
+    .single()
+
   const { error } = await supabase
     .from('thoughts')
     .delete()
     .eq('id', id)
   
   if (error) throw error
+
+  if (thought?.images && thought.images.length > 0) {
+    for (const url of thought.images) {
+      await deleteImage(url).catch(console.error)
+    }
+  }
 }
 
 // ==================== AI Analysis Services ====================

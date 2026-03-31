@@ -4,21 +4,12 @@ import {
   Activity, 
   Lightbulb,
   Award,
-  User
+  Sparkles
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { ChartsPanel } from '@/components/dashboard/ChartsPanel'
-
-// 六维属性配置
-const statConfig = [
-  { key: 'physical_score', label: '身体素质', color: '#EF4444', shortLabel: '体质' },
-  { key: 'execution_score', label: '执行力', color: '#3B82F6', shortLabel: '执行' },
-  { key: 'focus_score', label: '专注力', color: '#10B981', shortLabel: '专注' },
-  { key: 'emotion_score', label: '情绪稳定', color: '#F59E0B', shortLabel: '情绪' },
-  { key: 'social_score', label: '社交状态', color: '#8B5CF6', shortLabel: '社交' },
-  { key: 'creativity_score', label: '创造力', color: '#EC4899', shortLabel: '创造' },
-]
+import { STAT_CONFIG } from '@/lib/constants'
 
 // 获取真实数据
 async function getDashboardData(userId: string) {
@@ -89,26 +80,35 @@ async function getDashboardData(userId: string) {
     .eq('user_id', userId)
     .order('log_date', { ascending: false })
   
-  // 计算连续记录天数
+  // 计算连续记录天数（使用日期字符串避免时区问题，使用 Set 优化查找）
   let streak = 0
   if (allDailyLogs && allDailyLogs.length > 0) {
     const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    const dates = allDailyLogs.map(log => {
-      const d = new Date(log.log_date)
-      d.setHours(0, 0, 0, 0)
-      return d.getTime()
-    })
-    
-    const todayTime = today.getTime()
-    const yesterdayTime = todayTime - 24 * 60 * 60 * 1000
-    
-    let checkDate = dates.includes(todayTime) ? todayTime : yesterdayTime
-    
-    while (dates.includes(checkDate)) {
+    const todayStr = today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0')
+
+    const dateSet = new Set<string>(
+      allDailyLogs.map(log => String(log.log_date).slice(0, 10))
+    )
+
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = yesterday.getFullYear() + '-' +
+      String(yesterday.getMonth() + 1).padStart(2, '0') + '-' +
+      String(yesterday.getDate()).padStart(2, '0')
+
+    let checkDate = new Date(
+      dateSet.has(todayStr) ? todayStr : yesterdayStr
+    )
+
+    while (dateSet.has(
+      checkDate.getFullYear() + '-' +
+      String(checkDate.getMonth() + 1).padStart(2, '0') + '-' +
+      String(checkDate.getDate()).padStart(2, '0')
+    )) {
       streak++
-      checkDate -= 24 * 60 * 60 * 1000
+      checkDate.setDate(checkDate.getDate() - 1)
     }
   }
   
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
   const data = await getDashboardData(user.id)
   
   // 雷达图数据
-  const radarData = statConfig.map(stat => ({
+  const radarData = STAT_CONFIG.map(stat => ({
     subject: stat.shortLabel,
     A: data.stats[stat.key as keyof typeof data.stats],
     fullMark: 100,
@@ -178,13 +178,19 @@ export default async function DashboardPage() {
     平均: Math.round((item.physical_score + item.execution_score + item.focus_score + 
                      item.emotion_score + item.social_score + item.creativity_score) / 6)
   }))
+  const previousStats = data.recentStats[1]
+  const previousAvgScore = previousStats
+    ? Math.round((previousStats.physical_score + previousStats.execution_score + previousStats.focus_score +
+      previousStats.emotion_score + previousStats.social_score + previousStats.creativity_score) / 6)
+    : data.avgScore
+  const avgDelta = data.avgScore - previousAvgScore
+  const avgDeltaLabel = avgDelta === 0 ? '持平' : `${avgDelta > 0 ? '+' : ''}${avgDelta}`
+  const avgTrendUp = avgDelta >= 0
 
   return (
     <div className="space-y-8">
-      {/* 人物总览卡片 */}
-      <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700">
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* 头像区域 */}
+      <Card className="border-blue-500/20 bg-gradient-to-br from-gray-800 via-gray-900 to-gray-900 shadow-lg shadow-blue-950/20">
+        <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
           <div className="relative">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
               {data.profile?.character_name?.[0] || user.email?.[0] || '?'}
@@ -194,7 +200,6 @@ export default async function DashboardPage() {
             </div>
           </div>
           
-          {/* 信息区域 */}
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
               <h1 className="text-2xl font-bold text-white">
@@ -207,6 +212,15 @@ export default async function DashboardPage() {
             <p className="text-gray-400 mt-1">
               {data.profile?.bio || '开始你的成长之旅'}
             </p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
+              <span className="inline-flex items-center px-3 py-1 text-sm rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300">
+                <Sparkles className="w-3.5 h-3.5 mr-1" />
+                评分趋势 {avgDeltaLabel}
+              </span>
+              <span className="inline-flex items-center px-3 py-1 text-sm rounded-full border border-gray-600 bg-gray-800/80 text-gray-300">
+                连续记录 {data.streak || 0} 天
+              </span>
+            </div>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3 text-sm">
               <span className="text-gray-400">
                 <span className="text-white font-medium">{data.avgScore}</span> 综合评分
@@ -238,7 +252,6 @@ export default async function DashboardPage() {
         </div>
       </Card>
 
-      {/* 统计卡片 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           label="每日记录"
@@ -261,22 +274,19 @@ export default async function DashboardPage() {
           label="综合评分"
           value={data.avgScore}
           icon={<Award className="w-6 h-6 text-purple-400" />}
-          trend={data.avgScore >= 60 ? '良好' : '提升中'}
-          trendUp={data.avgScore >= 60}
+          trend={avgDelta === 0 ? '较上次持平' : `较上次 ${avgDeltaLabel}`}
+          trendUp={avgTrendUp}
         />
       </div>
 
-      {/* 主内容区 - 六维雷达图 + 趋势 */}
       <ChartsPanel radarData={radarData} trendData={trendData} />
 
-      {/* 最近记录 */}
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* 最近每日记录 */}
         <Card title="最近每日记录" subtitle="过去3天">
           <div className="space-y-3">
             {data.recentDailyLogs.length > 0 ? (
               data.recentDailyLogs.map((log) => (
-                <div key={log.id} className="p-4 bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
+                <div key={log.id} className="pg-card-soft p-4 hover:border-gray-500/70 transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-white font-medium">{log.log_date}</span>
                     <span className="text-yellow-400">心情 {log.mood_score}/10</span>
@@ -285,7 +295,7 @@ export default async function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="p-8 bg-gray-900 rounded-lg text-center">
+              <div className="p-8 bg-gray-900/70 rounded-lg text-center border border-dashed border-gray-700">
                 <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Calendar className="w-8 h-8 text-gray-600" />
                 </div>
@@ -298,12 +308,11 @@ export default async function DashboardPage() {
           </div>
         </Card>
 
-        {/* 最近经历事件 */}
         <Card title="最近经历事件" subtitle="过去3条">
           <div className="space-y-3">
             {data.recentEvents.length > 0 ? (
               data.recentEvents.map((event) => (
-                <div key={event.id} className="p-4 bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
+                <div key={event.id} className="pg-card-soft p-4 hover:border-gray-500/70 transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-white font-medium line-clamp-1">{event.title}</span>
                     <span className="text-purple-400 text-sm">影响 {event.impact_level}/10</span>
@@ -321,7 +330,7 @@ export default async function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="p-8 bg-gray-900 rounded-lg text-center">
+              <div className="p-8 bg-gray-900/70 rounded-lg text-center border border-dashed border-gray-700">
                 <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Lightbulb className="w-8 h-8 text-gray-600" />
                 </div>
