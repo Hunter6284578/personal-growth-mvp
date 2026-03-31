@@ -55,8 +55,9 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
+        <div className="absolute inset-0 bg-gray-950/75" />
+        <div className="w-full max-w-md relative z-10">
           <Card>
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -80,8 +81,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
+      <div className="absolute inset-0 bg-gray-950/75" />
+      <div className="w-full max-w-md relative z-10">
         <Link href="/">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="w-4 h-4 mr-1" />

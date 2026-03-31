@@ -34,8 +34,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
+      <div className="absolute inset-0 bg-gray-950/75" />
+      <div className="w-full max-w-md relative z-10">
         <Link href="/">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="w-4 h-4 mr-1" />

@@ -7,14 +7,16 @@ export default function HomePage() {
   return (
     <div className="space-y-16">
       {/* Hero Section */}
-      <section className="text-center py-20">
-        <h1 className="text-5xl font-bold text-white mb-6">
-          记录成长，成为更好的自己
-        </h1>
-        <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-          通过数据追踪个人发展，记录每日进步，分析成长轨迹，
-          让每一次努力都看得见。
-        </p>
+      <section className="relative text-center py-32 rounded-2xl overflow-hidden pg-bg-hero">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/60 via-gray-950/50 to-gray-950" />
+        <div className="relative z-10">
+          <h1 className="text-5xl font-bold text-white mb-6 drop-shadow-lg">
+            记录成长，成为更好的自己
+          </h1>
+          <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto drop-shadow-md">
+            通过数据追踪个人发展，记录每日进步，分析成长轨迹，
+            让每一次努力都看得见。
+          </p>
         <div className="flex justify-center gap-4">
           <Link href="/blog">
             <Button variant="primary" size="lg">
@@ -27,6 +29,7 @@ export default function HomePage() {
               了解更多
             </Button>
           </Link>
+        </div>
         </div>
       </section>
 
