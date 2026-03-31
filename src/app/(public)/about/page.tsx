@@ -46,14 +46,14 @@ export default function AboutPage() {
         <Card title="联系方式">
           <div className="flex flex-wrap gap-4">
             <a
-              href="mailto:your.email@example.com"
+              href="mailto:996717215@qq.com"
               className="flex items-center text-gray-300 hover:text-white transition-colors"
             >
               <Mail className="w-5 h-5 mr-2" />
-              邮箱
+              996717215@qq.com
             </a>
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/Hunter6284578"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center text-gray-300 hover:text-white transition-colors"
