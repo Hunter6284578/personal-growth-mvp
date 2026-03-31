@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import type { Components } from 'react-markdown'
 import { 
   Sparkles, 
   MessageSquare, 
@@ -25,26 +26,26 @@ import { useAuth } from '@/hooks/useAuth'
 import { getLifeEvents, getAIAnalyses } from '@/lib/services'
 import { LifeEvent, AIAnalysis } from '@/types'
 
-const markdownComponents = {
-  h2: ({ children }: { children: React.ReactNode }) => (
+const markdownComponents: Components = {
+  h2: ({ children }) => (
     <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>
   ),
-  h3: ({ children }: { children: React.ReactNode }) => (
+  h3: ({ children }) => (
     <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>
   ),
-  strong: ({ children }: { children: React.ReactNode }) => (
+  strong: ({ children }) => (
     <strong className="text-white">{children}</strong>
   ),
-  ul: ({ children }: { children: React.ReactNode }) => (
+  ul: ({ children }) => (
     <ul className="list-disc ml-4 text-gray-300 space-y-1">{children}</ul>
   ),
-  ol: ({ children }: { children: React.ReactNode }) => (
+  ol: ({ children }) => (
     <ol className="list-decimal ml-4 text-gray-300 space-y-1">{children}</ol>
   ),
-  li: ({ children }: { children: React.ReactNode }) => (
+  li: ({ children }) => (
     <li className="text-gray-300 mb-1">{children}</li>
   ),
-  p: ({ children }: { children: React.ReactNode }) => (
+  p: ({ children }) => (
     <p className="text-gray-300 mb-2 leading-relaxed">{children}</p>
   ),
 }

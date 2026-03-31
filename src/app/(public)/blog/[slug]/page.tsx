@@ -72,7 +72,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
         {post.images && post.images.length > 0 && (
           <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4 pb-8 border-b border-gray-700">
-            {post.images.map((img, idx) => (
+            {post.images.map((img: string, idx: number) => (
               <img key={idx} src={img} alt="" className="w-full rounded-lg border border-gray-700" />
             ))}
           </div>
