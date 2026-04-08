@@ -1,8 +1,11 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
-import { ArrowLeft, Calendar } from 'lucide-react'
-import { createClient } from '@/lib/supabase-server'
-import { sanitizeHTML } from '@/lib/sanitize'
+import { notFound } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { ArrowLeft, CalendarDays, Clock3 } from 'lucide-react'
+import { getPublishedPostBySlug } from '@/lib/blog'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -10,88 +13,114 @@ interface BlogPostPageProps {
   }>
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params
-  let post = null
-  let error = null
+const markdownComponents: Components = {
+  h2: ({ children }) => <h2 className="mt-10 text-2xl font-semibold text-stone-950">{children}</h2>,
+  h3: ({ children }) => <h3 className="mt-8 text-xl font-semibold text-stone-950">{children}</h3>,
+  p: ({ children }) => <p className="mt-4 text-base leading-8 text-stone-700">{children}</p>,
+  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2 pl-5 text-stone-700">{children}</ul>,
+  ol: ({ children }) => <ol className="mt-4 list-decimal space-y-2 pl-5 text-stone-700">{children}</ol>,
+  li: ({ children }) => <li className="leading-8">{children}</li>,
+  a: ({ children, href }) => (
+    <a href={href} className="text-teal-700 underline decoration-teal-200 underline-offset-4">
+      {children}
+    </a>
+  ),
+  code: ({ children }) => (
+    <code className="rounded bg-stone-100 px-1.5 py-0.5 text-sm text-stone-900">{children}</code>
+  ),
+  blockquote: ({ children }) => (
+    <blockquote className="mt-4 border-l-4 border-stone-300 pl-4 text-stone-600">{children}</blockquote>
+  ),
+}
 
-  try {
-    const supabase = await createClient()
-    const { data, error: queryError } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .single()
-    if (queryError) throw queryError
-    post = data
-  } catch (err) {
-    error = err
-    console.error('Error loading blog post:', err)
-  }
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPublishedPostBySlug(slug)
 
   if (!post) {
-    return (
-      <div className="max-w-3xl mx-auto text-center py-20">
-        <h1 className="text-2xl font-bold text-white mb-4">
-          {error ? '加载失败' : '文章未找到'}
-        </h1>
-        <Link href="/blog">
-          <Button variant="primary">返回博客列表</Button>
-        </Link>
-      </div>
-    )
+    return {
+      title: '文章未找到',
+    }
+  }
+
+  return {
+    title: post.title,
+    description: post.summary || post.content.slice(0, 120),
+    openGraph: {
+      title: post.title,
+      description: post.summary || post.content.slice(0, 120),
+      type: 'article',
+      publishedTime: post.created_at,
+      modifiedTime: post.updated_at,
+    },
+  }
+}
+
+export const revalidate = 300
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params
+  const post = await getPublishedPostBySlug(slug)
+
+  if (!post) {
+    notFound()
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Link href="/blog">
-        <Button variant="ghost" size="sm" className="mb-6">
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          返回博客列表
-        </Button>
+    <div className="space-y-6">
+      <Link
+        href="/blog"
+        className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition-colors hover:text-stone-950"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        返回 Notes 列表
       </Link>
 
-      <article className="pg-card p-8">
-        <h1 className="text-3xl font-bold text-white mb-4">{post.title}</h1>
+      <article className="public-section">
+        <div className="max-w-3xl space-y-5">
+          <div className="space-y-3">
+            <p className="eyebrow">Note Detail</p>
+            <h1 className="text-4xl font-semibold tracking-tight text-stone-950">
+              {post.title}
+            </h1>
+            {post.summary ? (
+              <p className="text-lg leading-8 text-stone-600">{post.summary}</p>
+            ) : null}
+          </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-400 mb-8 pb-8 border-b border-gray-700">
-          <span className="flex items-center">
-            <Calendar className="w-4 h-4 mr-1" />
-            {new Date(post.created_at).toLocaleDateString('zh-CN')}
-          </span>
-          <span>
-            更新于 {new Date(post.updated_at).toLocaleDateString('zh-CN')}
-          </span>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-stone-500">
+            <span className="inline-flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />
+              {new Date(post.created_at).toLocaleDateString('zh-CN')}
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Clock3 className="h-4 w-4" />
+              {Math.max(1, Math.ceil((post.content?.length || 0) / 320))} 分钟阅读
+            </span>
+            <span>更新于 {new Date(post.updated_at).toLocaleDateString('zh-CN')}</span>
+          </div>
+
+          {post.tags?.length ? (
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
-        {post.summary && (
-          <div className="mb-6 text-gray-300 leading-relaxed text-base">
-            {post.summary}
+        <div className="mt-10 max-w-3xl">
+          <div>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+              {post.content}
+            </ReactMarkdown>
           </div>
-        )}
-
-        {post.images && post.images.length > 0 && (
-          <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4 pb-8 border-b border-gray-700">
-            {post.images.map((img: string, idx: number) => (
-              <img key={idx} src={img} alt="" className="w-full rounded-lg border border-gray-700" />
-            ))}
-          </div>
-        )}
-
-        {post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-8">
-            {post.tags.map((tag: string) => (
-              <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-blue-900/30 text-blue-300 border border-blue-700/40">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div
-          className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-gray-300 prose-a:text-blue-400 prose-strong:text-white prose-h2:text-xl prose-h2:font-semibold prose-h2:mt-8 prose-h2:mb-4 prose-p:leading-relaxed prose-p:mb-4"
-          dangerouslySetInnerHTML={{ __html: sanitizeHTML(post.content) }}
-        />
+        </div>
       </article>
     </div>
   )

@@ -374,7 +374,7 @@ ${!hasBeforeData || !hasAfterData ? '- 注意：基于有限数据的推测' : '
 
 // Profile 分析 - 30天人物画像
 export function buildProfilePrompt(data: AnalysisData): string {
-  const { stats = [], dailyLogs = [], events = [], fitness = [] } = data;
+  const { stats = [], dailyLogs = [], events = [] } = data;
   
   // 计算统计数据
   const avgMood = dailyLogs.length > 0 && dailyLogs.some(l => l.mood_score)

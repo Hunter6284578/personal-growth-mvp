@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
 import { getExercises } from '@/lib/fit/services'
 import { MUSCLE_GROUPS, CATEGORY_LABELS, EQUIPMENT_LABELS } from '@/types/fit'
 import type { FitExercise } from '@/types/fit'
-import { Search, Dumbbell, Filter } from 'lucide-react'
+import { Search, Dumbbell } from 'lucide-react'
 
 export default function FitExercisesPage() {
   const [exercises, setExercises] = useState<FitExercise[]>([])

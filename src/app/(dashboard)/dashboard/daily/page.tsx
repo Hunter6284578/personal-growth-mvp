@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Calendar, Smile, Trash2, Edit2 } from 'lucide-react'
@@ -24,21 +24,7 @@ export default function DailyLogPage() {
   const [moodScore, setMoodScore] = useState(7)
   const [editingId, setEditingId] = useState<string | null>(null)
 
-  // 加载数据
-  useEffect(() => {
-    if (user) {
-      loadLogs()
-    }
-  }, [user])
-
-  // 当日期改变时，加载该日期的记录
-  useEffect(() => {
-    if (user) {
-      loadLogForDate(selectedDate)
-    }
-  }, [selectedDate, user])
-
-  const loadLogs = async () => {
+  const loadLogs = useCallback(async () => {
     if (!user) return
     try {
       const data = await getDailyLogs(user.id, 30)
@@ -48,9 +34,9 @@ export default function DailyLogPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
-  const loadLogForDate = async (date: string) => {
+  const loadLogForDate = useCallback(async (date: string) => {
     if (!user) return
     try {
       const log = await getDailyLogByDate(user.id, date)
@@ -68,7 +54,21 @@ export default function DailyLogPage() {
     } catch (error) {
       console.error('Error loading log:', error)
     }
-  }
+  }, [user])
+
+  // 加载数据
+  useEffect(() => {
+    if (user) {
+      void loadLogs()
+    }
+  }, [user, loadLogs])
+
+  // 当日期改变时，加载该日期的记录
+  useEffect(() => {
+    if (user) {
+      void loadLogForDate(selectedDate)
+    }
+  }, [selectedDate, user, loadLogForDate])
 
   const resetForm = () => {
     setEditingId(null)

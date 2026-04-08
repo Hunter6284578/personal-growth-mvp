@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card'
 import { Trash2, Tag, Plus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/ui/ImageUpload'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 interface ThoughtsManagerProps {
   initialThoughts: Thought[]
@@ -184,7 +185,14 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
                 {thought.images && thought.images.length > 0 && (
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     {thought.images.map((img, idx) => (
-                      <img key={idx} src={img} alt="" className="w-full aspect-square object-cover rounded-md border border-gray-700" />
+                      <ManagedImage
+                        key={idx}
+                        src={img}
+                        alt={`想法配图 ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 640px) 30vw, 160px"
+                        className="aspect-square rounded-md border border-gray-700"
+                      />
                     ))}
                   </div>
                 )}

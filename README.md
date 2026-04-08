@@ -1,32 +1,35 @@
-# 个人成长网站 MVP
+# Personal Career Site
 
-一个基于 Next.js + TypeScript + Tailwind + Supabase 的个人成长追踪网站。
+一个基于 `Next.js + TypeScript + Tailwind CSS + Supabase` 的个人站点，当前目标是把公开站重构为求职导向的个人品牌页，同时保留私密工作台用于内容沉淀、训练记录与 AI 建议。
 
-## 功能特性
+## 当前定位
 
-### 公开区
-- **首页** - 展示网站介绍和核心概念
-- **博客** - 发布和阅读文章
-- **想法** - 记录短内容
-- **关于** - 个人介绍和六大属性说明
+- 公开站：求职展示、项目介绍、技术博客、Fitness 模块说明
+- 私密工作台：文章管理、记录录入、训练日志、AI 分析
+- 技术原则：先把结构做清楚，再逐步扩展，不为了“高级感”堆复杂度
 
-### 私密区（需登录）
-- **Dashboard** - 总览页面，显示统计数据和快捷操作
-- **属性面板** - 六大属性评分和调整
-- **每日记录** - 记录每日总结、反思和计划
-- **经历事件** - 记录人生重要时刻
-- **体测数据** - 追踪身体健康指标
-- **AI 分析** - 智能分析成长数据
-- **设置** - 个人资料管理
+## 公开页面
+
+- `/`：首页，突出个人定位、技能、代表项目、最近更新和联系方式
+- `/about`：Resume 风格的个人介绍页
+- `/projects`：代表项目页
+- `/blog`：技术记录 / 项目复盘 / 阶段总结
+- `/fitness`：健身模块说明页
+
+## 私密页面
+
+- `/dashboard/*`：内容工作台与成长记录后台
+- `/fit`：训练记录工作台
+- `/fit/plan`：AI Fitness Advisor
 
 ## 技术栈
 
-- **框架**: Next.js 15 (App Router)
-- **语言**: TypeScript
-- **样式**: Tailwind CSS
-- **数据库**: Supabase (PostgreSQL)
-- **认证**: Supabase Auth
-- **图标**: Lucide React
+- `Next.js 16` App Router
+- `React 19`
+- `TypeScript`
+- `Tailwind CSS 4`
+- `Supabase Auth + Database`
+- `Recharts`
 
 ## 快速开始
 
@@ -38,82 +41,83 @@ npm install
 
 ### 2. 配置环境变量
 
-复制 `.env.local.example` 为 `.env.local`，并填写你的 Supabase 配置：
-
-```bash
-cp .env.local.example .env.local
-```
-
-编辑 `.env.local`：
+复制 `.env.local.example` 为 `.env.local` 并填写：
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+
+AI_PROVIDER=deepseek
+AI_API_KEY=...
+AI_BASE_URL=
+AI_MODEL=
 ```
 
-### 3. 创建 Supabase 项目
+说明：
 
-1. 前往 [Supabase](https://supabase.com) 创建新项目
-2. 在 SQL Editor 中执行 `supabase/migrations/001_initial.sql` 中的 SQL 语句
-3. 在 Authentication 中创建用户（用于登录私密区）
+- `NEXT_PUBLIC_SITE_URL` 用于 sitemap、robots 和 metadata
+- `AI_PROVIDER` 当前支持 `openai`、`deepseek`、`gemini`、`openai-compatible`
+- `AI_BASE_URL` 仅在你使用代理或兼容 OpenAI 的网关时需要
 
-### 4. 运行开发服务器
+### 3. 初始化数据库
+
+按顺序执行 `supabase/migrations` 下的 SQL。  
+如果你的线上库来自旧版本，请先核对 `blog_posts`、`thoughts`、`profiles` 等表结构是否与当前代码一致。
+
+### 4. 启动开发环境
 
 ```bash
 npm run dev
 ```
 
-访问 http://localhost:3000
+### 5. 运行校验
 
-## 项目结构
-
-```
-personal-growth-mvp/
-├── src/
-│   ├── app/
-│   │   ├── (public)/           # 公开区页面组
-│   │   │   ├── page.tsx        # 首页
-│   │   │   ├── blog/           # 博客
-│   │   │   ├── thoughts/       # 想法
-│   │   │   └── about/          # 关于
-│   │   ├── (dashboard)/        # 私密区页面组
-│   │   │   └── dashboard/
-│   │   │       ├── page.tsx    # 总览
-│   │   │       ├── stats/      # 属性面板
-│   │   │       ├── daily/      # 每日记录
-│   │   │       ├── events/     # 经历事件
-│   │   │       ├── fitness/    # 体测数据
-│   │   │       ├── analysis/   # AI分析
-│   │   │       └── settings/   # 设置
-│   │   ├── api/
-│   │   │   └── analysis/       # AI分析API
-│   │   ├── login/              # 登录页
-│   │   └── layout.tsx          # 根布局
-│   ├── components/
-│   │   ├── ui/                 # UI组件
-│   │   └── Navigation.tsx      # 导航组件
-│   ├── lib/                    # Supabase配置
-│   ├── hooks/                  # 自定义Hooks
-│   └── types/                  # TypeScript类型
-├── supabase/
-│   └── migrations/             # 数据库迁移
-└── README.md
+```bash
+npm run lint
+npm run build
 ```
 
-## 六大属性
+## 内容配置
 
-1. **身体素质** - 身体健康、体能状况、运动能力
-2. **执行力** - 行动力、任务完成度、拖延程度
-3. **专注力** - 注意力集中、深度工作时间
-4. **情绪稳定性** - 情绪管理、压力应对、心态平和
-5. **社交状态** - 人际关系、社交活动、沟通能力
-6. **创造力** - 创新思维、产出质量、学习速度
+公开站的个人信息、项目卡片、技能分组等内容集中在：
 
-## 下一阶段开发计划
+```txt
+src/content/site.ts
+```
 
-- [ ] 连接真实数据库，实现 CRUD 操作
-- [ ] 添加 Recharts 图表展示
-- [ ] 接入真实 AI API
-- [ ] 博客管理后台
-- [ ] 文件上传功能
-- [ ] 数据导入导出
+如果你要替换成真实求职内容，优先修改这里。
+
+## 重要目录
+
+```txt
+src/
+├─ app/
+│  ├─ (public)/        # 求职导向公开站
+│  ├─ (dashboard)/     # 私密内容工作台
+│  ├─ fit/             # 训练记录工作台
+│  ├─ api/             # AI 分析与健身建议接口
+│  ├─ robots.ts
+│  ├─ sitemap.ts
+│  └─ opengraph-image.tsx
+├─ components/
+│  ├─ site/            # 公开站组件
+│  ├─ dashboard/       # 工作台组件
+│  └─ ui/              # 基础 UI 组件
+├─ content/
+│  └─ site.ts          # 站点内容配置
+├─ lib/
+│  ├─ blog.ts
+│  ├─ ai-service.ts
+│  ├─ supabase-public.ts
+│  └─ fit/advisor.ts
+└─ types/
+```
+
+## 后续建议
+
+- 把 `src/content/site.ts` 替换成真实姓名、教育经历、项目结果和简历链接
+- 逐步整理旧版 dashboard 的 lint warning 和 `<img>` 优化
+- 如果博客文章量增加，可进一步拆为 `Blog` 与 `Notes` 两类内容
+- 如果健身数据需要长期保留，可将 `fitness_advice` 从 `ai_analyses` 中拆成独立历史表

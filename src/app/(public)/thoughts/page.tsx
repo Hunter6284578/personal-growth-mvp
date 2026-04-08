@@ -9,6 +9,7 @@ import type { Thought } from '@/types'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 const quickTemplates = ['今天最大的收获是', '我准备开始做', '一个值得复盘的问题']
 
@@ -160,7 +161,14 @@ export default function ThoughtsPage() {
                   {thought.images && thought.images.length > 0 && (
                     <div className="mt-4 grid grid-cols-3 gap-2">
                       {thought.images.map((img, idx) => (
-                        <img key={idx} src={img} alt="" className="w-full aspect-square object-cover rounded-md border border-gray-700" />
+                        <ManagedImage
+                          key={idx}
+                          src={img}
+                          alt={`想法配图 ${idx + 1}`}
+                          fill
+                          sizes="(max-width: 640px) 30vw, 160px"
+                          className="aspect-square rounded-md border border-gray-700"
+                        />
                       ))}
                     </div>
                   )}

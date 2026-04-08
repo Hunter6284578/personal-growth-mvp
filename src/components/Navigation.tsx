@@ -2,28 +2,30 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
-import { Button } from './ui/Button'
-import { Home, BookOpen, Lightbulb, User, LayoutDashboard, LogOut, Menu, X, FileText, Sparkles, Calendar, Activity } from 'lucide-react'
 import { useState } from 'react'
+import { Menu, X, BriefcaseBusiness, NotebookPen, Dumbbell, FileUser, LayoutDashboard, LogOut, Home } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { Button } from '@/components/ui/Button'
+import { siteConfig } from '@/content/site'
 
 const publicNavItems = [
-  { href: '/', label: '首页', icon: Home },
-  { href: '/blog', label: '博客', icon: BookOpen },
-  { href: '/thoughts', label: '想法', icon: Lightbulb },
-  { href: '/about', label: '关于', icon: User },
+  { href: '/', label: 'Home', icon: Home },
+  { href: '/projects', label: 'Projects', icon: BriefcaseBusiness },
+  { href: '/blog', label: 'Notes', icon: NotebookPen },
+  { href: '/fitness', label: 'Fitness', icon: Dumbbell },
+  { href: '/about', label: 'Resume', icon: FileUser },
 ]
 
 const dashboardNavItems = [
-  { href: '/dashboard', label: '总览', icon: LayoutDashboard },
-  { href: '/dashboard/stats', label: '属性', icon: User },
-  { href: '/dashboard/daily', label: '每日', icon: Calendar },
-  { href: '/dashboard/events', label: '经历', icon: Activity },
-  { href: '/dashboard/fitness', label: '体测', icon: User },
-  { href: '/dashboard/thoughts', label: '想法', icon: Sparkles },
-  { href: '/dashboard/blog', label: '博客', icon: FileText },
-  { href: '/dashboard/analysis', label: 'AI分析', icon: LayoutDashboard },
-  { href: '/dashboard/settings', label: '设置', icon: User },
+  { href: '/dashboard', label: '总览' },
+  { href: '/dashboard/stats', label: '属性评分' },
+  { href: '/dashboard/daily', label: '每日记录' },
+  { href: '/dashboard/events', label: '事件库' },
+  { href: '/dashboard/fitness', label: '健康记录' },
+  { href: '/dashboard/thoughts', label: '短记录' },
+  { href: '/dashboard/blog', label: '文章管理' },
+  { href: '/dashboard/analysis', label: 'AI 分析' },
+  { href: '/dashboard/settings', label: '设置' },
 ]
 
 export function PublicNavigation() {
@@ -31,67 +33,104 @@ export function PublicNavigation() {
   const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  const isActive = (href: string) =>
+    href === '/' ? pathname === href : pathname.startsWith(href)
+
   return (
-    <nav className="bg-gray-900 border-b border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-white">
-              成长记录
-            </Link>
-            <div className="hidden md:ml-10 md:flex md:space-x-8">
-              {publicNavItems.map((item) => {
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors ${
-                      pathname === item.href
-                        ? 'text-blue-400 border-b-2 border-blue-400'
-                        : 'text-gray-300 hover:text-white'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 mr-1" />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
+    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-stone-100/85 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <Link href="/" className="min-w-0">
+          <p className="hidden truncate text-sm font-semibold uppercase tracking-[0.28em] text-teal-700 sm:block">
+            {siteConfig.role}
+          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-lg font-semibold text-stone-950">{siteConfig.name}</p>
+            <span className="rounded-full bg-teal-50 px-2.5 py-1 text-[11px] font-semibold text-teal-700 sm:hidden">
+              {siteConfig.roleShort}
+            </span>
           </div>
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <>
-                <Link href="/dashboard">
-                  <Button variant="ghost" size="sm">
-                    <LayoutDashboard className="w-4 h-4 mr-1" />
-                    后台
-                  </Button>
-                </Link>
-                <Button variant="outline" size="sm" onClick={signOut}>
-                  <LogOut className="w-4 h-4 mr-1" />
-                  退出
-                </Button>
-              </>
-            ) : (
-              <Link href="/login">
-                <Button variant="primary" size="sm">登录</Button>
+        </Link>
+
+        <nav className="hidden items-center gap-2 lg:flex">
+          {publicNavItems.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-stone-950 text-white'
+                    : 'text-stone-600 hover:bg-white hover:text-stone-950'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {item.label}
               </Link>
-            )}
-          </div>
-          <div className="flex items-center md:hidden">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-300 hover:text-white p-2"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
+            )
+          })}
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link
+            href={siteConfig.github}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-medium text-stone-600 transition-colors hover:text-stone-950"
+          >
+            GitHub
+          </Link>
+          {user ? (
+            <>
+              <Link href="/dashboard">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-950"
+                >
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Studio
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-950"
+                onClick={signOut}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                退出
+              </Button>
+            </>
+          ) : (
+            <Link href="/login">
+              <Button variant="primary" size="sm">
+                登录工作台
+              </Button>
+            </Link>
+          )}
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen((open) => !open)}
+          className="inline-flex rounded-full border border-stone-200 bg-white p-2 text-stone-700 lg:hidden"
+          aria-label="切换菜单"
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
       </div>
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-gray-900 border-t border-gray-800">
-          <div className="px-2 pt-2 pb-3 space-y-1">
+
+      {mobileMenuOpen ? (
+        <div className="border-t border-stone-200 bg-stone-100/95 px-4 py-4 lg:hidden">
+          <div className="mb-4 rounded-3xl border border-stone-200 bg-white p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">Profile</p>
+            <p className="mt-2 text-base font-semibold text-stone-950">{siteConfig.role}</p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">{siteConfig.lookingFor}</p>
+          </div>
+
+          <div className="space-y-2">
             {publicNavItems.map((item) => {
               const Icon = item.icon
               return (
@@ -99,48 +138,64 @@ export function PublicNavigation() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${
-                    pathname === item.href
-                      ? 'bg-gray-800 text-white'
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium ${
+                    isActive(item.href)
+                      ? 'bg-stone-950 text-white'
+                      : 'bg-white text-stone-700'
                   }`}
                 >
-                  <Icon className="w-5 h-5 mr-2" />
+                  <Icon className="h-4 w-4" />
                   {item.label}
                 </Link>
               )
             })}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link
+              href={siteConfig.github}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700"
+            >
+              GitHub
+            </Link>
             {user ? (
               <>
-                <Link
-                  href="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
-                >
-                  <LayoutDashboard className="w-5 h-5 mr-2" />
-                  后台
+                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-950"
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Studio
+                  </Button>
                 </Link>
-                <button
-                  onClick={() => { signOut(); setMobileMenuOpen(false); }}
-                  className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-800 hover:text-white"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-950"
+                  onClick={() => {
+                    signOut()
+                    setMobileMenuOpen(false)
+                  }}
                 >
-                  <LogOut className="w-5 h-5 mr-2" />
+                  <LogOut className="mr-2 h-4 w-4" />
                   退出
-                </button>
+                </Button>
               </>
             ) : (
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-blue-400 hover:bg-gray-800"
-              >
-                登录
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="primary" size="sm">
+                  登录工作台
+                </Button>
               </Link>
             )}
           </div>
         </div>
-      )}
-    </nav>
+      ) : null}
+    </header>
   )
 }
 
@@ -151,54 +206,52 @@ export function DashboardNavigation() {
 
   return (
     <>
-      {/* 顶部导航栏 */}
-      <nav className="bg-gray-900 border-b border-gray-800 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden text-gray-300 hover:text-white p-2 mr-2"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              <Link href="/dashboard" className="text-xl font-bold text-white">
-                人物面板
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/">
-                <Button variant="ghost" size="sm">返回前台</Button>
-              </Link>
-              <Button variant="outline" size="sm" onClick={signOut}>
-                <LogOut className="w-4 h-4 mr-1" />
-                退出
-              </Button>
-            </div>
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen((open) => !open)}
+              className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 md:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <Link href="/dashboard" className="text-base font-semibold text-white">
+              Content Studio
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white">
+              返回公开站
+            </Link>
+            <Button variant="outline" size="sm" onClick={signOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              退出
+            </Button>
           </div>
         </div>
       </nav>
 
-      {/* 侧边栏 */}
-      <aside className={`fixed left-0 top-16 bottom-0 w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-200 ease-in-out z-40 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-      }`}>
-        <div className="p-4 space-y-1 overflow-y-auto h-full">
+      <aside
+        className={`fixed inset-y-16 left-0 z-40 w-64 border-r border-slate-800 bg-slate-950/95 px-4 py-6 transition-transform duration-200 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <div className="space-y-1">
           {dashboardNavItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href
+            const active = pathname === item.href
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                className={`block rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
+                  active
+                    ? 'bg-teal-500/20 text-white'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
-                <Icon className="w-5 h-5 mr-3" />
                 {item.label}
               </Link>
             )
@@ -206,13 +259,14 @@ export function DashboardNavigation() {
         </div>
       </aside>
 
-      {/* 遮罩层 */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+      {sidebarOpen ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-slate-950/50 md:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-label="关闭侧边栏"
         />
-      )}
+      ) : null}
     </>
   )
 }

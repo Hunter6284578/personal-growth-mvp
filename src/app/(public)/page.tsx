@@ -1,109 +1,267 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { ArrowRight, BookOpen, Lightbulb, TrendingUp } from 'lucide-react'
+import { ArrowRight, BriefcaseBusiness, NotebookPen, Dumbbell, Mail } from 'lucide-react'
+import { siteConfig, featuredProjects, skillGroups, homeSignals, fitnessCapabilities } from '@/content/site'
+import { getPublishedPosts } from '@/lib/blog'
+import { SectionHeading } from '@/components/site/SectionHeading'
+import { SignalCard } from '@/components/site/SignalCard'
+import { ProjectCard } from '@/components/site/ProjectCard'
+import { SkillGroupCard } from '@/components/site/SkillGroupCard'
 
-export default function HomePage() {
+export const revalidate = 300
+
+export default async function HomePage() {
+  const recentPosts = (await getPublishedPosts()).slice(0, 3)
+
   return (
-    <div className="space-y-16">
-      {/* Hero Section */}
-      <section className="relative text-center py-32 rounded-2xl overflow-hidden pg-bg-hero">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-950/60 via-gray-950/50 to-gray-950" />
-        <div className="relative z-10">
-          <h1 className="text-5xl font-bold text-white mb-6 drop-shadow-lg">
-            记录成长，成为更好的自己
-          </h1>
-          <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto drop-shadow-md">
-            通过数据追踪个人发展，记录每日进步，分析成长轨迹，
-            让每一次努力都看得见。
-          </p>
-        <div className="flex justify-center gap-4">
-          <Link href="/blog">
-            <Button variant="primary" size="lg">
-              阅读博客
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-          <Link href="/about">
-            <Button variant="outline" size="lg">
-              了解更多
-            </Button>
-          </Link>
-        </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="grid md:grid-cols-3 gap-8">
-        <Card title="博客文章" subtitle="分享学习与思考">
-          <BookOpen className="w-12 h-12 text-blue-400 mb-4" />
-          <p className="text-gray-400">
-            记录技术学习、读书笔记和生活感悟，沉淀知识体系。
-          </p>
-        </Card>
-        <Card title="灵感想法" subtitle="捕捉瞬间的火花">
-          <Lightbulb className="w-12 h-12 text-yellow-400 mb-4" />
-          <p className="text-gray-400">
-            随时记录闪现的想法和灵感，不让任何创意溜走。
-          </p>
-        </Card>
-        <Card title="成长追踪" subtitle="数据驱动进步">
-          <TrendingUp className="w-12 h-12 text-green-400 mb-4" />
-          <p className="text-gray-400">
-            通过六大属性维度，量化个人成长，可视化进步轨迹。
-          </p>
-        </Card>
-      </section>
-
-      {/* Stats Preview Section */}
-      <section className="bg-gray-900 rounded-2xl p-8 md:p-12">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl font-bold text-white mb-4">
-              游戏化的人物面板
-            </h2>
-            <p className="text-gray-400 mb-6">
-              将个人成长游戏化，通过六大属性维度全面评估自己：
-              身体素质、执行力、专注力、情绪稳定性、社交状态、创造力。
-            </p>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
-                每日记录，追踪习惯养成
-              </li>
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-3"></span>
-                体测数据，关注身体健康
-              </li>
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-purple-400 rounded-full mr-3"></span>
-                AI 分析，获取成长建议
-              </li>
-            </ul>
-          </div>
-          <div className="bg-gray-800 rounded-xl p-6">
+    <div className="space-y-8 lg:space-y-10">
+      <section className="public-section overflow-hidden">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
+          <div className="space-y-6 sm:space-y-8">
             <div className="space-y-4">
-              {[
-                { label: '身体素质', value: 75, color: 'bg-red-500' },
-                { label: '执行力', value: 82, color: 'bg-blue-500' },
-                { label: '专注力', value: 68, color: 'bg-green-500' },
-                { label: '情绪稳定', value: 85, color: 'bg-yellow-500' },
-                { label: '社交状态', value: 70, color: 'bg-purple-500' },
-                { label: '创造力', value: 78, color: 'bg-pink-500' },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-300">{stat.label}</span>
-                    <span className="text-white">{stat.value}</span>
-                  </div>
-                  <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${stat.color} rounded-full transition-all`}
-                      style={{ width: `${stat.value}%` }}
-                    ></div>
-                  </div>
+              <p className="eyebrow">Job-Oriented Personal Site</p>
+              <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-stone-950 sm:text-5xl lg:text-6xl">
+                用项目、记录和持续迭代证明我能把事情做成。
+              </h1>
+              <p className="max-w-3xl text-base leading-7 text-stone-600 sm:text-lg sm:leading-8">
+                {siteConfig.heroIntro}
+              </p>
+              <p className="max-w-3xl text-sm leading-7 text-stone-600 sm:text-base">
+                当前目标是把这个站点打造成简历的补充入口：别人能快速知道我是谁、我做过什么、我在持续沉淀什么，以及我为什么值得进一步沟通。
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5">
+              {siteConfig.heroFocus.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 sm:text-sm"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {siteConfig.targetRoles.map((item) => (
+                <div key={item} className="rounded-[1.5rem] border border-stone-200 bg-stone-50/70 px-4 py-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">求职方向</p>
+                  <p className="mt-2 text-sm font-semibold text-stone-950">{item}</p>
                 </div>
               ))}
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-white transition-transform hover:-translate-y-0.5"
+              >
+                看代表项目
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/about"
+                className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 transition-colors hover:border-stone-950 hover:text-stone-950"
+              >
+                查看 Resume
+              </Link>
+              <Link
+                href={`mailto:${siteConfig.email}`}
+                className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 transition-colors hover:border-stone-950 hover:text-stone-950"
+              >
+                <Mail className="h-4 w-4" />
+                联系我
+              </Link>
+            </div>
+          </div>
+
+          <div className="surface-panel p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
+              当前状态
+            </p>
+            <div className="mt-5 space-y-4">
+              <div>
+                <p className="text-lg font-semibold text-stone-950">{siteConfig.role}</p>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{siteConfig.lookingFor}</p>
+              </div>
+              <div className="space-y-3 rounded-3xl bg-stone-100/90 p-5">
+                {siteConfig.now.map((item) => (
+                  <p key={item} className="text-sm leading-6 text-stone-700">
+                    • {item}
+                  </p>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2 text-sm text-stone-600">
+                <span className="rounded-full bg-teal-50 px-3 py-1 text-teal-700">{siteConfig.location}</span>
+                <span className="rounded-full bg-stone-100 px-3 py-1">可持续维护</span>
+                <span className="rounded-full bg-stone-100 px-3 py-1">内容沉淀</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {homeSignals.map((signal) => (
+          <SignalCard key={signal.label} label={signal.label} value={signal.value} />
+        ))}
+      </section>
+
+      <section className="public-section space-y-8">
+        <SectionHeading
+          eyebrow="Featured Work"
+          title="先用项目说话，再谈能力。"
+          description="优先展示项目背景、我负责什么、最后交付了什么。这样招聘方能先看到结果，再回头判断技术深度。"
+        />
+        <div className="grid gap-6">
+          {featuredProjects.slice(0, 2).map((project) => (
+            <ProjectCard key={project.slug} project={project} compact />
+          ))}
+        </div>
+        <Link
+          href="/projects"
+          className="inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition-colors hover:text-teal-600"
+        >
+          查看完整项目页
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="public-section space-y-8">
+          <SectionHeading
+            eyebrow="Core Skills"
+            title="技术栈之外，也关注工程边界和表达效率。"
+            description="这个站点会长期承载求职展示、博客、健身记录和 AI 接入，所以我优先考虑模块职责清晰和后续扩展成本。"
+          />
+          <div className="grid gap-4 md:grid-cols-2">
+            {skillGroups.map((group) => (
+              <SkillGroupCard key={group.title} title={group.title} items={group.items} />
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <section className="public-section space-y-6">
+            <SectionHeading
+              eyebrow="Recent Notes"
+              title="最近在沉淀什么"
+              description="博客和记录不是装饰，而是用来展示学习路径、项目复盘和思考质量。"
+            />
+            {recentPosts.length > 0 ? (
+              <div className="space-y-4">
+                {recentPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="block rounded-3xl border border-stone-200 bg-white p-5 transition-transform hover:-translate-y-0.5"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <h3 className="text-lg font-semibold text-stone-950">{post.title}</h3>
+                      <span className="metric-font text-xs text-stone-500">
+                        {new Date(post.created_at).toLocaleDateString('zh-CN')}
+                      </span>
+                    </div>
+                    {post.summary ? (
+                      <p className="mt-3 text-sm leading-6 text-stone-600">{post.summary}</p>
+                    ) : null}
+                    {post.tags?.length ? (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {post.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={`${post.id}-${tag}`}
+                            className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-3xl border border-dashed border-stone-300 bg-white px-5 py-8 text-sm text-stone-500">
+                文章内容还在补充，但结构已经按“技术学习 / 项目复盘 / 阶段总结”准备好，后续会逐步把记录密度拉起来。
+              </div>
+            )}
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition-colors hover:text-teal-600"
+            >
+              <NotebookPen className="h-4 w-4" />
+              浏览全部 Notes
+            </Link>
+          </section>
+
+          <section className="public-section space-y-6">
+            <SectionHeading
+              eyebrow="Fitness Module"
+              title="健身模块的意义不是炫耀，而是展示自律和数据意识。"
+              description="它在整站中是辅助线：不喧宾夺主，但能体现长期记录习惯、目标管理和 AI 接入能力。"
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              {fitnessCapabilities.map((item) => (
+                <div key={item.title} className="rounded-3xl border border-stone-200 bg-white p-5">
+                  <p className="text-base font-semibold text-stone-950">{item.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-stone-600">{item.description}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/fitness"
+                className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 transition-colors hover:border-stone-950 hover:text-stone-950"
+              >
+                <Dumbbell className="h-4 w-4" />
+                查看 Fitness 页面
+              </Link>
+              <Link
+                href="/fit"
+                className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 transition-colors hover:border-stone-950 hover:text-stone-950"
+              >
+                进入私密记录工作台
+              </Link>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section className="public-section">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          <div className="space-y-4">
+            <p className="eyebrow">Contact</p>
+            <h2 className="text-3xl font-semibold text-stone-950">
+              如果你在看的是简历补充页，这里就是下一步入口。
+            </h2>
+            <p className="max-w-2xl text-base leading-7 text-stone-600">
+              目前这个站点更像一个持续迭代中的产品样本，而不是一次性包装页。它会继续累积项目、文章、训练数据和 AI 模块。
+            </p>
+          </div>
+          <div className="surface-panel p-6">
+            <div className="space-y-3 text-sm text-stone-600">
+              <p>
+                <span className="font-semibold text-stone-950">Email：</span>
+                {siteConfig.email}
+              </p>
+              <p>
+                <span className="font-semibold text-stone-950">GitHub：</span>
+                {siteConfig.github}
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href={`mailto:${siteConfig.email}`}
+                className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-white"
+              >
+                邮件联系
+              </Link>
+              <Link
+                href="/projects"
+                className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700"
+              >
+                <BriefcaseBusiness className="h-4 w-4" />
+                项目总览
+              </Link>
             </div>
           </div>
         </div>

@@ -1,67 +1,124 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f3efe8;
   --foreground: #171717;
-  --pg-bg: #030712;
-  --pg-card: #111827;
-  --pg-card-soft: #1f2937;
-  --pg-border: #374151;
-  --pg-border-strong: #4b5563;
-  --pg-text-muted: #9ca3af;
-  --pg-ring: #3b82f6;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-strong: #ffffff;
+  --muted: #57534e;
+  --border: rgba(41, 37, 36, 0.12);
+  --border-strong: rgba(41, 37, 36, 0.22);
+  --accent: #0f766e;
+  --accent-soft: rgba(15, 118, 110, 0.12);
+  --page-gradient:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 32%),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 28%),
+    linear-gradient(180deg, #f8f5ef 0%, #f2ede4 100%);
+  --pg-bg: #020617;
+  --pg-card: rgba(10, 23, 39, 0.88);
+  --pg-card-soft: rgba(16, 23, 42, 0.72);
+  --pg-border: rgba(148, 163, 184, 0.22);
+  --pg-border-strong: rgba(148, 163, 184, 0.34);
+  --pg-text-muted: #94a3b8;
+  --pg-ring: #14b8a6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --pg-bg: #030712;
-    --pg-card: #111827;
-    --pg-card-soft: #1f2937;
-    --pg-border: #374151;
-    --pg-border-strong: #4b5563;
-    --pg-text-muted: #9ca3af;
-    --pg-ring: #3b82f6;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  background: var(--page-gradient);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+code,
+pre,
+.metric-font {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+::selection {
+  background: rgba(15, 118, 110, 0.18);
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.03em;
+  }
 }
 
 @layer components {
+  .public-shell {
+    @apply min-h-screen;
+    background: var(--page-gradient);
+  }
+
+  .public-section {
+    @apply rounded-[2rem] border px-6 py-8 sm:px-8 sm:py-10;
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: 0 22px 70px -42px rgba(24, 24, 27, 0.35);
+    backdrop-filter: blur(18px);
+  }
+
+  .surface-panel {
+    @apply rounded-3xl border;
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: 0 22px 70px -42px rgba(24, 24, 27, 0.28);
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.28em];
+    color: var(--accent);
+  }
+
   .pg-card {
-    @apply bg-gray-800 border rounded-xl;
+    @apply rounded-3xl border p-6 text-white;
+    background: var(--pg-card);
     border-color: var(--pg-border);
+    box-shadow: 0 24px 80px -48px rgba(2, 6, 23, 0.8);
+    backdrop-filter: blur(18px);
   }
 
   .pg-card-soft {
-    @apply rounded-lg border;
-    background-color: rgba(17, 24, 39, 0.72);
-    border-color: rgba(75, 85, 99, 0.45);
+    @apply rounded-2xl border;
+    background: var(--pg-card-soft);
+    border-color: var(--pg-border-strong);
   }
 
   .pg-input {
-    @apply w-full px-3 py-2 rounded-lg text-white placeholder-gray-500 transition-colors focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed;
-    background-color: rgba(31, 41, 55, 0.65);
-    border: 1px solid var(--pg-border);
+    @apply w-full rounded-2xl border px-4 py-3 text-white transition-colors focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50;
+    background: rgba(15, 23, 42, 0.72);
+    border-color: var(--pg-border);
     --tw-ring-color: var(--pg-ring);
   }
 
-  .pg-bg-hero {
-    background-image: url('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1920&q=80');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+  .pg-page {
+    @apply min-h-screen;
+    background:
+      radial-gradient(circle at top left, rgba(20, 184, 166, 0.08), transparent 28%),
+      linear-gradient(180deg, #020617 0%, #0f172a 100%);
   }
 }

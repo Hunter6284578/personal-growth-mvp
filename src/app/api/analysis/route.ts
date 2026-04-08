@@ -157,7 +157,7 @@ async function saveAnalysis(
 
 // 检查数据充足度
 function checkDataSufficiency(type: string, data: AnalysisData): { sufficient: boolean; message?: string } {
-  const { stats = [], dailyLogs = [], events = [] } = data
+  const { stats = [], dailyLogs = [] } = data
   
   switch (type) {
     case 'weekly':

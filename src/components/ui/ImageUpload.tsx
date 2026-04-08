@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { ImagePlus, X, Loader2 } from 'lucide-react'
 import { uploadImage } from '@/lib/upload'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 interface ImageUploadProps {
   images: string[]
@@ -63,7 +64,14 @@ export function ImageUpload({ images, onChange, maxImages = 4 }: ImageUploadProp
       <div className="flex flex-wrap gap-4">
         {images.map((url, index) => (
           <div key={index} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-700 group">
-            <img src={url} alt={`上传的图片 ${index + 1}`} className="w-full h-full object-cover" />
+            <ManagedImage
+              src={url}
+              alt={`上传的图片 ${index + 1}`}
+              width={96}
+              height={96}
+              sizes="96px"
+              className="h-full w-full"
+            />
             <button
               type="button"
               onClick={() => handleRemoveImage(index)}

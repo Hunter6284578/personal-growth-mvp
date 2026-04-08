@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/Button'
 const fitNavItems = [
   { href: '/fit', label: '总览', icon: BarChart3 },
   { href: '/fit/logs', label: '记录训练', icon: ClipboardList },
-  { href: '/fit/plan', label: 'AI 计划', icon: Sparkles },
+  { href: '/fit/plan', label: 'AI 建议', icon: Sparkles },
   { href: '/fit/exercises', label: '动作库', icon: Dumbbell },
 ]
 

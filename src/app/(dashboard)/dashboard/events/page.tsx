@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Plus, Star, Trash2, Edit2, X } from 'lucide-react'
@@ -8,6 +8,7 @@ import { getLifeEvents, createLifeEvent, updateLifeEvent, deleteLifeEvent } from
 import { useAuth } from '@/hooks/useAuth'
 import type { LifeEvent } from '@/types'
 import { ImageUpload } from '@/components/ui/ImageUpload'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 const statOptions = [
   { value: 'physical_score', label: '身体素质' },
@@ -36,14 +37,7 @@ export default function EventsPage() {
   const [tagList, setTagList] = useState<string[]>([])
   const [images, setImages] = useState<string[]>([])
 
-  // 加载数据
-  useEffect(() => {
-    if (user) {
-      loadEvents()
-    }
-  }, [user])
-
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     if (!user) return
     try {
       const data = await getLifeEvents(user.id, 50)
@@ -53,7 +47,14 @@ export default function EventsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  // 加载数据
+  useEffect(() => {
+    if (user) {
+      void loadEvents()
+    }
+  }, [user, loadEvents])
 
   const resetForm = () => {
     setEditingId(null)
@@ -312,10 +313,13 @@ export default function EventsPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1 flex gap-4">
                     {event.images && event.images.length > 0 && (
-                      <img
+                      <ManagedImage
                         src={event.images[0]}
-                        alt=""
-                        className="h-20 w-20 object-cover rounded-lg border border-gray-700 flex-shrink-0"
+                        alt={`${event.title} 配图`}
+                        width={80}
+                        height={80}
+                        sizes="80px"
+                        className="h-20 w-20 rounded-lg border border-gray-700 flex-shrink-0"
                       />
                     )}
                     <div className="flex-1">
@@ -363,7 +367,15 @@ export default function EventsPage() {
                     {event.images && event.images.length > 1 && (
                       <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
                         {event.images.slice(1).map((img, idx) => (
-                          <img key={idx} src={img} alt="" className="h-14 w-14 object-cover rounded border border-gray-700" />
+                          <ManagedImage
+                            key={idx}
+                            src={img}
+                            alt={`${event.title} 配图 ${idx + 2}`}
+                            width={56}
+                            height={56}
+                            sizes="56px"
+                            className="h-14 w-14 rounded border border-gray-700 flex-shrink-0"
+                          />
                         ))}
                       </div>
                     )}

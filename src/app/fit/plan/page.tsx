@@ -1,32 +1,52 @@
 'use client'
 
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { BrainCircuit, Loader2, ShieldAlert, Sparkles } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Sparkles, Loader2, CheckCircle, Dumbbell } from 'lucide-react'
-import type { AIPlan } from '@/types/fit'
+import { Textarea } from '@/components/ui/Textarea'
 
-export default function FitPlanPage() {
-  const [plan, setPlan] = useState<AIPlan | null>(null)
-  const [loading, setLoading] = useState(false)
+type FitnessGoal = 'muscle_gain' | 'fat_loss' | 'maintenance' | 'strength'
+
+const goalOptions: Array<{ value: FitnessGoal; label: string; description: string }> = [
+  { value: 'muscle_gain', label: '增肌', description: '优先考虑训练容量、恢复和渐进超负荷。' },
+  { value: 'fat_loss', label: '减脂', description: '兼顾力量保留、训练频率和恢复压力。' },
+  { value: 'maintenance', label: '维持', description: '优先稳定训练节奏，避免无效疲劳。' },
+  { value: 'strength', label: '提高力量', description: '更关注动作表现、组次安排和负重建议。' },
+]
+
+export default function FitAdvisorPage() {
+  const [goal, setGoal] = useState<FitnessGoal>('muscle_gain')
+  const [note, setNote] = useState('')
+  const [advice, setAdvice] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const generatePlan = async () => {
+  const generateAdvice = async () => {
     setLoading(true)
     setError('')
 
     try {
-      const response = await fetch('/api/fit/plan', { method: 'POST' })
+      const response = await fetch('/api/fit/plan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ goal, note }),
+      })
+
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || '生成计划失败')
+        setError(data.error || '生成建议失败')
         return
       }
 
-      setPlan(data.plan)
-    } catch (err) {
-      setError('网络请求失败，请重试')
+      setAdvice(data.advice || '')
+    } catch {
+      setError('网络请求失败，请稍后重试')
     } finally {
       setLoading(false)
     }
@@ -34,83 +54,86 @@ export default function FitPlanPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">AI 训练计划</h1>
-          <p className="text-gray-400 text-sm mt-1">基于近期数据智能生成今日训练计划</p>
+          <h1 className="text-2xl font-bold text-white">AI Fitness Advisor</h1>
+          <p className="mt-1 text-sm text-slate-400">
+            基于最近训练、体重和备注生成训练建议，定位是辅助复盘，不替代教练或医疗意见。
+          </p>
         </div>
-        <Button onClick={generatePlan} loading={loading} disabled={loading}>
-          <Sparkles className="w-4 h-4 mr-2" />
-          {loading ? '生成中...' : '生成计划'}
+        <Button onClick={generateAdvice} loading={loading} disabled={loading}>
+          <Sparkles className="mr-2 h-4 w-4" />
+          {loading ? '分析中...' : '生成建议'}
         </Button>
       </div>
 
-      {error && (
-        <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg">
-          <p className="text-sm text-red-400">{error}</p>
-        </div>
-      )}
-
-      {loading && (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-          <p className="text-gray-400">AI 正在分析你的训练数据...</p>
-        </div>
-      )}
-
-      {plan && !loading && (
-        <div className="space-y-4">
-          <Card>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-lg font-semibold text-white">{plan.focus_area}</h2>
-                <p className="text-sm text-gray-400">{plan.plan_date}</p>
+      <Card>
+        <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium text-slate-200">当前目标</p>
+              <div className="mt-3 grid gap-3">
+                {goalOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setGoal(option.value)}
+                    className={`rounded-2xl border p-4 text-left transition-colors ${
+                      goal === option.value
+                        ? 'border-teal-400 bg-teal-500/10'
+                        : 'border-slate-700 bg-slate-900/60 hover:border-slate-500'
+                    }`}
+                  >
+                    <p className="text-sm font-semibold text-white">{option.label}</p>
+                    <p className="mt-2 text-xs leading-6 text-slate-400">{option.description}</p>
+                  </button>
+                ))}
               </div>
-              <CheckCircle className="w-6 h-6 text-green-400" />
             </div>
-          </Card>
 
-          {plan.exercises.map((exercise, index) => (
-            <Card key={index}>
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-sm font-bold">{index + 1}</span>
+            <div>
+              <p className="text-sm font-medium text-slate-200">补充说明</p>
+              <Textarea
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                rows={6}
+                placeholder="例如：最近睡眠一般、肩推卡住了、下周训练时间变少等。"
+                className="mt-3"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-slate-700 bg-slate-900/70 p-5">
+            {error ? (
+              <div className="rounded-2xl border border-red-800 bg-red-900/20 p-4 text-sm text-red-300">
+                {error}
+              </div>
+            ) : null}
+
+            {loading ? (
+              <div className="flex min-h-[320px] flex-col items-center justify-center text-slate-400">
+                <Loader2 className="mb-4 h-10 w-10 animate-spin text-teal-400" />
+                AI 正在整理你最近的训练摘要和建议。
+              </div>
+            ) : advice ? (
+              <div className="space-y-5">
+                <div className="flex items-center gap-3 rounded-2xl border border-amber-700/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                  <ShieldAlert className="h-4 w-4 text-amber-300" />
+                  仅供参考，不替代专业教练或医疗建议。
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-white font-medium flex items-center">
-                    <Dumbbell className="w-4 h-4 mr-2 text-blue-400" />
-                    {exercise.name}
-                  </h3>
-                  <div className="flex flex-wrap gap-3 mt-2 text-sm">
-                    <span className="px-2 py-0.5 bg-gray-700 text-gray-300 rounded">
-                      {exercise.target_sets} 组
-                    </span>
-                    <span className="px-2 py-0.5 bg-gray-700 text-gray-300 rounded">
-                      {exercise.rep_range} 次
-                    </span>
-                    <span className="px-2 py-0.5 bg-blue-900/50 text-blue-300 rounded">
-                      {exercise.intensity_guideline}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-400 mt-2 italic">
-                    {exercise.rationale}
-                  </p>
+                <div className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{advice}</ReactMarkdown>
                 </div>
               </div>
-            </Card>
-          ))}
+            ) : (
+              <div className="flex min-h-[320px] flex-col items-center justify-center text-center text-slate-400">
+                <BrainCircuit className="mb-4 h-12 w-12 text-slate-600" />
+                <p className="text-sm">点击“生成建议”后，系统会读取最近训练与健康记录给出摘要。</p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
-
-      {!plan && !loading && !error && (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Sparkles className="w-12 h-12 text-gray-600 mb-4" />
-          <p className="text-gray-500">点击"生成计划"获取今日 AI 训练推荐</p>
-          <p className="text-gray-600 text-sm mt-2">
-            AI 会分析你过去 14 天的肩部训练数据
-          </p>
-        </div>
-      )}
+      </Card>
     </div>
   )
 }

@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card'
 import { Trash2, Edit2, Plus, Loader2, FileText } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/ui/ImageUpload'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 interface BlogManagerProps {
   initialPosts: BlogPost[]
@@ -261,7 +262,14 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
                   className="pg-card p-5 hover:border-gray-600 transition-colors flex flex-col md:flex-row gap-5 justify-between items-start"
                 >
                   {post.images && post.images.length > 0 && (
-                    <img src={post.images[0]} alt="" className="h-20 w-28 rounded-lg border border-gray-700 object-cover flex-shrink-0" />
+                    <ManagedImage
+                      src={post.images[0]}
+                      alt={`${post.title} 配图`}
+                      width={112}
+                      height={80}
+                      sizes="112px"
+                      className="h-20 w-28 rounded-lg border border-gray-700 flex-shrink-0"
+                    />
                   )}
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-3">
@@ -298,7 +306,15 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
                     {post.images && post.images.length > 1 && (
                       <div className="flex gap-2 pt-3 overflow-x-auto">
                         {post.images.slice(1).map((img, idx) => (
-                          <img key={idx} src={img} alt="" className="h-14 w-14 object-cover rounded border border-gray-700" />
+                          <ManagedImage
+                            key={idx}
+                            src={img}
+                            alt={`${post.title} 配图 ${idx + 2}`}
+                            width={56}
+                            height={56}
+                            sizes="56px"
+                            className="h-14 w-14 rounded border border-gray-700 flex-shrink-0"
+                          />
                         ))}
                       </div>
                     )}

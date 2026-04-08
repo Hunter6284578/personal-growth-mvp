@@ -1,0 +1,25 @@
+import type { MetadataRoute } from 'next'
+import { getPublishedPosts } from '@/lib/blog'
+import { getSiteUrl } from '@/lib/site-url'
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const siteUrl = getSiteUrl()
+  const posts = await getPublishedPosts()
+  const now = new Date()
+
+  const staticRoutes = ['', '/about', '/projects', '/blog', '/fitness'].map((path) => ({
+    url: `${siteUrl}${path}`,
+    lastModified: now,
+    changeFrequency: (path === '' ? 'weekly' : 'monthly') as 'weekly' | 'monthly',
+    priority: path === '' ? 1 : 0.7,
+  }))
+
+  const blogRoutes = posts.map((post) => ({
+    url: `${siteUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.updated_at || post.created_at),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticRoutes, ...blogRoutes]
+}

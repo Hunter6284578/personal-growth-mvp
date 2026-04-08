@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Plus, Activity, Trash2, Edit2, X, Moon, Heart, Dumbbell } from 'lucide-react'
@@ -70,14 +70,7 @@ export default function FitnessPage() {
   const [saving, setSaving] = useState(false)
   const [showForm, setShowForm] = useState(false)
 
-  // ================= 数据加载 =================
-  useEffect(() => {
-    if (user) {
-      loadAllRecords()
-    }
-  }, [user])
-
-  const loadAllRecords = async () => {
+  const loadAllRecords = useCallback(async () => {
     if (!user) return
     setLoading(true)
     try {
@@ -94,7 +87,14 @@ export default function FitnessPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  // ================= 数据加载 =================
+  useEffect(() => {
+    if (user) {
+      void loadAllRecords()
+    }
+  }, [user, loadAllRecords])
 
   const resetForm = () => {
     if (activeTab === 'daily') {
@@ -242,7 +242,7 @@ export default function FitnessPage() {
     try {
       await deleteDailyHealth(id)
       await loadAllRecords()
-    } catch (error) {
+    } catch {
       alert('删除失败')
     }
   }
@@ -252,7 +252,7 @@ export default function FitnessPage() {
     try {
       await deleteFitnessTest(id)
       await loadAllRecords()
-    } catch (error) {
+    } catch {
       alert('删除失败')
     }
   }
@@ -262,7 +262,7 @@ export default function FitnessPage() {
     try {
       await deleteBodyMetrics(id)
       await loadAllRecords()
-    } catch (error) {
+    } catch {
       alert('删除失败')
     }
   }

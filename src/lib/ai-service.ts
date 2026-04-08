@@ -1,5 +1,3 @@
-// AI 服务封装 - 支持多种模型提供商
-
 export interface AIMessage {
   role: 'system' | 'user' | 'assistant'
   content: string
@@ -21,14 +19,36 @@ export interface AIResponse {
   error?: string
 }
 
-// 支持的 AI 提供商
-export type AIProvider = 'openai' | 'deepseek' | 'zhipu' | 'siliconflow'
+export type AIProvider = 'openai' | 'deepseek' | 'gemini' | 'openai-compatible'
 
-// 获取环境变量中的配置
-const getAIConfig = () => {
+interface ProviderDefaults {
+  url: string
+  model: string
+}
+
+const providerDefaults: Record<AIProvider, ProviderDefaults> = {
+  openai: {
+    url: 'https://api.openai.com/v1/chat/completions',
+    model: 'gpt-4o-mini',
+  },
+  deepseek: {
+    url: 'https://api.deepseek.com/v1/chat/completions',
+    model: 'deepseek-chat',
+  },
+  gemini: {
+    url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+    model: 'gemini-2.5-flash',
+  },
+  'openai-compatible': {
+    url: 'https://api.openai.com/v1/chat/completions',
+    model: 'gpt-4o-mini',
+  },
+}
+
+function getAIConfig() {
   const provider = (process.env.AI_PROVIDER as AIProvider) || 'deepseek'
   const apiKey = process.env.AI_API_KEY
-  const apiUrl = process.env.AI_API_URL
+  const apiUrl = process.env.AI_BASE_URL || process.env.AI_API_URL
   const model = process.env.AI_MODEL
 
   if (!apiKey) {
@@ -38,151 +58,122 @@ const getAIConfig = () => {
   return { provider, apiKey, apiUrl, model }
 }
 
-// 获取默认模型和 API URL
-const getProviderDefaults = (provider: AIProvider): { url: string; model: string } => {
-  switch (provider) {
-    case 'openai':
-      return {
-        url: 'https://api.openai.com/v1/chat/completions',
-        model: 'gpt-4o-mini'
+function normalizeUsage(data: Record<string, unknown>) {
+  const usage = data.usage as
+    | {
+        prompt_tokens?: number
+        completion_tokens?: number
+        total_tokens?: number
       }
-    case 'deepseek':
-      return {
-        url: 'https://api.deepseek.com/v1/chat/completions',
-        model: 'deepseek-chat'
-      }
-    case 'zhipu':
-      return {
-        url: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-        model: 'glm-4-flash'
-      }
-    case 'siliconflow':
-      return {
-        url: 'https://api.siliconflow.cn/v1/chat/completions',
-        model: 'deepseek-ai/DeepSeek-V2.5'
-      }
-    default:
-      return {
-        url: 'https://api.deepseek.com/v1/chat/completions',
-        model: 'deepseek-chat'
-      }
+    | undefined
+
+  if (!usage) {
+    return undefined
+  }
+
+  return {
+    promptTokens: usage.prompt_tokens ?? 0,
+    completionTokens: usage.completion_tokens ?? 0,
+    totalTokens: usage.total_tokens ?? 0,
   }
 }
 
-// 主调用函数
+async function requestAI(request: AIRequest, stream: boolean) {
+  const config = getAIConfig()
+  const defaults = providerDefaults[config.provider]
+  const url = config.apiUrl || defaults.url
+  const model = config.model || defaults.model
+
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: request.messages,
+      temperature: request.temperature ?? 0.4,
+      max_tokens: request.maxTokens ?? 1800,
+      stream,
+    }),
+  })
+}
+
 export async function callAI(request: AIRequest): Promise<AIResponse> {
   try {
-    const config = getAIConfig()
-    const defaults = getProviderDefaults(config.provider)
-    
-    const url = config.apiUrl || defaults.url
-    const model = config.model || defaults.model
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.apiKey}`
-      },
-      body: JSON.stringify({
-        model,
-        messages: request.messages,
-        temperature: request.temperature ?? 0.7,
-        max_tokens: request.maxTokens ?? 2000,
-        stream: false
-      })
-    })
+    const response = await requestAI(request, false)
 
     if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`AI API 错误: ${error}`)
+      const errorText = await response.text()
+      throw new Error(`AI API 错误: ${errorText}`)
     }
 
-    const data = await response.json()
+    const data = (await response.json()) as Record<string, unknown>
+    const choice = (data.choices as Array<{ message?: { content?: string } }> | undefined)?.[0]
+    const output = choice?.message?.content
 
-    // 统一不同提供商的响应格式
     return {
-      content: data.choices?.[0]?.message?.content || data.output?.text || '',
-      usage: data.usage ? {
-        promptTokens: data.usage.prompt_tokens,
-        completionTokens: data.usage.completion_tokens,
-        totalTokens: data.usage.total_tokens
-      } : undefined
+      content: output || '',
+      usage: normalizeUsage(data),
     }
   } catch (error) {
     console.error('AI 调用失败:', error)
     return {
       content: '',
-      error: error instanceof Error ? error.message : '未知错误'
+      error: error instanceof Error ? error.message : '未知错误',
     }
   }
 }
 
-// 流式调用 - 使用 SSE 逐块读取 AI 响应
 export async function* callAIStream(request: AIRequest): AsyncGenerator<string, void, unknown> {
-  try {
-    const config = getAIConfig()
-    const defaults = getProviderDefaults(config.provider)
+  const response = await requestAI(request, true)
 
-    const url = config.apiUrl || defaults.url
-    const model = config.model || defaults.model
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`AI API 错误: ${errorText}`)
+  }
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: request.messages,
-        temperature: request.temperature ?? 0.7,
-        max_tokens: request.maxTokens ?? 2000,
-        stream: true,
-      }),
-    })
+  if (!response.body) {
+    throw new Error('AI API 未返回可读流')
+  }
 
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`AI API 错误: ${error}`)
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (done) {
+      break
     }
 
-    if (!response.body) {
-      throw new Error('AI API 未返回可读流')
-    }
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() || ''
 
-    const reader = response.body.getReader()
-    const decoder = new TextDecoder()
-    let buffer = ''
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (!trimmed || !trimmed.startsWith('data:')) {
+        continue
+      }
 
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
+      const data = trimmed.slice(5).trim()
+      if (data === '[DONE]') {
+        return
+      }
 
-      buffer += decoder.decode(value, { stream: true })
-      const lines = buffer.split('\n')
-      buffer = lines.pop() || ''
-
-      for (const line of lines) {
-        const trimmed = line.trim()
-        if (!trimmed || !trimmed.startsWith('data:')) continue
-
-        const data = trimmed.slice(5).trim()
-        if (data === '[DONE]') return
-
-        try {
-          const parsed = JSON.parse(data)
-          const content = parsed.choices?.[0]?.delta?.content
-          if (content) {
-            yield content
-          }
-        } catch {
-          // 忽略无法解析的行，继续处理后续数据
+      try {
+        const parsed = JSON.parse(data) as {
+          choices?: Array<{ delta?: { content?: string } }>
         }
+        const content = parsed.choices?.[0]?.delta?.content
+        if (content) {
+          yield content
+        }
+      } catch {
+        continue
       }
     }
-  } catch (error) {
-    console.error('AI 流式调用失败:', error)
-    throw error
   }
 }

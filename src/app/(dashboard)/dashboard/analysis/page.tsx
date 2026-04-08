@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import ReactMarkdown from 'react-markdown'
@@ -186,14 +186,7 @@ export default function AnalysisPage() {
   const [showHistory, setShowHistory] = useState(false)
   const [selectedHistoryItem, setSelectedHistoryItem] = useState<AIAnalysis | null>(null)
 
-  // 加载数据
-  useEffect(() => {
-    if (user) {
-      loadData()
-    }
-  }, [user])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return
     
     setDataLoading(true)
@@ -211,7 +204,14 @@ export default function AnalysisPage() {
     } finally {
       setDataLoading(false)
     }
-  }
+  }, [user])
+
+  // 加载数据
+  useEffect(() => {
+    if (user) {
+      void loadData()
+    }
+  }, [user, loadData])
 
   const handleAnalyze = async () => {
     if (!user) {
@@ -272,15 +272,6 @@ export default function AnalysisPage() {
     })
   }
 
-  const getAnalysisTypeLabel = (type: string) => {
-    switch (type) {
-      case 'weekly': return '周报分析'
-      case 'event': return '事件分析'
-      case 'profile': return '人物画像'
-      default: return type
-    }
-  }
-
   // 检查是否可以进行 event 分析
   const canDoEventAnalysis = events.length > 0
 
@@ -321,7 +312,7 @@ export default function AnalysisPage() {
 
       {/* 全局错误提示 */}
       {errorMessage && analysisState === 'idle' && (
-        <ErrorState message={errorMessage} onRetry={loadData} />
+        <ErrorState message={errorMessage} onRetry={() => void loadData()} />
       )}
 
       <div className="grid lg:grid-cols-3 gap-8">

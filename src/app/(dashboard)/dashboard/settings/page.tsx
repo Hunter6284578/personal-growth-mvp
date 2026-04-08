@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { User, Save, Camera, Loader2 } from 'lucide-react'
@@ -8,6 +8,7 @@ import { getProfile, upsertProfile } from '@/lib/services'
 import { uploadImage } from '@/lib/upload'
 import { useAuth } from '@/hooks/useAuth'
 import type { Profile } from '@/types'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -22,14 +23,7 @@ export default function SettingsPage() {
   const [bio, setBio] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
 
-  // 加载数据
-  useEffect(() => {
-    if (user) {
-      loadProfile()
-    }
-  }, [user])
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     if (!user) return
     try {
       const data = await getProfile(user.id)
@@ -44,7 +38,14 @@ export default function SettingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  // 加载数据
+  useEffect(() => {
+    if (user) {
+      void loadProfile()
+    }
+  }, [user, loadProfile])
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -121,7 +122,14 @@ export default function SettingsPage() {
                   className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden relative group cursor-pointer transition-all hover:ring-2 hover:ring-blue-500 disabled:opacity-50"
                 >
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    <ManagedImage
+                      src={avatarUrl}
+                      alt={`${characterName || '用户'}头像`}
+                      width={80}
+                      height={80}
+                      sizes="80px"
+                      className="h-full w-full"
+                    />
                   ) : (
                     <User className="w-10 h-10 text-gray-400" />
                   )}

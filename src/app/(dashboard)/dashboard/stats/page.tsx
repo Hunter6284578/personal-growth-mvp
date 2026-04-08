@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
@@ -45,14 +45,7 @@ export default function StatsPage() {
   const [evaluating, setEvaluating] = useState(false)
   const [trendDays, setTrendDays] = useState<7 | 30>(7)
 
-  // 加载最新数据和历史记录
-  useEffect(() => {
-    if (user) {
-      loadData()
-    }
-  }, [user])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return
     
     setLoading(true)
@@ -79,7 +72,14 @@ export default function StatsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  // 加载最新数据和历史记录
+  useEffect(() => {
+    if (user) {
+      void loadData()
+    }
+  }, [user, loadData])
 
   const handleAIEval = async () => {
     if (!user) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
@@ -11,8 +11,7 @@ import {
   TrendingUp, Calendar, Flame
 } from 'lucide-react'
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts'
 
 export default function FitDashboardPage() {
@@ -23,11 +22,7 @@ export default function FitDashboardPage() {
   const [streak, setStreak] = useState(0)
   const [weekCount, setWeekCount] = useState(0)
 
-  useEffect(() => {
-    if (user) loadData()
-  }, [user])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!user) return
     try {
       const [dates, trend] = await Promise.all([
@@ -51,7 +46,13 @@ export default function FitDashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      void loadData()
+    }
+  }, [user, loadData])
 
   const calcStreak = (dates: string[]): number => {
     if (dates.length === 0) return 0
@@ -59,7 +60,7 @@ export default function FitDashboardPage() {
     const today = new Date().toISOString().split('T')[0]
 
     let streak = 0
-    let checkDate = new Date(today)
+    const checkDate = new Date(today)
 
     for (let i = 0; i < 365; i++) {
       const dateStr = checkDate.toISOString().split('T')[0]
@@ -97,8 +98,8 @@ export default function FitDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">健身追踪</h1>
-          <p className="text-gray-400 text-sm mt-1">肩部肌肥大训练计划</p>
+          <h1 className="text-2xl font-bold text-white">训练总览</h1>
+          <p className="text-gray-400 text-sm mt-1">关注频率、容量和最近训练状态</p>
         </div>
         <Link href="/fit/logs">
           <Button variant="primary">
@@ -172,7 +173,7 @@ export default function FitDashboardPage() {
           <Card className="hover:border-purple-600 transition-colors cursor-pointer">
             <div className="text-center py-4">
               <Sparkles className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-              <p className="text-sm font-medium text-white">AI 计划</p>
+              <p className="text-sm font-medium text-white">AI 建议</p>
             </div>
           </Card>
         </Link>
@@ -209,7 +210,7 @@ export default function FitDashboardPage() {
       </Card>
 
       {/* 肩部容量趋势 */}
-      <Card title="肩部训练容量趋势" subtitle="三角肌中束 - 过去 14 天">
+      <Card title="重点动作容量趋势" subtitle="当前默认展示肩部相关容量（过去 14 天）">
         {volumeTrend.length > 0 ? (
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -241,7 +242,7 @@ export default function FitDashboardPage() {
           </div>
         ) : (
           <div className="h-32 flex items-center justify-center text-gray-500 text-sm">
-            暂无肩部训练数据
+            暂无可用于趋势分析的训练数据
           </div>
         )}
       </Card>

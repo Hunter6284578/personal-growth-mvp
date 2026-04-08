@@ -11,9 +11,8 @@ import { useAuth } from '@/hooks/useAuth'
 import type { FitExercise, FitSet } from '@/types/fit'
 import {
   Plus, Trash2, Save, WifiOff, Wifi, RefreshCw,
-  Search, Dumbbell, ChevronDown, ChevronUp
+  Dumbbell, ChevronDown, ChevronUp
 } from 'lucide-react'
-import Link from 'next/link'
 
 export default function FitLogsPage() {
   const { user } = useAuth()
