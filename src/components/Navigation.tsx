@@ -21,6 +21,7 @@ import {
   PenLine,
   Sparkles,
   Settings,
+  Target,
   ChevronRight,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -72,6 +73,7 @@ const dashboardNavGroups: Array<{ title: string; items: DashboardNavItem[] }> = 
       { href: '/dashboard/daily', label: '每日记录', icon: CalendarDays },
       { href: '/dashboard/events', label: '事件库', icon: Lightbulb },
       { href: '/dashboard/thoughts', label: '短记录', icon: MessageSquareText },
+      { href: '/dashboard/focus', label: '聚焦方向', icon: Target },
       { href: '/dashboard/blog', label: '文章管理', icon: PenLine },
     ],
   },

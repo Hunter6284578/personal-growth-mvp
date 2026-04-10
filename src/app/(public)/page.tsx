@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight, BriefcaseBusiness, NotebookPen, Mail, Clock3 
 
 import { siteConfig } from '@/content/site'
 import { getPublishedPosts } from '@/lib/blog'
+import { getPublicSkillGroups } from '@/lib/public-data'
 import { SectionHeading } from '@/components/site/SectionHeading'
 import { formatDate, getReadingTimeLabel, pickText } from '@/lib/site-language'
 
@@ -13,6 +14,7 @@ export const revalidate = 300
 export default async function HomePage() {
   const lang = await getCurrentLanguage()
   const recentPosts = (await getPublishedPosts()).slice(0, 3)
+  const skillGroups = await getPublicSkillGroups()
 
   return (
     <div className="space-y-8 lg:space-y-10">
@@ -97,9 +99,26 @@ export default async function HomePage() {
             eyebrow={lang === 'zh' ? '我在聚焦什么' : 'What I\'m Focused On'}
             title={lang === 'zh' ? '构建、学习、反思。' : 'Building, learning, reflecting.'}
           />
-          <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
-            {lang === 'zh' ? '暂无内容，待添加。' : 'No content yet. Coming soon.'}
-          </div>
+          {skillGroups.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {skillGroups.map((group) => (
+                <div key={group.id} className="content-card">
+                  <h3 className="text-base font-semibold text-white">{lang === 'zh' ? group.title_zh : group.title_en}</h3>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {group.items.slice(0, 8).map((item, idx) => (
+                      <span key={idx} className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs font-medium text-slate-300">
+                        {lang === 'zh' ? item.text_zh : item.text_en}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
+              {lang === 'zh' ? '暂无内容，待添加。' : 'No content yet. Coming soon.'}
+            </div>
+          )}
         </section>
       </section>
 

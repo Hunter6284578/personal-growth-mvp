@@ -163,3 +163,25 @@ export interface UploadedFile {
   related_id: string | null
   created_at: string
 }
+
+// 聚焦方向 - 技能分组
+export interface SkillGroup {
+  id: string
+  user_id: string
+  title_zh: string
+  title_en: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+  items?: SkillItem[]
+}
+
+// 聚焦方向 - 技能项
+export interface SkillItem {
+  id: string
+  group_id: string
+  text_zh: string
+  text_en: string
+  sort_order: number
+  created_at: string
+}
