@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, BriefcaseBusiness, NotebookPen, Mail, Clock3 } from 'lucide-react'
 
-import { siteConfig, skillGroups, timeline } from '@/content/site'
+import { siteConfig } from '@/content/site'
 import { getPublishedPosts } from '@/lib/blog'
 import { SectionHeading } from '@/components/site/SectionHeading'
-import { SkillGroupCard } from '@/components/site/SkillGroupCard'
-import { formatDate, getReadingTimeLabel, pickList, pickText } from '@/lib/site-language'
+import { formatDate, getReadingTimeLabel, pickText } from '@/lib/site-language'
 
 import { getCurrentLanguage } from '@/lib/site-language.server'
 
@@ -97,17 +96,9 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow={lang === 'zh' ? '我在聚焦什么' : 'What I\'m Focused On'}
             title={lang === 'zh' ? '构建、学习、反思。' : 'Building, learning, reflecting.'}
-            description={lang === 'zh' ? '这三件事构成了我现在的工作方式。' : 'These three things shape the way I work right now.'}
           />
-          <div className="grid gap-4 md:grid-cols-2">
-            {skillGroups.map((group) => (
-              <SkillGroupCard
-                key={pickText(group.title, lang)}
-                title={pickText(group.title, lang)}
-                items={pickList(group.items, lang)}
-                countLabel={lang === 'zh' ? '项' : 'items'}
-              />
-            ))}
+          <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
+            {lang === 'zh' ? '暂无内容，待添加。' : 'No content yet. Coming soon.'}
           </div>
         </section>
       </section>
@@ -116,16 +107,9 @@ export default async function HomePage() {
         <SectionHeading
           eyebrow={lang === 'zh' ? '成长时间线' : 'Growth Timeline'}
           title={lang === 'zh' ? '几个阶段性的节点。' : 'A few milestones from the journey.'}
-          description={lang === 'zh' ? '不是简历，而是真实经历过的变化。' : 'Not a resume, but real changes I\'ve been through.'}
         />
-        <div className="grid gap-4 md:grid-cols-3">
-          {timeline.map((item) => (
-            <div key={pickText(item.title, lang)} className="content-card">
-              <p className="metric-font text-xs uppercase tracking-[0.22em] text-emerald-300/85">{pickText(item.year, lang)}</p>
-              <h3 className="mt-3 text-lg font-semibold text-white">{pickText(item.title, lang)}</h3>
-              <p className="mt-3 text-sm leading-7 text-slate-300">{pickText(item.description, lang)}</p>
-            </div>
-          ))}
+        <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
+          {lang === 'zh' ? '暂无时间线，待添加。' : 'No timeline yet. Coming soon.'}
         </div>
       </section>
 
