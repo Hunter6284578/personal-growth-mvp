@@ -9,11 +9,11 @@ import { Button } from '@/components/ui/Button'
 import { siteConfig } from '@/content/site'
 
 const publicNavItems = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/projects', label: 'Projects', icon: BriefcaseBusiness },
-  { href: '/blog', label: 'Notes', icon: NotebookPen },
-  { href: '/fitness', label: 'Fitness', icon: Dumbbell },
-  { href: '/about', label: 'Resume', icon: FileUser },
+  { href: '/', label: '首页', icon: Home },
+  { href: '/projects', label: '作品', icon: BriefcaseBusiness },
+  { href: '/blog', label: '文字', icon: NotebookPen },
+  { href: '/fitness', label: '记录', icon: Dumbbell },
+  { href: '/about', label: '关于', icon: FileUser },
 ]
 
 const dashboardNavItems = [
@@ -123,7 +123,7 @@ export function PublicNavigation() {
       {mobileMenuOpen ? (
         <div className="border-t border-stone-200 bg-stone-100/95 px-4 py-4 lg:hidden">
           <div className="mb-4 rounded-3xl border border-stone-200 bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-700">Profile</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Profile</p>
             <p className="mt-2 text-base font-semibold text-stone-950">{siteConfig.role}</p>
             <p className="mt-2 text-sm leading-6 text-stone-600">{siteConfig.lookingFor}</p>
           </div>

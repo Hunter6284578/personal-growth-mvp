@@ -6,8 +6,8 @@ import { SectionHeading } from '@/components/site/SectionHeading'
 import { SkillGroupCard } from '@/components/site/SkillGroupCard'
 
 export const metadata: Metadata = {
-  title: 'About / Resume',
-  description: '教育背景、技能栈、项目方向和联系方式。',
+  title: 'About',
+  description: '关于我。',
 }
 
 export const revalidate = 86400
@@ -17,15 +17,15 @@ export default function AboutPage() {
     <div className="space-y-8 lg:space-y-10">
       <section className="public-section space-y-8">
         <SectionHeading
-          eyebrow="About / Resume"
-          title="信息组织偏简历视角，而不是自我感动视角。"
-          description="这一页尽量回答四个问题：我是谁、我在做什么、我具备哪些能力、为什么值得进一步沟通。"
+          eyebrow="About"
+          title="关于我，和我为什么写这个站点。"
+          description="比起“我会什么”，我更想说“我在意什么”。"
         />
 
         <div className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
           <div className="rounded-[2rem] border border-stone-200 bg-white p-6">
             <p className="text-2xl font-semibold text-stone-950">{siteConfig.name}</p>
-            <p className="mt-2 text-base text-teal-700">{siteConfig.role}</p>
+            <p className="mt-2 text-base text-stone-600">{siteConfig.role}</p>
             <p className="mt-5 text-base leading-7 text-stone-600">{siteConfig.description}</p>
             <p className="mt-4 text-base leading-7 text-stone-600">{siteConfig.lookingFor}</p>
           </div>
@@ -45,7 +45,7 @@ export default function AboutPage() {
               </p>
               <p>
                 <span className="font-semibold text-stone-950">当前状态：</span>
-                寻找实习 / 校招机会
+                持续更新中
               </p>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -69,7 +69,7 @@ export default function AboutPage() {
               ) : (
                 <span className="inline-flex items-center gap-2 rounded-full border border-dashed border-stone-300 px-5 py-3 text-sm text-stone-500">
                   <Download className="h-4 w-4" />
-                  在 `src/content/site.ts` 中补充简历链接
+                  暂不提供简历下载
                 </span>
               )}
             </div>
@@ -80,8 +80,8 @@ export default function AboutPage() {
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="public-section space-y-6">
           <SectionHeading
-            eyebrow="Resume Blocks"
-            title="把求职最需要看到的信息放在前面。"
+            eyebrow="Fragments"
+            title="一些更接近我本人的片段。"
           />
           <div className="space-y-4">
             {resumeBlocks.map((block) => (
@@ -99,9 +99,9 @@ export default function AboutPage() {
 
         <div className="public-section space-y-6">
           <SectionHeading
-            eyebrow="Skill Stack"
-            title="技能栈按协作与落地能力来组织。"
-            description="不只罗列框架名，也强调我当前能独立完成的事情：结构设计、页面搭建、数据表单、内容管理、AI API 接入和后续维护。"
+            eyebrow="Daily Structure"
+            title="我的日常结构。"
+            description="写作、整理、创作和慢慢更新。"
           />
           <div className="grid gap-4 md:grid-cols-2">
             {skillGroups.map((group) => (
@@ -112,11 +112,11 @@ export default function AboutPage() {
       </section>
 
       <section className="public-section space-y-6">
-        <SectionHeading
-          eyebrow="Growth Timeline"
-          title="成长轨迹会继续更新，但表达方式保持专业。"
-          description="这部分不是抒情，而是说明我当前在系统化积累哪些能力。"
-        />
+          <SectionHeading
+            eyebrow="Timeline"
+            title="一些正在发生的事。"
+            description="不做宏大叙事，只记录真实阶段。"
+          />
         <div className="grid gap-4 md:grid-cols-3">
           {timeline.map((item) => (
             <div key={`${item.year}-${item.title}`} className="rounded-[2rem] border border-stone-200 bg-white p-6">
@@ -133,7 +133,7 @@ export default function AboutPage() {
           <div>
             <p className="eyebrow">Next Step</p>
             <h2 className="mt-3 text-3xl font-semibold text-stone-950">
-              更详细的能力证明放在 Projects 和 Notes。
+              如果你愿意，可以继续看作品和文字。
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -141,14 +141,14 @@ export default function AboutPage() {
               href="/projects"
               className="inline-flex items-center gap-2 rounded-full bg-stone-950 px-5 py-3 text-sm font-medium text-white"
             >
-              查看项目页
+              看作品
               <ArrowUpRight className="h-4 w-4" />
             </Link>
             <Link
               href="/blog"
               className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700"
             >
-              浏览 Notes
+              看文字
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>

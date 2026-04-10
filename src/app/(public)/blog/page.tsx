@@ -6,8 +6,8 @@ import { getBlogTags, getPublishedPosts } from '@/lib/blog'
 import { SectionHeading } from '@/components/site/SectionHeading'
 
 export const metadata: Metadata = {
-  title: 'Blog / Notes',
-  description: '技术学习、项目复盘、成长记录和阶段总结。',
+  title: 'Writing',
+  description: '写作与阶段记录。',
 }
 
 interface BlogPageProps {
@@ -42,24 +42,24 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     <div className="space-y-8 lg:space-y-10">
       <section className="public-section space-y-8">
         <SectionHeading
-          eyebrow="Blog / Notes"
-          title="博客是复盘库，不是心情墙。"
-          description="每篇文章固定结构：背景 -> 方案 -> 踩坑 -> 结果 -> 可复用结论。"
+          eyebrow="Writing"
+          title="写下当下，留给未来。"
+          description="这里的文字更像慢速笔记，而不是即时观点。"
         />
 
         <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-[1.75rem] border border-stone-200 bg-white p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">公开文章</p>
             <p className="mt-3 text-3xl font-semibold text-stone-950">{posts.length}</p>
-            <p className="mt-2 text-sm leading-6 text-stone-600">只收录“可验证、可复用”的工程记录。</p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">按时间慢慢积累，不追求高频更新。</p>
           </div>
           <div className="rounded-[1.75rem] border border-stone-200 bg-white p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">标签数量</p>
             <p className="mt-3 text-3xl font-semibold text-stone-950">{tags.length}</p>
-            <p className="mt-2 text-sm leading-6 text-stone-600">标签是检索入口，不替代文章结构质量。</p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">标签只帮助检索，不限定表达方式。</p>
           </div>
           <div className="rounded-[1.75rem] border border-stone-200 bg-white p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">推荐主题</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">常写主题</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {blogThemes.map((theme) => (
                 <span key={theme} className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
@@ -103,14 +103,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         <div className="rounded-[2rem] border border-stone-200 bg-stone-50/60 p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">推荐写作模板</p>
-          <div className="mt-3 grid gap-2 text-sm text-stone-700 md:grid-cols-5">
-            <span>1. 背景</span>
-            <span>2. 方案</span>
-            <span>3. 踩坑</span>
-            <span>4. 结果</span>
-            <span>5. 可复用结论</span>
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">写作提醒</p>
+          <p className="mt-3 text-sm leading-7 text-stone-700">
+            写正在发生的事，写真实的感受，写那些你愿意在一年后再读一遍的句子。
+          </p>
         </div>
 
         {posts.length < 3 ? (
@@ -136,7 +132,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     <p className="mt-4 text-base leading-7 text-stone-600">
                       {post.summary?.trim() || stripMarkdown(post.content).slice(0, 140) || '这篇记录还没有补摘要，后续会继续完善。'}
                     </p>
-                    <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500">复盘导向内容</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500">阶段记录</p>
                   </div>
                 <div className="space-y-2 text-sm text-stone-500">
                   <p className="inline-flex items-center gap-2">
@@ -166,7 +162,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           ))
         ) : (
           <div className="rounded-[2rem] border border-dashed border-stone-300 bg-white px-6 py-10 text-sm text-stone-500">
-            当前标签下还没有内容。建议优先补一篇真实上线复盘，再扩展其他主题。
+            当前标签下还没有内容。可以先回到全部文章看看其他记录。
           </div>
         )}
       </section>

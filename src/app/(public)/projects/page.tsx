@@ -4,8 +4,8 @@ import { SectionHeading } from '@/components/site/SectionHeading'
 import { ProjectCard } from '@/components/site/ProjectCard'
 
 export const metadata: Metadata = {
-  title: 'Projects',
-  description: '展示项目背景、技术栈、职责、难点和结果。',
+  title: 'Works',
+  description: '作品与阶段片段。',
 }
 
 export const revalidate = 86400
@@ -17,13 +17,13 @@ export default function ProjectsPage() {
         <div className="rounded-lg border border-stone-200 bg-stone-50/70 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">阅读建议</p>
           <p className="mt-2 text-sm leading-7 text-stone-700">
-            每个项目按同一顺序阅读：背景 {`->`} 职责边界 {`->`} 难点取舍 {`->`} 结果指标 {`->`} 证据链接。
+            把这些内容当作作品手记：它们并不完美，但都来自真实阶段。
           </p>
         </div>
         <SectionHeading
-          eyebrow="Projects"
-          title="项目页只回答一件事：你是否真的交付过。"
-          description="每个项目默认包含职责边界、关键取舍、可验证证据与结果指标，避免空话。"
+          eyebrow="Works"
+          title="我做过的事，和仍在继续的事。"
+          description="这里放的是阶段性的作品，不是终极答案。"
         />
         <div className="grid gap-6">
           {featuredProjects.map((project) => (
@@ -36,34 +36,34 @@ export default function ProjectsPage() {
 
       <section className="public-section space-y-6">
         <SectionHeading
-          eyebrow="Evidence Checklist"
-          title="新增项目时，请先补齐这 6 条证据。"
+          eyebrow="How I Keep Them"
+          title="我如何维护这些作品。"
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {[
             {
-              title: '上线地址',
-              description: '有可访问链接，或可运行仓库与启动说明。',
+              title: '持续记录',
+              description: '记录阶段变化，而不是只记录结果。',
             },
             {
-              title: '职责边界',
-              description: '明确你独立负责与协作部分，避免“全包式”叙述。',
+              title: '定期整理',
+              description: '让每个作品都有可回看的上下文。',
             },
             {
-              title: '难点与取舍',
-              description: '说明限制条件、替代方案和最终决策理由。',
+              title: '不过度包装',
+              description: '保留过程中的不完美与犹豫。',
             },
             {
-              title: '结果指标',
-              description: '给出可量化结果：性能、交付周期、功能覆盖等。',
+              title: '保留证据',
+              description: '让文字、链接和版本共同构成记忆。',
             },
             {
-              title: '复盘结论',
-              description: '总结可迁移经验，体现你能持续优化。',
+              title: '反复回看',
+              description: '从旧作品里看见下一步方向。',
             },
             {
-              title: '持续状态',
-              description: '标注当前状态：运行中、迭代中、已归档。',
+              title: '长期更新',
+              description: '不急于完成，只保持不断线。',
             },
           ].map((item) => (
             <div key={item.title} className="rounded-[2rem] border border-stone-200 bg-white p-6">
