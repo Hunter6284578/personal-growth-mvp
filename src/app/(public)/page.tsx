@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, BriefcaseBusiness, NotebookPen, Mail, Clock3 } from 'lucide-react'
 
-import { siteConfig, featuredProjects, skillGroups, timeline } from '@/content/site'
+import { siteConfig, skillGroups, timeline } from '@/content/site'
 import { getPublishedPosts } from '@/lib/blog'
 import { SectionHeading } from '@/components/site/SectionHeading'
-import { ProjectCard } from '@/components/site/ProjectCard'
 import { SkillGroupCard } from '@/components/site/SkillGroupCard'
 import { formatDate, getReadingTimeLabel, pickList, pickText } from '@/lib/site-language'
 
@@ -84,14 +83,9 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow={lang === 'zh' ? '精选作品' : 'Featured Projects'}
             title={lang === 'zh' ? '最近在构建的几个方向。' : 'A few things I\'ve been building recently.'}
-            description={lang === 'zh' ? '不是结果汇报，而是我真实持续投入的工作。' : 'Not a trophy shelf, but the work I am genuinely investing in.'}
           />
-          <div className="featured-stack grid gap-6">
-            {featuredProjects.slice(0, 2).map((project, index) => (
-              <div key={project.slug} className={index === 0 ? 'featured-card-shell featured-card-shell-primary' : 'featured-card-shell'}>
-                <ProjectCard project={project} lang={lang} compact />
-              </div>
-            ))}
+          <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
+            {lang === 'zh' ? '暂无精选作品，敬请期待。' : 'No featured projects yet. Stay tuned.'}
           </div>
           <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white">
             {lang === 'zh' ? '查看完整项目页' : 'View all projects'}
