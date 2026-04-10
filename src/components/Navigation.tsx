@@ -123,7 +123,7 @@ export function PublicNavigation() {
       {mobileMenuOpen ? (
         <div className="border-t border-stone-200 bg-stone-100/95 px-4 py-4 lg:hidden">
           <div className="mb-4 rounded-3xl border border-stone-200 bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">Profile</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">简介</p>
             <p className="mt-2 text-base font-semibold text-stone-950">{siteConfig.role}</p>
             <p className="mt-2 text-sm leading-6 text-stone-600">{siteConfig.lookingFor}</p>
           </div>

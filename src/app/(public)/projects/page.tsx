@@ -4,7 +4,7 @@ import { SectionHeading } from '@/components/site/SectionHeading'
 import { ProjectCard } from '@/components/site/ProjectCard'
 
 export const metadata: Metadata = {
-  title: 'Works',
+  title: '作品',
   description: '作品与阶段片段。',
 }
 
@@ -21,7 +21,7 @@ export default function ProjectsPage() {
           </p>
         </div>
         <SectionHeading
-          eyebrow="Works"
+          eyebrow="作品"
           title="我做过的事，和仍在继续的事。"
           description="这里放的是阶段性的作品，不是终极答案。"
         />
@@ -36,7 +36,7 @@ export default function ProjectsPage() {
 
       <section className="public-section space-y-6">
         <SectionHeading
-          eyebrow="How I Keep Them"
+          eyebrow="维护方式"
           title="我如何维护这些作品。"
         />
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -54,8 +54,8 @@ export default function ProjectsPage() {
               description: '保留过程中的不完美与犹豫。',
             },
             {
-              title: '保留证据',
-              description: '让文字、链接和版本共同构成记忆。',
+              title: '保留线索',
+              description: '让文字、链接和版本一起留下来。',
             },
             {
               title: '反复回看',

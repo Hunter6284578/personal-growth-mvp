@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition-colors hover:text-stone-950"
       >
         <ArrowLeft className="h-4 w-4" />
-        返回 Notes 列表
+        返回文字列表
       </Link>
 
       <article className="public-section">
@@ -96,7 +96,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         />
         <div className="max-w-3xl space-y-5">
           <div className="space-y-3">
-            <p className="eyebrow">Note Detail</p>
+            <p className="eyebrow">正文</p>
             <h1 className="text-4xl font-semibold tracking-tight text-stone-950">
               {post.title}
             </h1>

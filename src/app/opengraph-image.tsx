@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 import { siteConfig } from '@/content/site'
 
 export const runtime = 'edge'
-export const alt = `${siteConfig.name} Portfolio`
+export const alt = `${siteConfig.name} 个人网站`
 export const size = {
   width: 1200,
   height: 630,
@@ -37,7 +37,7 @@ export default function OpenGraphImage() {
             color: '#0f766e',
           }}
         >
-          Job-Oriented Personal Site
+            CagedSheep
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 900 }}>
@@ -45,7 +45,7 @@ export default function OpenGraphImage() {
             {siteConfig.name} · {siteConfig.role}
           </div>
           <div style={{ fontSize: 30, lineHeight: 1.45, color: '#44403c' }}>
-            项目展示、技术记录、健身数据与 AI 建议整合到一个长期维护的个人站点里。
+            作品、文字与日常片段，留给自己，也留给后来回看的时刻。
           </div>
         </div>
 

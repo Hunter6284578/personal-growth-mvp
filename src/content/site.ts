@@ -178,8 +178,8 @@ export const featuredProjects: FeaturedProject[] = [
   },
   {
     slug: 'fitness-tracker',
-    title: '训练记录与趋势追踪模块',
-    tagline: '记录每次训练的动作、组数、重量和容量，并给出趋势反馈。',
+    title: '训练记录',
+    tagline: '用朴素的方式记录训练与恢复，让变化可回看。',
     period: '2026',
     status: 'online',
     summary:
@@ -218,8 +218,8 @@ export const featuredProjects: FeaturedProject[] = [
   },
   {
     slug: 'ai-fitness-advisor',
-    title: 'AI Fitness Advisor',
-    tagline: '基于近期训练记录、体重和备注生成克制的训练建议。',
+    title: '训练建议助手',
+    tagline: '在需要的时候给出轻量建议，不替代人的判断。',
     period: '2026',
     status: 'building',
     summary:
@@ -280,8 +280,8 @@ export const fitnessCapabilities: FitnessCapability[] = [
 export const homeSignals = [
   { label: '代表项目', value: '3 个重点方向' },
   { label: '公开内容', value: '博客 / 记录持续沉淀' },
-  { label: '健身模块', value: '训练记录 + AI 建议' },
+  { label: '记录部分', value: '训练记录 + 建议助手' },
   { label: '联系入口', value: 'GitHub / Email' },
 ]
 
-export const blogThemes = ['技术学习', '项目复盘', '阶段总结']
+export const blogThemes = ['生活片段', '阶段记录', '作品手记']

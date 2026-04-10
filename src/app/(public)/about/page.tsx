@@ -6,7 +6,7 @@ import { SectionHeading } from '@/components/site/SectionHeading'
 import { SkillGroupCard } from '@/components/site/SkillGroupCard'
 
 export const metadata: Metadata = {
-  title: 'About',
+  title: '关于',
   description: '关于我。',
 }
 
@@ -17,7 +17,7 @@ export default function AboutPage() {
     <div className="space-y-8 lg:space-y-10">
       <section className="public-section space-y-8">
         <SectionHeading
-          eyebrow="About"
+          eyebrow="关于"
           title="关于我，和我为什么写这个站点。"
           description="比起“我会什么”，我更想说“我在意什么”。"
         />
@@ -80,7 +80,7 @@ export default function AboutPage() {
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="public-section space-y-6">
           <SectionHeading
-            eyebrow="Fragments"
+            eyebrow="片段"
             title="一些更接近我本人的片段。"
           />
           <div className="space-y-4">
@@ -99,7 +99,7 @@ export default function AboutPage() {
 
         <div className="public-section space-y-6">
           <SectionHeading
-            eyebrow="Daily Structure"
+            eyebrow="日常结构"
             title="我的日常结构。"
             description="写作、整理、创作和慢慢更新。"
           />
@@ -113,7 +113,7 @@ export default function AboutPage() {
 
       <section className="public-section space-y-6">
           <SectionHeading
-            eyebrow="Timeline"
+            eyebrow="近况"
             title="一些正在发生的事。"
             description="不做宏大叙事，只记录真实阶段。"
           />
@@ -131,7 +131,7 @@ export default function AboutPage() {
       <section className="public-section">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="eyebrow">Next Step</p>
+            <p className="eyebrow">下一步</p>
             <h2 className="mt-3 text-3xl font-semibold text-stone-950">
               如果你愿意，可以继续看作品和文字。
             </h2>

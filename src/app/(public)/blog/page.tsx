@@ -6,7 +6,7 @@ import { getBlogTags, getPublishedPosts } from '@/lib/blog'
 import { SectionHeading } from '@/components/site/SectionHeading'
 
 export const metadata: Metadata = {
-  title: 'Writing',
+  title: '文字',
   description: '写作与阶段记录。',
 }
 
@@ -42,7 +42,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     <div className="space-y-8 lg:space-y-10">
       <section className="public-section space-y-8">
         <SectionHeading
-          eyebrow="Writing"
+          eyebrow="文字"
           title="写下当下，留给未来。"
           description="这里的文字更像慢速笔记，而不是即时观点。"
         />
@@ -111,7 +111,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
         {posts.length < 3 ? (
           <div className="rounded-[2rem] border border-dashed border-stone-300 bg-white px-6 py-5 text-sm leading-7 text-stone-600">
-            当前公开内容还偏少，这属于正常阶段。接下来更值得补的是项目拆解、踩坑复盘和阶段总结，而不是泛泛而谈的“学习日记”。
+            当前公开内容还偏少，这属于正常阶段。先写具体发生过的事，再慢慢补齐脉络。
           </div>
         ) : null}
       </section>

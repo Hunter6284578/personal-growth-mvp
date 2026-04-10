@@ -14,8 +14,8 @@ export function SiteFooter() {
           <Link href={siteConfig.github} target="_blank" rel="noreferrer noopener">
             GitHub
           </Link>
-          <Link href="/blog">Blog</Link>
-          <Link href="/projects">Projects</Link>
+          <Link href="/blog">文字</Link>
+          <Link href="/projects">作品</Link>
           <a href={siteConfig.icpLink} target="_blank" rel="noreferrer noopener nofollow">
             {siteConfig.icpNo}
           </a>
