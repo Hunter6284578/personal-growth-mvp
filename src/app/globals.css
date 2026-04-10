@@ -1,19 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3efe8;
-  --foreground: #171717;
-  --surface: rgba(255, 255, 255, 0.86);
+  --background: #f7f7f5;
+  --foreground: #1f1f1f;
+  --surface: #ffffff;
   --surface-strong: #ffffff;
-  --muted: #57534e;
-  --border: rgba(41, 37, 36, 0.12);
-  --border-strong: rgba(41, 37, 36, 0.22);
-  --accent: #0f766e;
-  --accent-soft: rgba(15, 118, 110, 0.12);
-  --page-gradient:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 32%),
-    radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 28%),
-    linear-gradient(180deg, #f8f5ef 0%, #f2ede4 100%);
+  --muted: #6b6b6b;
+  --border: rgba(31, 31, 31, 0.12);
+  --border-strong: rgba(31, 31, 31, 0.22);
+  --accent: #2f2f2f;
+  --accent-soft: rgba(47, 47, 47, 0.12);
+  --page-gradient: #f7f7f5;
   --pg-bg: #020617;
   --pg-card: rgba(10, 23, 39, 0.88);
   --pg-card-soft: rgba(16, 23, 42, 0.72);
@@ -75,18 +72,17 @@ pre,
   }
 
   .public-section {
-    @apply rounded-[2rem] border px-6 py-8 sm:px-8 sm:py-10;
+    @apply rounded-lg border px-6 py-8 sm:px-8 sm:py-10;
     background: var(--surface);
     border-color: var(--border);
-    box-shadow: 0 22px 70px -42px rgba(24, 24, 27, 0.35);
-    backdrop-filter: blur(18px);
+    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.06);
   }
 
   .surface-panel {
-    @apply rounded-3xl border;
+    @apply rounded-lg border;
     background: var(--surface-strong);
     border-color: var(--border);
-    box-shadow: 0 22px 70px -42px rgba(24, 24, 27, 0.28);
+    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.06);
   }
 
   .eyebrow {

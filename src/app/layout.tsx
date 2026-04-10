@@ -24,6 +24,13 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   applicationName: `${siteConfig.name} Portfolio`,
   keywords: [
     '个人网站',

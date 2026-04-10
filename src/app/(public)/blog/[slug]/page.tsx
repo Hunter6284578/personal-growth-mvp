@@ -6,6 +6,8 @@ import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { ArrowLeft, CalendarDays, Clock3 } from 'lucide-react'
 import { getPublishedPostBySlug } from '@/lib/blog'
+import { siteConfig } from '@/content/site'
+import { getArticleSchema } from '@/lib/structured-data'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -46,6 +48,9 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   return {
     title: post.title,
     description: post.summary || post.content.slice(0, 120),
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.summary || post.content.slice(0, 120),
@@ -66,6 +71,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
+  const articleSchema = getArticleSchema({
+    title: post.title,
+    description: post.summary || post.content.slice(0, 120),
+    url: `${siteConfig.siteUrl}/blog/${post.slug}`,
+    datePublished: post.created_at,
+    dateModified: post.updated_at,
+  })
+
   return (
     <div className="space-y-6">
       <Link
@@ -77,6 +90,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </Link>
 
       <article className="public-section">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        />
         <div className="max-w-3xl space-y-5">
           <div className="space-y-3">
             <p className="eyebrow">Note Detail</p>

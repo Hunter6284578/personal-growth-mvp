@@ -34,30 +34,33 @@ export interface FitnessCapability {
 }
 
 export const siteConfig = {
-  name: 'Hunter',
-  role: '全栈开发学生 / 准工程师',
-  roleShort: '全栈开发 / 求职中',
+  name: 'CagedSheep',
+  role: '清冷克制的个人创作与工程记录',
+  roleShort: '极简个人站',
   location: '中国 · 上海时区',
   email: '996717215@qq.com',
   github: 'https://github.com/Hunter6284578',
+  siteUrl: 'https://cagedsheep.cn',
+  icpNo: '【ICP备案号】',
+  icpLink: 'https://beian.miit.gov.cn/',
   resumeUrl: '',
   description:
-    '一个以求职展示为核心，同时沉淀项目、技术记录与健身数据的个人站点。',
+    '笼中羊，一个清冷、克制、留白的极简个人博客与作品站点。',
   heroIntro:
-    '我关注可维护的 Web 产品构建，偏好把产品思考、工程实现和数据反馈放在同一套系统里迭代。',
+    '在有限之境，持续记录项目、作品、文字与思考。',
   heroFocus: [
-    '求职导向个人品牌站',
-    'Next.js + Supabase + AI API',
-    '项目 / 内容 / 训练数据一体化',
+    '极简文艺风',
+    '内容长期沉淀',
+    '工程化可维护',
   ],
-  targetRoles: ['前端实习', '全栈实习', '内容型产品工程'],
+  targetRoles: ['博客写作', '摄影作品', '独立项目'],
   now: [
-    '持续完善个人品牌站，作为项目展示与长期内容沉淀平台',
-    '打磨 Next.js + Supabase + AI API 的整合能力',
-    '用结构化记录管理学习、项目和健身训练',
+    '持续迭代站点体验与内容结构',
+    '沉淀技术实践与创作过程',
+    '保持克制、稳定、长期更新',
   ],
   lookingFor:
-    '寻找前端 / 全栈方向的实习与校招机会，期望参与真实业务、工程协作和产品迭代。',
+    '这里不是一次性展示页，而是长期记录与作品归档入口。',
   contactLinks: [
     { label: 'GitHub', href: 'https://github.com/Hunter6284578' },
     { label: 'Email', href: 'mailto:996717215@qq.com' },

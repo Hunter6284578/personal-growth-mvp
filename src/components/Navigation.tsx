@@ -37,15 +37,15 @@ export function PublicNavigation() {
     href === '/' ? pathname === href : pathname.startsWith(href)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-stone-100/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-stone-200 bg-stone-50/95">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link href="/" className="min-w-0">
-          <p className="hidden truncate text-sm font-semibold uppercase tracking-[0.28em] text-teal-700 sm:block">
+          <p className="hidden truncate text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 sm:block">
             {siteConfig.role}
           </p>
           <div className="flex items-center gap-2">
             <p className="text-lg font-semibold text-stone-950">{siteConfig.name}</p>
-            <span className="rounded-full bg-teal-50 px-2.5 py-1 text-[11px] font-semibold text-teal-700 sm:hidden">
+            <span className="rounded-md border border-stone-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-stone-600 sm:hidden">
               {siteConfig.roleShort}
             </span>
           </div>
@@ -53,18 +53,16 @@ export function PublicNavigation() {
 
         <nav className="hidden items-center gap-2 lg:flex">
           {publicNavItems.map((item) => {
-            const Icon = item.icon
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'bg-stone-950 text-white'
-                    : 'text-stone-600 hover:bg-white hover:text-stone-950'
+                    ? 'border-stone-900 bg-stone-900 text-white'
+                    : 'border-stone-200 bg-white text-stone-600 hover:border-stone-900 hover:text-stone-900'
                 }`}
               >
-                <Icon className="h-4 w-4" />
                 {item.label}
               </Link>
             )
