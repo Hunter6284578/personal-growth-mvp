@@ -89,9 +89,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="public-section space-y-8">
+        <section className="public-section space-y-8">
           <SectionHeading
-            eyebrow="Featured Work"
+            eyebrow="作品"
             title="作品与阶段片段。"
             description="不是完美陈列，只是此刻真实在做的事。"
           />
@@ -117,7 +117,7 @@ export default async function HomePage() {
         </div>
 
         <section className="public-section space-y-6">
-          <SectionHeading eyebrow="Recent Notes" title="最近写下的东西" description="不追求高产，只记录真正想留下的内容。"/>
+          <SectionHeading eyebrow="最近文字" title="最近写下的东西" description="不追求高产，只记录真正想留下的内容。"/>
           {recentPosts.length > 0 ? (
             <div className="space-y-4">
               {recentPosts.map((post) => (
@@ -149,7 +149,7 @@ export default async function HomePage() {
           )}
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-950">
             <NotebookPen className="h-4 w-4" />
-            浏览全部 Notes
+            浏览全部文字
           </Link>
         </section>
       </section>
@@ -157,7 +157,7 @@ export default async function HomePage() {
       <section className="public-section">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div className="space-y-4">
-            <p className="eyebrow">Contact</p>
+            <p className="eyebrow">联系</p>
             <h2 className="text-3xl font-semibold text-stone-950">如果你也偏爱慢一点的表达，欢迎联系我。</h2>
             <p className="max-w-2xl text-base leading-7 text-stone-600">
               这里会持续更新，像一封不断续写的长信。
