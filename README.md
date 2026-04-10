@@ -47,17 +47,19 @@ npm install
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+NEXT_PUBLIC_SITE_URL=https://cagedsheep.cn
 
 AI_PROVIDER=deepseek
 AI_API_KEY=...
 AI_BASE_URL=
 AI_MODEL=
+REVALIDATE_TOKEN=...
 ```
 
 说明：
 
 - `NEXT_PUBLIC_SITE_URL` 用于 sitemap、robots 和 metadata
+- `REVALIDATE_TOKEN` 用于 `/api/revalidate` 的内容主动刷新鉴权
 - `AI_PROVIDER` 当前支持 `openai`、`deepseek`、`gemini`、`openai-compatible`
 - `AI_BASE_URL` 仅在你使用代理或兼容 OpenAI 的网关时需要
 

@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 import { callAI } from '@/lib/ai-service'
 import { buildFitnessAdvisorPrompt } from '@/lib/fit/advisor'
+import { logError, logInfo } from '@/lib/logger'
+import { checkRateLimit, getRequestKey } from '@/lib/rate-limit'
+
+export const runtime = 'nodejs'
+export const maxDuration = 30
 
 type FitnessGoal = 'muscle_gain' | 'fat_loss' | 'maintenance' | 'strength'
 
@@ -20,6 +25,12 @@ function normalizeGoal(goal: string | undefined): FitnessGoal {
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const limit = checkRateLimit(getRequestKey(ip, 'api-fit-plan'))
+    if (limit.limited) {
+      return NextResponse.json({ error: '请求过于频繁，请稍后重试' }, { status: 429 })
+    }
+
     const supabase = await createClient()
     const {
       data: { user },
@@ -122,6 +133,7 @@ export async function POST(request: Request) {
       result: advice,
     })
 
+    logInfo('fitness advice generated', { endpoint: '/api/fit/plan', userId: user.id, goal })
     return NextResponse.json({
       advice,
       meta: {
@@ -131,7 +143,7 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    console.error('AI 健身建议失败:', error)
+    logError(error, { endpoint: '/api/fit/plan', stage: 'uncaught' })
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '服务端错误' },
       { status: 500 }

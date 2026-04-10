@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: '展示项目背景、技术栈、职责、难点和结果。',
 }
 
+export const revalidate = 86400
+
 export default function ProjectsPage() {
   return (
     <div className="space-y-8 lg:space-y-10">

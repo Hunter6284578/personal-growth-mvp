@@ -16,7 +16,7 @@ interface BlogPageProps {
   }>
 }
 
-export const revalidate = 300
+export const revalidate = 1800
 
 function stripMarkdown(content: string) {
   return content

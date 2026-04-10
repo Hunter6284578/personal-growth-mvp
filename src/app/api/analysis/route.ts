@@ -3,6 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 import { callAI } from '@/lib/ai-service'
 import { buildPrompt, AnalysisData } from '@/lib/prompts'
+import { logError, logInfo } from '@/lib/logger'
+import { checkRateLimit, getRequestKey } from '@/lib/rate-limit'
+
+export const runtime = 'nodejs'
+export const maxDuration = 30
 
 // 验证请求体的函数
 function validateRequest(body: unknown): { valid: boolean; error?: string; data?: { type: 'weekly' | 'event' | 'profile' | 'attribute_eval'; eventId?: string } } {
@@ -205,6 +210,15 @@ function checkDataSufficiency(type: string, data: AnalysisData): { sufficient: b
 // POST /api/analysis
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const requestLimit = checkRateLimit(getRequestKey(ip, 'api-analysis'))
+    if (requestLimit.limited) {
+      return NextResponse.json(
+        { error: '请求过于频繁，请稍后重试', code: 'RATE_LIMIT' },
+        { status: 429 }
+      )
+    }
+
     // 1. 验证用户登录状态
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
@@ -277,7 +291,7 @@ export async function POST(request: NextRequest) {
     try {
       prompt = buildPrompt(type, data, targetEvent)
     } catch (error) {
-      console.error('构建 Prompt 失败:', error)
+      logError(error, { endpoint: '/api/analysis', stage: 'buildPrompt', userId: user.id, type })
       return NextResponse.json(
         { error: '构建分析请求失败', code: 'PROMPT_BUILD_ERROR' },
         { status: 500 }
@@ -293,7 +307,7 @@ export async function POST(request: NextRequest) {
     
     // 7. 处理 AI 响应错误
     if (aiResponse.error) {
-      console.error('AI 调用失败:', aiResponse.error)
+      logError(aiResponse.error, { endpoint: '/api/analysis', stage: 'callAI', userId: user.id, type })
       
       // 分类错误类型
       let errorCode = 'AI_ERROR'
@@ -350,7 +364,7 @@ export async function POST(request: NextRequest) {
             }
         }
       } catch (e) {
-         console.error('AI JSON 解析失败:', e);
+         logError(e, { endpoint: '/api/analysis', stage: 'parseAttributeEval', userId: user.id });
          return NextResponse.json(
             { error: 'AI 返回格式错误，无法解析评分', code: 'PARSE_ERROR', details: process.env.NODE_ENV === 'development' ? aiResponse.content : undefined },
             { status: 500 }
@@ -373,6 +387,7 @@ export async function POST(request: NextRequest) {
     const savedAnalysis = await saveAnalysis(user.id, type, prompt, aiResponse.content)
     
     // 10. 返回结果
+    logInfo('analysis completed', { endpoint: '/api/analysis', userId: user.id, type })
     return NextResponse.json({
       result: aiResponse.content,
       saved: !!savedAnalysis,
@@ -382,7 +397,7 @@ export async function POST(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('AI 分析 API 未捕获错误:', error)
+    logError(error, { endpoint: '/api/analysis', stage: 'uncaught' })
     
     // 区分已知错误和未知错误
     if (error instanceof Error) {
@@ -411,6 +426,15 @@ export async function POST(request: NextRequest) {
 // GET /api/analysis - 获取历史分析记录
 export async function GET(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const requestLimit = checkRateLimit(getRequestKey(ip, 'api-analysis-get'))
+    if (requestLimit.limited) {
+      return NextResponse.json(
+        { error: '请求过于频繁，请稍后重试', code: 'RATE_LIMIT' },
+        { status: 429 }
+      )
+    }
+
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
@@ -455,7 +479,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query
     
     if (error) {
-      console.error('获取分析记录失败:', error)
+      logError(error, { endpoint: '/api/analysis', stage: 'fetchHistory', userId: user.id })
       return NextResponse.json(
         { error: '获取分析记录失败', code: 'DB_ERROR' },
         { status: 500 }
@@ -468,7 +492,7 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error) {
-    console.error('获取分析记录错误:', error)
+    logError(error, { endpoint: '/api/analysis', stage: 'getUncaught' })
     return NextResponse.json(
       { error: '服务器错误', code: 'INTERNAL_ERROR' },
       { status: 500 }

@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: '训练记录、趋势回看与 AI Fitness Advisor 模块说明。',
 }
 
+export const revalidate = 86400
+
 const dashboards = [
   {
     title: '训练频率',

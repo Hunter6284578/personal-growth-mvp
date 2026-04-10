@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next'
 import { getPublishedPosts } from '@/lib/blog'
 import { getSiteUrl } from '@/lib/site-url'
 
+export const revalidate = 3600
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl()
   const posts = await getPublishedPosts()

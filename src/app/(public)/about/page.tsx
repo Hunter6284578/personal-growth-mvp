@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: '教育背景、技能栈、项目方向和联系方式。',
 }
 
+export const revalidate = 86400
+
 export default function AboutPage() {
   return (
     <div className="space-y-8 lg:space-y-10">

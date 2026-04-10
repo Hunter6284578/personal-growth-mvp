@@ -16,9 +16,10 @@ const monoFont = JetBrains_Mono({
 })
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+const canonicalUrl = siteConfig.siteUrl || siteUrl
 
 export const metadata: Metadata = {
-  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
+  metadataBase: canonicalUrl ? new URL(canonicalUrl) : undefined,
   title: {
     default: `${siteConfig.name} | ${siteConfig.role}`,
     template: `%s | ${siteConfig.name}`,
@@ -49,11 +50,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'zh_CN',
     siteName: `${siteConfig.name} Portfolio`,
+    url: canonicalUrl,
+    images: [
+      {
+        url: `${canonicalUrl}/opengraph-image`,
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} Portfolio`,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${siteConfig.name} | ${siteConfig.role}`,
     description: siteConfig.description,
+    images: [`${canonicalUrl}/opengraph-image`],
   },
 }
 
