@@ -5,6 +5,23 @@
    清冷克制 · 手作温度 · 书卷气息
    ======================================== */
 
+/* 霞鹜文楷 - 手写装饰字体（CDN 加载） */
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LXGW WenKai';
+  src: url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #0e0f11;
   --bg-warm: #12131a;
@@ -117,14 +134,13 @@ pre,
     background: var(--surface);
   }
 
-  /* eyebrow 改为更克制的样式 */
+  /* eyebrow / 日期小注 — 使用霞鹜文楷手写体 */
   .eyebrow {
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 400;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    letter-spacing: 0.12em;
     color: var(--text-muted);
-    font-family: var(--font-body), sans-serif;
+    font-family: 'LXGW WenKai', 'STKaiti', 'Kaiti SC', cursive;
   }
 
   /* Hero - 去掉所有渐变和光效 */
@@ -228,15 +244,40 @@ pre,
     border-color: var(--border-hover);
   }
 
-  /* ========================================
-     个人痕迹：手写体装饰
-     ======================================== */
-
+  /* 个人痕迹：手写体装饰 */
   .hand-note {
-    font-style: italic;
     color: var(--text-dim);
     font-size: 0.8125rem;
     letter-spacing: 0.02em;
+    font-family: 'LXGW WenKai', 'STKaiti', 'Kaiti SC', cursive;
+  }
+
+  /* 日期小注 — 手写体 */
+  .date-note {
+    font-size: 0.8125rem;
+    color: var(--text-dim);
+    font-family: 'LXGW WenKai', 'STKaiti', 'Kaiti SC', cursive;
+  }
+
+  /* 照片容器 — 暖灰调、轻微手作感 */
+  .portrait-frame {
+    border: 1px solid var(--border);
+    background: var(--bg-warm);
+    overflow: hidden;
+  }
+
+  .portrait-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: saturate(0.85) contrast(1.02);
+    opacity: 0.92;
+    transition: opacity 0.4s ease, filter 0.4s ease;
+  }
+
+  .portrait-frame:hover img {
+    opacity: 1;
+    filter: saturate(1) contrast(1);
   }
 
   .accent-line {

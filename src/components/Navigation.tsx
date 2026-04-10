@@ -112,7 +112,7 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
     <header className="sticky top-0 z-40" style={{ borderBottom: '1px solid var(--border)', background: 'color-mix(in srgb, var(--bg) 85%, transparent)', backdropFilter: 'blur(8px)' }}>
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4 sm:px-8 lg:px-0">
         <Link href="/" className="min-w-0">
-          <p className="text-sm font-normal" style={{ fontFamily: 'var(--font-title), serif', color: 'var(--text-bright)' }}>
+          <p className="text-sm font-normal" style={{ fontFamily: "'LXGW WenKai', 'STKaiti', 'Kaiti SC', cursive", color: 'var(--text-bright)' }}>
             {siteConfig.title}
           </p>
         </Link>
