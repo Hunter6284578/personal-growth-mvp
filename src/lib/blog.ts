@@ -3,7 +3,13 @@ import type { BlogPost } from '@/types'
 import { getPublicSupabaseClient } from '@/lib/supabase-public'
 
 export const getPublishedPosts = cache(async () => {
-  const supabase = getPublicSupabaseClient()
+  let supabase
+  try {
+    supabase = getPublicSupabaseClient()
+  } catch {
+    return [] as BlogPost[]
+  }
+
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
@@ -18,7 +24,13 @@ export const getPublishedPosts = cache(async () => {
 })
 
 export const getPublishedPostBySlug = cache(async (slug: string) => {
-  const supabase = getPublicSupabaseClient()
+  let supabase
+  try {
+    supabase = getPublicSupabaseClient()
+  } catch {
+    return null
+  }
+
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
