@@ -4,7 +4,7 @@ export function getOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: siteConfig.name,
+    name: siteConfig.title,
     url: siteConfig.siteUrl,
     sameAs: [siteConfig.github],
   }
@@ -14,7 +14,7 @@ export function getWebsiteSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: siteConfig.name,
+    name: siteConfig.title,
     url: siteConfig.siteUrl,
     inLanguage: 'zh-CN',
   }
@@ -41,7 +41,7 @@ export function getArticleSchema(input: {
     },
     publisher: {
       '@type': 'Organization',
-      name: siteConfig.name,
+      name: siteConfig.title,
     },
   }
 }

@@ -1,184 +1,215 @@
 import Link from 'next/link'
-import { ArrowRight, BriefcaseBusiness, NotebookPen, Mail } from 'lucide-react'
-import { siteConfig, featuredProjects, skillGroups } from '@/content/site'
+import { ArrowRight, ArrowUpRight, BriefcaseBusiness, NotebookPen, Mail, Clock3 } from 'lucide-react'
+
+import { siteConfig, featuredProjects, skillGroups, timeline } from '@/content/site'
 import { getPublishedPosts } from '@/lib/blog'
 import { SectionHeading } from '@/components/site/SectionHeading'
 import { ProjectCard } from '@/components/site/ProjectCard'
 import { SkillGroupCard } from '@/components/site/SkillGroupCard'
+import { formatDate, getReadingTimeLabel, pickList, pickText } from '@/lib/site-language'
+
+import { getCurrentLanguage } from '@/lib/site-language.server'
 
 export const revalidate = 300
 
 export default async function HomePage() {
+  const lang = await getCurrentLanguage()
   const recentPosts = (await getPublishedPosts()).slice(0, 3)
 
   return (
-    <div className="space-y-8">
-      <section className="public-section overflow-hidden">
-        <div className="grid gap-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <p className="eyebrow">CagedSheep</p>
-              <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-stone-950 sm:text-5xl">
-                在有限之境，写下仍愿意回看的东西。
-              </h1>
-              <p className="max-w-3xl text-base leading-8 text-stone-600">{siteConfig.heroIntro}</p>
-            </div>
+    <div className="space-y-8 lg:space-y-10">
+      {/* Hero */}
+      <section className="hero-panel overflow-hidden">
+        <div className="absolute -left-24 top-0 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="absolute -right-16 top-10 h-72 w-72 rounded-full bg-cyan-400/8 blur-3xl" />
+        <div className="absolute inset-y-0 right-0 hidden w-[36%] bg-[radial-gradient(circle_at_top_right,rgba(52,211,153,0.16),transparent_58%)] lg:block" />
 
-            <div className="flex flex-wrap gap-2.5">
-              {siteConfig.heroFocus.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-md border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 sm:text-sm"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">我是谁</p>
-                <p className="mt-2 text-sm font-semibold text-stone-950">一个正在生活和创作的人</p>
-              </div>
-              <div className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">这里有什么</p>
-                <p className="mt-2 text-sm font-semibold text-stone-950">作品、文字、以及缓慢更新的日常</p>
-              </div>
-              <div className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">为什么继续做</p>
-                <p className="mt-2 text-sm font-semibold text-stone-950">为了留住会被时间冲走的片段</p>
+        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-stretch">
+          <div className="space-y-8">
+            <div className="space-y-5">
+              <div className="space-y-4">
+                <p className="eyebrow">{siteConfig.title}</p>
+                <h1 className="max-w-4xl text-5xl font-semibold leading-[1.02] text-white sm:text-6xl lg:text-7xl">
+                  {pickText(siteConfig.heroTitle, lang)}
+                </h1>
+                <p className="max-w-3xl text-lg leading-8 text-slate-300 sm:text-xl">
+                  {pickText(siteConfig.heroIntro, lang)}
+                </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Link href="/projects" className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-5 py-3 text-sm font-medium text-white">
-                看作品
+            <div className="flex flex-wrap gap-3 pt-1">
+              <Link href="/projects" className="cta-primary text-base">
+                {lang === 'zh' ? '查看作品' : 'View Projects'}
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/about" className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 hover:border-stone-950 hover:text-stone-950">
-                关于我
+              <Link href="/blog" className="cta-secondary text-base">
+                {lang === 'zh' ? '阅读日志' : 'Read Journal'}
               </Link>
-              <Link href={`mailto:${siteConfig.email}`} className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 hover:border-stone-950 hover:text-stone-950">
+              <Link href={`mailto:${siteConfig.email}`} className="cta-secondary text-base">
                 <Mail className="h-4 w-4" />
-                联系我
+                {lang === 'zh' ? '联系我' : 'Contact'}
               </Link>
             </div>
           </div>
 
-          <div className="surface-panel p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">当前状态</p>
-            <div className="mt-4 space-y-4">
-              <div>
-                <p className="text-lg font-semibold text-stone-950">{siteConfig.role}</p>
-                <p className="mt-2 text-sm leading-6 text-stone-600">{siteConfig.lookingFor}</p>
+          <div className="surface-panel flex h-full flex-col justify-between p-6 lg:p-7">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300/85">{lang === 'zh' ? '关于我' : 'About Me'}</p>
+              <div className="mt-4 space-y-4">
+                <div>
+                  <p className="text-xl font-semibold text-white">{pickText(siteConfig.role, lang)}</p>
+                  <p className="mt-2 text-sm leading-7 text-slate-300">{pickText(siteConfig.lookingFor, lang)}</p>
+                </div>
+                <div className="space-y-2 text-sm text-slate-300">
+                  <p><span className="font-semibold text-white">Email: </span>{siteConfig.email}</p>
+                  <p><span className="font-semibold text-white">GitHub: </span>{siteConfig.github}</p>
+                  <p><span className="font-semibold text-white">{lang === 'zh' ? '定位: ' : 'Location: '}</span>{pickText(siteConfig.location, lang)}</p>
+                </div>
               </div>
-              <div className="space-y-3 rounded-lg bg-stone-100/90 p-4">
-                {siteConfig.now.map((item) => (
-                  <p key={item} className="text-sm leading-6 text-stone-700">
-                    • {item}
-                  </p>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2 text-sm text-stone-600">
-                <span className="rounded-md border border-stone-200 bg-white px-3 py-1">{siteConfig.location}</span>
-                <span className="rounded-md border border-stone-200 bg-white px-3 py-1">可持续维护</span>
-                <span className="rounded-md border border-stone-200 bg-white px-3 py-1">内容沉淀</span>
-              </div>
+            </div>
+
+            <div className="mt-6">
+              <Link href="/about" className="inline-flex items-center gap-2 text-sm font-medium text-emerald-200 transition hover:text-white">
+                {lang === 'zh' ? '了解更多关于我' : 'Learn more about me'}
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>
-      </section>
-
-        <section className="public-section space-y-8">
-          <SectionHeading
-            eyebrow="作品"
-            title="作品与阶段片段。"
-            description="不是完美陈列，只是此刻真实在做的事。"
-          />
-        <div className="grid gap-6">
-          {featuredProjects.slice(0, 2).map((project) => (
-            <ProjectCard key={project.slug} project={project} compact />
-          ))}
-        </div>
-        <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-950">
-          查看完整项目页
-          <ArrowRight className="h-4 w-4" />
-        </Link>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="public-section space-y-8">
-          <SectionHeading eyebrow="日常结构" title="我如何与日子相处。" description="写作、拍摄、整理、复盘。"/>
-          <div className="grid gap-4 md:grid-cols-2">
-            {skillGroups.map((group) => (
-              <SkillGroupCard key={group.title} title={group.title} items={group.items} />
+          <SectionHeading
+            eyebrow={lang === 'zh' ? '精选作品' : 'Featured Projects'}
+            title={lang === 'zh' ? '最近在构建的几个方向。' : 'A few things I\'ve been building recently.'}
+            description={lang === 'zh' ? '不是结果汇报，而是我真实持续投入的工作。' : 'Not a trophy shelf, but the work I am genuinely investing in.'}
+          />
+          <div className="featured-stack grid gap-6">
+            {featuredProjects.slice(0, 2).map((project, index) => (
+              <div key={project.slug} className={index === 0 ? 'featured-card-shell featured-card-shell-primary' : 'featured-card-shell'}>
+                <ProjectCard project={project} lang={lang} compact />
+              </div>
             ))}
           </div>
+          <Link href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white">
+            {lang === 'zh' ? '查看完整项目页' : 'View all projects'}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
         <section className="public-section space-y-6">
-          <SectionHeading eyebrow="最近文字" title="最近写下的东西" description="不追求高产，只记录真正想留下的内容。"/>
-          {recentPosts.length > 0 ? (
-            <div className="space-y-4">
-              {recentPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="block rounded-lg border border-stone-200 bg-white p-5">
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="text-lg font-semibold text-stone-950">{post.title}</h3>
-                    <span className="metric-font text-xs text-stone-500">{new Date(post.created_at).toLocaleDateString('zh-CN')}</span>
-                  </div>
-                      {post.summary ? <p className="mt-3 text-sm leading-6 text-stone-600">{post.summary}</p> : null}
-                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500">
-                        一次片段，一次回看
-                      </p>
-                  {post.tags?.length ? (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {post.tags.slice(0, 3).map((tag) => (
-                        <span key={`${post.id}-${tag}`} className="rounded-md border border-stone-200 bg-white px-3 py-1 text-xs font-medium text-stone-600">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-lg border border-dashed border-stone-300 bg-white px-5 py-8 text-sm text-stone-500">
-              暂时还没有新的公开文章。
-            </div>
-          )}
-          <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-950">
-            <NotebookPen className="h-4 w-4" />
-            浏览全部文字
-          </Link>
+          <SectionHeading
+            eyebrow={lang === 'zh' ? '我在聚焦什么' : 'What I\'m Focused On'}
+            title={lang === 'zh' ? '构建、学习、反思。' : 'Building, learning, reflecting.'}
+            description={lang === 'zh' ? '这三件事构成了我现在的工作方式。' : 'These three things shape the way I work right now.'}
+          />
+          <div className="grid gap-4 md:grid-cols-2">
+            {skillGroups.map((group) => (
+              <SkillGroupCard
+                key={pickText(group.title, lang)}
+                title={pickText(group.title, lang)}
+                items={pickList(group.items, lang)}
+                countLabel={lang === 'zh' ? '项' : 'items'}
+              />
+            ))}
+          </div>
         </section>
       </section>
 
-      <section className="public-section">
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div className="space-y-4">
-            <p className="eyebrow">联系</p>
-            <h2 className="text-3xl font-semibold text-stone-950">如果你也偏爱慢一点的表达，欢迎联系我。</h2>
-            <p className="max-w-2xl text-base leading-7 text-stone-600">
-              这里会持续更新，像一封不断续写的长信。
-            </p>
-          </div>
-          <div className="surface-panel p-6">
-            <div className="space-y-3 text-sm text-stone-600">
-              <p><span className="font-semibold text-stone-950">Email：</span>{siteConfig.email}</p>
-              <p><span className="font-semibold text-stone-950">GitHub：</span>{siteConfig.github}</p>
+      <section className="public-section space-y-6">
+        <SectionHeading
+          eyebrow={lang === 'zh' ? '成长时间线' : 'Growth Timeline'}
+          title={lang === 'zh' ? '几个阶段性的节点。' : 'A few milestones from the journey.'}
+          description={lang === 'zh' ? '不是简历，而是真实经历过的变化。' : 'Not a resume, but real changes I\'ve been through.'}
+        />
+        <div className="grid gap-4 md:grid-cols-3">
+          {timeline.map((item) => (
+            <div key={pickText(item.title, lang)} className="content-card">
+              <p className="metric-font text-xs uppercase tracking-[0.22em] text-emerald-300/85">{pickText(item.year, lang)}</p>
+              <h3 className="mt-3 text-lg font-semibold text-white">{pickText(item.title, lang)}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">{pickText(item.description, lang)}</p>
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link href={`mailto:${siteConfig.email}`} className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-5 py-3 text-sm font-medium text-white">
-                邮件联系
-              </Link>
-              <Link href="/projects" className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700">
-                <BriefcaseBusiness className="h-4 w-4" />
-                项目总览
-              </Link>
-            </div>
-          </div>
+          ))}
         </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="public-section space-y-6">
+          <SectionHeading
+            eyebrow={lang === 'zh' ? '最近日志' : 'Latest Notes'}
+            title={lang === 'zh' ? '最近写下的内容。' : 'Recent writing from the log.'}
+            description={lang === 'zh' ? '技术、项目、以及阶段性的自我复盘。' : 'Notes on tech, projects, and periodic reflection.'}
+          />
+          {recentPosts.length > 0 ? (
+            <div className="space-y-4">
+              {recentPosts.map((post) => {
+                const readingTime = Math.max(1, Math.ceil((post.content?.length || 0) / 320))
+
+                return (
+                  <Link key={post.id} href={`/blog/${post.slug}`} className="block rounded-[1.75rem] border border-white/10 bg-slate-950/40 p-5 transition hover:border-white/20 hover:-translate-y-0.5">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <h3 className="text-lg font-semibold text-white">{post.title}</h3>
+                      <span className="metric-font text-xs text-slate-500">{formatDate(post.created_at, lang)}</span>
+                    </div>
+                    {post.summary ? <p className="mt-3 text-sm leading-6 text-slate-300">{post.summary}</p> : null}
+                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock3 className="h-3.5 w-3.5" />
+                        {getReadingTimeLabel(readingTime, lang)}
+                      </span>
+                    </div>
+                    {post.tags?.length ? (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {post.tags.slice(0, 3).map((tag) => (
+                          <span key={`${post.id}-${tag}`} className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs font-medium text-slate-300">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
+              {lang === 'zh' ? '暂时还没有新的公开文章。' : 'No public notes yet.'}
+            </div>
+          )}
+          <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white">
+            <NotebookPen className="h-4 w-4" />
+            {lang === 'zh' ? '浏览全部日志' : 'Browse all notes'}
+          </Link>
+        </section>
+
+        <section className="public-section">
+          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+            <div className="space-y-4">
+              <p className="eyebrow">{lang === 'zh' ? '关于我' : 'About Me'}</p>
+              <h2 className="text-3xl font-semibold text-white">
+                {lang === 'zh' ? '我在做项目，也在认真经营自己的成长。' : 'I build projects and take my growth seriously.'}
+              </h2>
+              <p className="max-w-2xl text-base leading-7 text-slate-300">
+                {lang === 'zh'
+                  ? '如果你想快速了解我，可以从关于页开始；如果你更关心能力和思考方式，就直接去看项目和日志。'
+                  : 'If you want a quick sense of who I am, start with the about page. If you care more about capability and thinking, jump straight to projects and journal.'}
+              </p>
+            </div>
+            <div className="surface-panel p-6">
+              <div className="flex flex-wrap gap-3">
+                <Link href="/about" className="cta-primary">
+                  {lang === 'zh' ? '更多关于我' : 'Learn more'}
+                </Link>
+                <Link href="/projects" className="cta-secondary">
+                  <BriefcaseBusiness className="h-4 w-4" />
+                  {lang === 'zh' ? '项目总览' : 'Project overview'}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
     </div>
   )

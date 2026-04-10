@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f7f5;
-  --foreground: #1f1f1f;
-  --surface: #ffffff;
-  --surface-strong: #ffffff;
-  --muted: #6b6b6b;
-  --border: rgba(31, 31, 31, 0.12);
-  --border-strong: rgba(31, 31, 31, 0.22);
-  --accent: #2f2f2f;
-  --accent-soft: rgba(47, 47, 47, 0.12);
-  --page-gradient: #f7f7f5;
+  --background: #08111f;
+  --foreground: #f8fafc;
+  --surface: rgba(15, 23, 42, 0.78);
+  --surface-strong: rgba(15, 23, 42, 0.92);
+  --muted: #94a3b8;
+  --border: rgba(148, 163, 184, 0.18);
+  --border-strong: rgba(148, 163, 184, 0.3);
+  --accent: #7c3aed;
+  --accent-soft: rgba(124, 58, 237, 0.14);
+  --page-gradient: radial-gradient(circle at top, rgba(16, 185, 129, 0.16), transparent 26%), linear-gradient(180deg, #08111f 0%, #0f172a 100%);
   --pg-bg: #020617;
   --pg-card: rgba(10, 23, 39, 0.88);
   --pg-card-soft: rgba(16, 23, 42, 0.72);
   --pg-border: rgba(148, 163, 184, 0.22);
   --pg-border-strong: rgba(148, 163, 184, 0.34);
   --pg-text-muted: #94a3b8;
-  --pg-ring: #14b8a6;
+  --pg-ring: #34d399;
 }
 
 @theme inline {
@@ -53,7 +53,7 @@ pre,
 }
 
 ::selection {
-  background: rgba(15, 118, 110, 0.18);
+  background: rgba(52, 211, 153, 0.2);
 }
 
 @layer base {
@@ -72,23 +72,87 @@ pre,
   }
 
   .public-section {
-    @apply rounded-lg border px-6 py-8 sm:px-8 sm:py-10;
+    @apply rounded-[2rem] border px-6 py-8 sm:px-8 sm:py-10;
     background: var(--surface);
     border-color: var(--border);
-    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.06);
+    box-shadow: 0 24px 80px -56px rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(18px);
   }
 
   .surface-panel {
-    @apply rounded-lg border;
+    @apply rounded-[1.75rem] border;
     background: var(--surface-strong);
     border-color: var(--border);
-    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.06);
+    box-shadow: 0 18px 60px -42px rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(16px);
   }
 
   .eyebrow {
     @apply text-xs font-semibold uppercase tracking-[0.28em];
-    color: var(--accent);
+    color: #86efac;
   }
+
+  .hero-panel {
+    @apply relative overflow-hidden rounded-[2.25rem] border px-6 py-7 sm:px-8 sm:py-8;
+    background:
+      radial-gradient(circle at top right, rgba(52, 211, 153, 0.14), transparent 28%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, rgba(2, 6, 23, 0.84) 100%);
+    border-color: rgba(148, 163, 184, 0.18);
+    box-shadow: 0 36px 100px -60px rgba(15, 23, 42, 1);
+    backdrop-filter: blur(18px);
+  }
+
+  .hero-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.04) 48%, transparent 100%);
+  }
+
+  .cta-primary {
+    @apply inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all duration-200;
+    background: linear-gradient(135deg, #6ee7b7 0%, #34d399 50%, #10b981 100%);
+    color: #052e16;
+    box-shadow: 0 18px 42px -22px rgba(16, 185, 129, 0.85);
+  }
+
+  .cta-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 24px 54px -24px rgba(16, 185, 129, 0.95);
+  }
+
+  .cta-secondary {
+    @apply inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition-all duration-200;
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+  }
+
+  .cta-secondary:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+
+    .content-card {
+    @apply rounded-[1.75rem] border p-5;
+    background: rgba(2, 6, 23, 0.34);
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  .featured-card-shell {
+    @apply rounded-[2rem] p-[1px];
+    background: linear-gradient(140deg, rgba(148, 163, 184, 0.12), rgba(148, 163, 184, 0.03));
+  }
+
+  .featured-card-shell-primary {
+    background: linear-gradient(140deg, rgba(52, 211, 153, 0.34), rgba(34, 211, 238, 0.14), rgba(148, 163, 184, 0.06));
+    box-shadow: 0 28px 72px -44px rgba(16, 185, 129, 0.45);
+  }
+
+
 
   .pg-card {
     @apply rounded-3xl border p-6 text-white;
@@ -116,5 +180,67 @@ pre,
     background:
       radial-gradient(circle at top left, rgba(20, 184, 166, 0.08), transparent 28%),
       linear-gradient(180deg, #020617 0%, #0f172a 100%);
+  }
+
+  .prose-shell {
+    @apply text-slate-300;
+  }
+
+  .prose-shell pre {
+    @apply mt-6 overflow-x-auto rounded-[1.5rem] border p-4 text-sm leading-7;
+    background: rgba(2, 6, 23, 0.86);
+    border-color: rgba(148, 163, 184, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .prose-shell pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  .prose-shell table {
+    @apply mt-6 w-full overflow-hidden rounded-[1.25rem] border text-left text-sm;
+    border-color: rgba(148, 163, 184, 0.14);
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .prose-shell thead {
+    background: rgba(15, 23, 42, 0.8);
+  }
+
+  .prose-shell th,
+  .prose-shell td {
+    @apply px-4 py-3 align-top;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .prose-shell th {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-slate-300;
+  }
+
+  .prose-shell tbody tr {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .prose-shell tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .prose-shell blockquote {
+    @apply rounded-r-[1.25rem] bg-white/4 py-3;
+  }
+
+  .prose-shell hr {
+    @apply my-8 border-0 border-t;
+    border-color: rgba(148, 163, 184, 0.14);
+  }
+
+  .heading-anchor {
+    @apply ml-3 text-sm opacity-0 transition-opacity;
+    color: #86efac;
+  }
+
+  .anchor-heading:hover .heading-anchor {
+    @apply opacity-100;
   }
 }

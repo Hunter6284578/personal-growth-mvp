@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 import { siteConfig } from '@/content/site'
 
 export const runtime = 'edge'
-export const alt = `${siteConfig.name} 个人网站`
+export const alt = siteConfig.title
 export const size = {
   width: 1200,
   height: 630,
@@ -19,10 +19,9 @@ export default function OpenGraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background:
-            'linear-gradient(140deg, rgb(248, 245, 239) 0%, rgb(243, 239, 232) 48%, rgb(230, 245, 242) 100%)',
+          background: 'linear-gradient(160deg, rgb(8, 17, 31) 0%, rgb(15, 23, 42) 60%, rgb(6, 78, 59) 100%)',
           padding: 56,
-          color: '#171717',
+          color: '#f8fafc',
         }}
       >
         <div
@@ -32,20 +31,20 @@ export default function OpenGraphImage() {
             gap: 14,
             fontSize: 28,
             fontWeight: 700,
-            letterSpacing: 6,
+            letterSpacing: 4,
             textTransform: 'uppercase',
-            color: '#0f766e',
+            color: '#86efac',
           }}
         >
-            CagedSheep
+          {siteConfig.title}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 900 }}>
           <div style={{ fontSize: 72, fontWeight: 700, lineHeight: 1.08 }}>
-            {siteConfig.name} · {siteConfig.role}
+            {siteConfig.role.zh}
           </div>
-          <div style={{ fontSize: 30, lineHeight: 1.45, color: '#44403c' }}>
-            作品、文字与日常片段，留给自己，也留给后来回看的时刻。
+          <div style={{ fontSize: 30, lineHeight: 1.45, color: '#cbd5e1' }}>
+            {siteConfig.description.zh}
           </div>
         </div>
 
@@ -55,7 +54,7 @@ export default function OpenGraphImage() {
             justifyContent: 'space-between',
             alignItems: 'center',
             fontSize: 24,
-            color: '#44403c',
+            color: '#cbd5e1',
           }}
         >
           <div>{siteConfig.github}</div>
