@@ -40,29 +40,29 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
 
       <div className={`mt-6 grid gap-4 ${compact ? 'md:grid-cols-2 xl:grid-cols-3' : 'xl:grid-cols-3'}`}>
         <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50/80 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">这件事从哪里开始</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">起因</p>
           <p className="mt-3 text-sm leading-6 text-stone-700">{project.problem}</p>
         </div>
         <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50/80 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">我主要做了什么</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">我做了什么</p>
           <p className="mt-3 text-sm leading-6 text-stone-700">
             {project.responsibilities[0]}
           </p>
         </div>
         <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50/80 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">最后留下了什么</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">结果</p>
           <p className="mt-3 text-sm leading-6 text-stone-700">{project.outcome}</p>
         </div>
       </div>
 
       <div className="mt-4 rounded-[1.5rem] border border-stone-200 bg-stone-50/80 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">我在其中的位置</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">我的角色</p>
         <p className="mt-3 text-sm leading-6 text-stone-700">{project.roleBoundary}</p>
       </div>
 
       <div className={`mt-6 grid gap-6 ${compact ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">过程里的动作</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">过程</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
             {project.responsibilities.map((item) => (
               <li key={item}>• {item}</li>
@@ -70,7 +70,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">当时的取舍</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">取舍</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
             {project.tradeoffs.map((item) => (
               <li key={item}>• {item}</li>
@@ -81,7 +81,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
 
       <div className={`mt-6 grid gap-6 ${compact ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">这件事说明了什么</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">收获</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
             {project.highlights.map((item) => (
               <li key={item}>• {item}</li>
@@ -89,7 +89,7 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">可看的痕迹</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">相关记录</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
             {project.evidence.map((item) => (
               <li key={item}>• {item}</li>

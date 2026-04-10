@@ -136,12 +136,12 @@ export const timeline = [
 export const featuredProjects: FeaturedProject[] = [
   {
     slug: 'career-growth-platform',
-    title: '个人品牌站与成长记录平台',
-    tagline: '把求职展示、内容沉淀和个人数据记录整合到一个可维护的站点里。',
+    title: '个人网站重构',
+    tagline: '把原本偏功能说明的页面，改成更像“我本人”的表达空间。',
     period: '2026',
     status: 'online',
     summary:
-      '把“求职介绍页”改造成真正可长期使用的个人网站。',
+      '这次重构不是为了展示技术栈，而是为了让站点气质回到个人表达本身。',
     problem:
       '旧版更像技术说明，缺少真实语气与个人气质。',
     outcome:
