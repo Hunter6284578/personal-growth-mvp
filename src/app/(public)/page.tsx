@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, NotebookPen, Mail, Clock3 } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, NotebookPen, Mail, Clock3 } from 'lucide-react'
 
 import { siteConfig } from '@/content/site'
 import { getPublishedPosts } from '@/lib/blog'
@@ -122,81 +122,52 @@ export default async function HomePage() {
         </section>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-        <section className="public-section space-y-6">
-          <SectionHeading
-            eyebrow={lang === 'zh' ? '最近日志' : 'Latest Notes'}
-            title={lang === 'zh' ? '最近写下的内容。' : 'Recent writing from the log.'}
-            description={lang === 'zh' ? '技术、项目、以及阶段性的自我复盘。' : 'Notes on tech, projects, and periodic reflection.'}
-          />
-          {recentPosts.length > 0 ? (
-            <div className="space-y-4">
-              {recentPosts.map((post) => {
-                const readingTime = Math.max(1, Math.ceil((post.content?.length || 0) / 320))
+      <section className="public-section space-y-6">
+        <SectionHeading
+          eyebrow={lang === 'zh' ? '最近日志' : 'Latest Notes'}
+          title={lang === 'zh' ? '最近写下的内容。' : 'Recent writing from the log.'}
+          description={lang === 'zh' ? '技术、项目、以及阶段性的自我复盘。' : 'Notes on tech, projects, and periodic reflection.'}
+        />
+        {recentPosts.length > 0 ? (
+          <div className="space-y-4">
+            {recentPosts.map((post) => {
+              const readingTime = Math.max(1, Math.ceil((post.content?.length || 0) / 320))
 
-                return (
-                  <Link key={post.id} href={`/blog/${post.slug}`} className="block rounded-[1.75rem] border border-white/10 bg-slate-950/40 p-5 transition hover:border-white/20 hover:-translate-y-0.5">
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <h3 className="text-lg font-semibold text-white">{post.title}</h3>
-                      <span className="metric-font text-xs text-slate-500">{formatDate(post.created_at, lang)}</span>
+              return (
+                <Link key={post.id} href={`/blog/${post.slug}`} className="block rounded-[1.75rem] border border-white/10 bg-slate-950/40 p-5 transition hover:border-white/20 hover:-translate-y-0.5">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <h3 className="text-lg font-semibold text-white">{post.title}</h3>
+                    <span className="metric-font text-xs text-slate-500">{formatDate(post.created_at, lang)}</span>
+                  </div>
+                  {post.summary ? <p className="mt-3 text-sm leading-6 text-slate-300">{post.summary}</p> : null}
+                  <div className="mt-3 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+                    <span className="inline-flex items-center gap-1.5">
+                      <Clock3 className="h-3.5 w-3.5" />
+                      {getReadingTimeLabel(readingTime, lang)}
+                    </span>
+                  </div>
+                  {post.tags?.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {post.tags.slice(0, 3).map((tag) => (
+                        <span key={`${post.id}-${tag}`} className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs font-medium text-slate-300">
+                          #{tag}
+                        </span>
+                      ))}
                     </div>
-                    {post.summary ? <p className="mt-3 text-sm leading-6 text-slate-300">{post.summary}</p> : null}
-                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.18em] text-slate-500">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Clock3 className="h-3.5 w-3.5" />
-                        {getReadingTimeLabel(readingTime, lang)}
-                      </span>
-                    </div>
-                    {post.tags?.length ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span key={`${post.id}-${tag}`} className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs font-medium text-slate-300">
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </Link>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
-              {lang === 'zh' ? '暂时还没有新的公开文章。' : 'No public notes yet.'}
-            </div>
-          )}
-          <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white">
-            <NotebookPen className="h-4 w-4" />
-            {lang === 'zh' ? '浏览全部日志' : 'Browse all notes'}
-          </Link>
-        </section>
-
-        <section className="public-section">
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-            <div className="space-y-4">
-              <p className="eyebrow">{lang === 'zh' ? '关于我' : 'About Me'}</p>
-              <h2 className="text-3xl font-semibold text-white">
-                {lang === 'zh' ? '我在做项目，也在认真经营自己的成长。' : 'I build projects and take my growth seriously.'}
-              </h2>
-              <p className="max-w-2xl text-base leading-7 text-slate-300">
-                {lang === 'zh'
-                  ? '如果你想快速了解我，可以从关于页开始；如果你更关心能力和思考方式，就直接去看项目和日志。'
-                  : 'If you want a quick sense of who I am, start with the about page. If you care more about capability and thinking, jump straight to projects and journal.'}
-              </p>
-            </div>
-            <div className="surface-panel p-6">
-              <div className="flex flex-wrap gap-3">
-                <Link href="/about" className="cta-primary">
-                  {lang === 'zh' ? '更多关于我' : 'Learn more'}
+                  ) : null}
                 </Link>
-                <Link href="/projects" className="cta-secondary">
-                  <BriefcaseBusiness className="h-4 w-4" />
-                  {lang === 'zh' ? '项目总览' : 'Project overview'}
-                </Link>
-              </div>
-            </div>
+              )
+            })}
           </div>
-        </section>
+        ) : (
+          <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
+            {lang === 'zh' ? '暂时还没有新的公开文章。' : 'No public notes yet.'}
+          </div>
+        )}
+        <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-slate-200 hover:text-white">
+          <NotebookPen className="h-4 w-4" />
+          {lang === 'zh' ? '浏览全部日志' : 'Browse all notes'}
+        </Link>
       </section>
     </div>
   )
