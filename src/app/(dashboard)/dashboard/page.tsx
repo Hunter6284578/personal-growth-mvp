@@ -189,62 +189,57 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <Card className="border-blue-500/20 bg-gradient-to-br from-gray-800 via-gray-900 to-gray-900 shadow-lg shadow-blue-950/20">
+      <Card className="border-emerald-500/15 bg-gradient-to-br from-emerald-950/40 via-[#0d1520] to-[#0d1520]">
         <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-emerald-900/30">
               {data.profile?.character_name?.[0] || user.email?.[0] || '?'}
             </div>
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-sm font-bold text-gray-900">
+            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-xs font-bold text-gray-900 border-2 border-[#0d1520]">
               {data.level}
             </div>
           </div>
           
           <div className="flex-1 text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
               <h1 className="text-2xl font-bold text-white">
                 {data.profile?.character_name || '冒险者'}
               </h1>
-              <span className="inline-block px-3 py-1 bg-blue-600/30 text-blue-400 text-sm rounded-full border border-blue-500/30">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/15 text-emerald-400 text-xs font-medium rounded-full border border-emerald-500/20">
+                <Sparkles className="w-3 h-3" />
                 {data.title}
               </span>
             </div>
-            <p className="text-gray-400 mt-1">
+            <p className="text-slate-400 mt-1 text-sm">
               {data.profile?.bio || '开始你的成长之旅'}
             </p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-4">
-              <span className="inline-flex items-center px-3 py-1 text-sm rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300">
-                <Sparkles className="w-3.5 h-3.5 mr-1" />
-                评分趋势 {avgDeltaLabel}
+            <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3 text-sm">
+              <span className="text-slate-500">
+                <span className="text-white font-medium">{data.avgScore}</span> 评分
               </span>
-              <span className="inline-flex items-center px-3 py-1 text-sm rounded-full border border-gray-600 bg-gray-800/80 text-gray-300">
-                连续记录 {data.streak || 0} 天
-              </span>
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3 text-sm">
-              <span className="text-gray-400">
-                <span className="text-white font-medium">{data.avgScore}</span> 综合评分
-              </span>
-              <span className="text-gray-600">|</span>
-              <span className="text-gray-400">
+              <span className="text-slate-700">|</span>
+              <span className="text-slate-500">
                 <span className="text-white font-medium">{data.dailyCount}</span> 天记录
               </span>
-              <span className="text-gray-600">|</span>
-              <span className="text-gray-400">
+              <span className="text-slate-700">|</span>
+              <span className="text-slate-500">
                 <span className="text-white font-medium">{data.eventsCount}</span> 个事件
+              </span>
+              <span className="text-slate-700">|</span>
+              <span className="text-slate-500">
+                <span className="text-emerald-400 font-medium">{data.streak || 0}</span> 天连续
               </span>
             </div>
           </div>
           
           {/* 等级进度 */}
-          <div className="text-center">
-            <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+          <div className="text-center shrink-0">
+            <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
               Lv.{data.level}
             </div>
-            <div className="text-sm text-gray-400 mt-1">{data.title}</div>
-            <div className="w-32 h-2 bg-gray-700 rounded-full mt-2 overflow-hidden">
+            <div className="w-28 h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden">
               <div 
-                className="h-full bg-gradient-to-r from-yellow-400 to-orange-500"
+                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
                 style={{ width: `${data.avgScore}%` }}
               />
             </div>
@@ -256,24 +251,24 @@ export default async function DashboardPage() {
         <StatCard
           label="每日记录"
           value={data.dailyCount}
-          icon={<Calendar className="w-6 h-6 text-blue-400" />}
+          icon={<Calendar className="w-6 h-6 text-emerald-400" />}
           trend={data.streak > 0 ? `${data.streak}天连续` : '开始记录'}
           trendUp={data.streak > 0}
         />
         <StatCard
           label="经历事件"
           value={data.eventsCount}
-          icon={<Lightbulb className="w-6 h-6 text-yellow-400" />}
+          icon={<Lightbulb className="w-6 h-6 text-amber-400" />}
         />
         <StatCard
           label="体测记录"
           value={data.fitnessCount}
-          icon={<Activity className="w-6 h-6 text-green-400" />}
+          icon={<Activity className="w-6 h-6 text-teal-400" />}
         />
         <StatCard
           label="综合评分"
           value={data.avgScore}
-          icon={<Award className="w-6 h-6 text-purple-400" />}
+          icon={<Award className="w-6 h-6 text-violet-400" />}
           trend={avgDelta === 0 ? '较上次持平' : `较上次 ${avgDeltaLabel}`}
           trendUp={avgTrendUp}
         />
@@ -300,7 +295,7 @@ export default async function DashboardPage() {
                   <Calendar className="w-8 h-8 text-gray-600" />
                 </div>
                 <p className="text-gray-400">暂无记录</p>
-                <a href="/dashboard/daily" className="text-blue-400 text-sm hover:underline mt-2 inline-block">
+                <a href="/dashboard/daily" className="text-emerald-400 text-sm hover:underline mt-2 inline-block">
                   去添加第一条记录 →
                 </a>
               </div>
@@ -335,7 +330,7 @@ export default async function DashboardPage() {
                   <Lightbulb className="w-8 h-8 text-gray-600" />
                 </div>
                 <p className="text-gray-400">暂无事件</p>
-                <a href="/dashboard/events" className="text-blue-400 text-sm hover:underline mt-2 inline-block">
+                <a href="/dashboard/events" className="text-emerald-400 text-sm hover:underline mt-2 inline-block">
                   去添加第一个事件 →
                 </a>
               </div>

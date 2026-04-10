@@ -13,6 +13,15 @@ import {
   LayoutDashboard,
   LogOut,
   Home,
+  CalendarDays,
+  BarChart3,
+  Lightbulb,
+  HeartPulse,
+  MessageSquareText,
+  PenLine,
+  Sparkles,
+  Settings,
+  ChevronRight,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
@@ -48,17 +57,42 @@ const publicNavItems = [
   },
 ]
 
-const dashboardNavItems = [
-  { href: '/dashboard', label: '总览' },
-  { href: '/dashboard/stats', label: '属性评分' },
-  { href: '/dashboard/daily', label: '每日记录' },
-  { href: '/dashboard/events', label: '事件库' },
-  { href: '/dashboard/fitness', label: '健康记录' },
-  { href: '/dashboard/thoughts', label: '短记录' },
-  { href: '/dashboard/blog', label: '文章管理' },
-  { href: '/dashboard/analysis', label: 'AI 分析' },
-  { href: '/dashboard/settings', label: '设置' },
+interface DashboardNavItem {
+  href: string
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  external?: boolean
+}
+
+const dashboardNavGroups: Array<{ title: string; items: DashboardNavItem[] }> = [
+  {
+    title: '工作台',
+    items: [
+      { href: '/dashboard', label: '总览', icon: LayoutDashboard },
+      { href: '/dashboard/daily', label: '每日记录', icon: CalendarDays },
+      { href: '/dashboard/events', label: '事件库', icon: Lightbulb },
+      { href: '/dashboard/thoughts', label: '短记录', icon: MessageSquareText },
+      { href: '/dashboard/blog', label: '文章管理', icon: PenLine },
+    ],
+  },
+  {
+    title: '数据',
+    items: [
+      { href: '/dashboard/stats', label: '属性评分', icon: BarChart3 },
+      { href: '/dashboard/fitness', label: '健康记录', icon: HeartPulse },
+      { href: '/fit', label: '健身训练', icon: Dumbbell },
+      { href: '/dashboard/analysis', label: 'AI 分析', icon: Sparkles },
+    ],
+  },
+  {
+    title: '账户',
+    items: [
+      { href: '/dashboard/settings', label: '设置', icon: Settings },
+    ],
+  },
 ]
+
+const flatNavItems = dashboardNavGroups.flatMap((g) => g.items)
 
 interface PublicNavigationProps {
   lang: SiteLanguage
@@ -242,65 +276,99 @@ export function DashboardNavigation() {
   const { signOut } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
+  const activeItem = flatNavItems.find((item) => isActive(item.href))
+
   return (
     <>
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      {/* 顶部导航 */}
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#0a0f1a]/90 backdrop-blur-xl">
+        <div className="flex h-14 items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setSidebarOpen((open) => !open)}
-              className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 md:hidden"
+              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white lg:hidden"
             >
-              <Menu className="h-5 w-5" />
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
-            <Link href="/dashboard" className="text-base font-semibold text-white">
-              Content Studio
+            <Link href="/dashboard" className="flex items-center gap-2.5">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20">
+                <LayoutDashboard className="h-4 w-4 text-emerald-400" />
+              </div>
+              <span className="text-sm font-semibold text-white">Studio</span>
             </Link>
+            {activeItem && (
+              <div className="hidden items-center gap-1.5 text-sm text-slate-500 sm:flex">
+                <ChevronRight className="h-3.5 w-3.5" />
+                <span className="text-slate-300">{activeItem.label}</span>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white">
-              返回公开站
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+            >
+              <Home className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">公开站</span>
             </Link>
-            <Button variant="outline" size="sm" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              退出
-            </Button>
+            <button
+              type="button"
+              onClick={signOut}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">退出</span>
+            </button>
           </div>
         </div>
       </nav>
 
+      {/* 侧边栏 */}
       <aside
-        className={`fixed inset-y-16 left-0 z-40 w-64 border-r border-slate-800 bg-slate-950/95 px-4 py-6 transition-transform duration-200 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        className={`fixed inset-y-14 left-0 z-40 w-60 border-r border-white/[0.06] bg-[#0a0f1a]/95 backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="space-y-1">
-          {dashboardNavItems.map((item) => {
-            const active = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`block rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
-                  active
-                    ? 'bg-teal-500/20 text-white'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                {item.label}
-              </Link>
-            )
-          })}
+        <div className="flex h-full flex-col overflow-y-auto px-3 py-4">
+          {dashboardNavGroups.map((group) => (
+            <div key={group.title} className="mb-6 last:mb-0">
+              <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                {group.title}
+              </p>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const Icon = item.icon
+                  const active = isActive(item.href)
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${
+                        active
+                          ? 'bg-emerald-500/15 text-emerald-300'
+                          : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </aside>
 
+      {/* 移动端遮罩 */}
       {sidebarOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-30 bg-slate-950/50 md:hidden"
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-label="关闭侧边栏"
         />

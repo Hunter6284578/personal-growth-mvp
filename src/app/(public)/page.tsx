@@ -103,16 +103,6 @@ export default async function HomePage() {
         </section>
       </section>
 
-      <section className="public-section space-y-6">
-        <SectionHeading
-          eyebrow={lang === 'zh' ? '成长时间线' : 'Growth Timeline'}
-          title={lang === 'zh' ? '几个阶段性的节点。' : 'A few milestones from the journey.'}
-        />
-        <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-slate-950/30 px-5 py-8 text-sm text-slate-400">
-          {lang === 'zh' ? '暂无时间线，待添加。' : 'No timeline yet. Coming soon.'}
-        </div>
-      </section>
-
       <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <section className="public-section space-y-6">
           <SectionHeading
