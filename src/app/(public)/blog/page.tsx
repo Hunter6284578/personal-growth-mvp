@@ -43,23 +43,23 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <section className="public-section space-y-8">
         <SectionHeading
           eyebrow="Blog / Notes"
-          title="这里记录技术学习、项目复盘和阶段总结。"
-          description="内容定位偏“可复盘的记录”，而不是松散流水账。列表按时间倒序展示，并支持按标签筛选。"
+          title="博客是复盘库，不是心情墙。"
+          description="每篇文章固定结构：背景 -> 方案 -> 踩坑 -> 结果 -> 可复用结论。"
         />
 
         <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-[1.75rem] border border-stone-200 bg-white p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">公开文章</p>
             <p className="mt-3 text-3xl font-semibold text-stone-950">{posts.length}</p>
-            <p className="mt-2 text-sm leading-6 text-stone-600">按时间倒序呈现，优先放技术复盘和项目记录。</p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">只收录“可验证、可复用”的工程记录。</p>
           </div>
           <div className="rounded-[1.75rem] border border-stone-200 bg-white p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">标签数量</p>
             <p className="mt-3 text-3xl font-semibold text-stone-950">{tags.length}</p>
-            <p className="mt-2 text-sm leading-6 text-stone-600">标签用于快速筛选主题，不做复杂分类系统。</p>
+            <p className="mt-2 text-sm leading-6 text-stone-600">标签是检索入口，不替代文章结构质量。</p>
           </div>
           <div className="rounded-[1.75rem] border border-stone-200 bg-white p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">当前主题</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">推荐主题</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {blogThemes.map((theme) => (
                 <span key={theme} className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
@@ -102,6 +102,17 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
         </div>
 
+        <div className="rounded-[2rem] border border-stone-200 bg-stone-50/60 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">推荐写作模板</p>
+          <div className="mt-3 grid gap-2 text-sm text-stone-700 md:grid-cols-5">
+            <span>1. 背景</span>
+            <span>2. 方案</span>
+            <span>3. 踩坑</span>
+            <span>4. 结果</span>
+            <span>5. 可复用结论</span>
+          </div>
+        </div>
+
         {posts.length < 3 ? (
           <div className="rounded-[2rem] border border-dashed border-stone-300 bg-white px-6 py-5 text-sm leading-7 text-stone-600">
             当前公开内容还偏少，这属于正常阶段。接下来更值得补的是项目拆解、踩坑复盘和阶段总结，而不是泛泛而谈的“学习日记”。
@@ -122,10 +133,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   <h2 className="text-2xl font-semibold tracking-tight text-stone-950">
                     {post.title}
                   </h2>
-                  <p className="mt-4 text-base leading-7 text-stone-600">
-                    {post.summary?.trim() || stripMarkdown(post.content).slice(0, 140) || '这篇记录还没有补摘要，后续会继续完善。'}
-                  </p>
-                </div>
+                    <p className="mt-4 text-base leading-7 text-stone-600">
+                      {post.summary?.trim() || stripMarkdown(post.content).slice(0, 140) || '这篇记录还没有补摘要，后续会继续完善。'}
+                    </p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500">复盘导向内容</p>
+                  </div>
                 <div className="space-y-2 text-sm text-stone-500">
                   <p className="inline-flex items-center gap-2">
                     <CalendarDays className="h-4 w-4" />
@@ -154,7 +166,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           ))
         ) : (
           <div className="rounded-[2rem] border border-dashed border-stone-300 bg-white px-6 py-10 text-sm text-stone-500">
-            当前标签下还没有内容。你可以先返回 <Link href="/blog" className="font-medium text-teal-700 hover:text-teal-600">全部文章</Link>，或者后续补一篇对应主题的记录。
+            当前标签下还没有内容。建议优先补一篇真实上线复盘，再扩展其他主题。
           </div>
         )}
       </section>

@@ -14,10 +14,16 @@ export default function ProjectsPage() {
   return (
     <div className="space-y-8 lg:space-y-10">
       <section className="public-section space-y-8">
+        <div className="rounded-lg border border-stone-200 bg-stone-50/70 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">阅读建议</p>
+          <p className="mt-2 text-sm leading-7 text-stone-700">
+            每个项目按同一顺序阅读：背景 {`->`} 职责边界 {`->`} 难点取舍 {`->`} 结果指标 {`->`} 证据链接。
+          </p>
+        </div>
         <SectionHeading
           eyebrow="Projects"
-          title="项目页重点回答三件事：做了什么、解决了什么、体现了什么能力。"
-          description="目前先把已有个人站模块拆成三个代表方向展示，后续你可以直接在 `src/content/site.ts` 里替换成真实项目。"
+          title="项目页只回答一件事：你是否真的交付过。"
+          description="每个项目默认包含职责边界、关键取舍、可验证证据与结果指标，避免空话。"
         />
         <div className="grid gap-6">
           {featuredProjects.map((project) => (
@@ -30,26 +36,34 @@ export default function ProjectsPage() {
 
       <section className="public-section space-y-6">
         <SectionHeading
-          eyebrow="How To Extend"
-          title="后续补充真实项目时，优先补四类信息。"
+          eyebrow="Evidence Checklist"
+          title="新增项目时，请先补齐这 6 条证据。"
         />
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {[
             {
-              title: '项目背景',
-              description: '为什么做、面向谁、核心问题是什么。',
+              title: '上线地址',
+              description: '有可访问链接，或可运行仓库与启动说明。',
             },
             {
-              title: '我的职责',
-              description: '你负责了哪些模块，做的是主导还是协作。',
+              title: '职责边界',
+              description: '明确你独立负责与协作部分，避免“全包式”叙述。',
             },
             {
               title: '难点与取舍',
-              description: '遇到了什么限制，为什么这样设计。',
+              description: '说明限制条件、替代方案和最终决策理由。',
             },
             {
-              title: '结果与证明',
-              description: '上线、指标、截图、Demo、文档或 GitHub 链接。',
+              title: '结果指标',
+              description: '给出可量化结果：性能、交付周期、功能覆盖等。',
+            },
+            {
+              title: '复盘结论',
+              description: '总结可迁移经验，体现你能持续优化。',
+            },
+            {
+              title: '持续状态',
+              description: '标注当前状态：运行中、迭代中、已归档。',
             },
           ].map((item) => (
             <div key={item.title} className="rounded-[2rem] border border-stone-200 bg-white p-6">

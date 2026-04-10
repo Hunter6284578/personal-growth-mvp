@@ -17,9 +17,9 @@ export default async function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[1.4fr_0.8fr] lg:items-end">
           <div className="space-y-6">
             <div className="space-y-4">
-              <p className="eyebrow">CagedSheep</p>
+              <p className="eyebrow">30 秒说服路径</p>
               <h1 className="max-w-4xl text-4xl font-semibold leading-tight text-stone-950 sm:text-5xl">
-                在有限之境，记录生长与微光。
+                我是能把需求变成可运行交付的全栈实践者。
               </h1>
               <p className="max-w-3xl text-base leading-8 text-stone-600">{siteConfig.heroIntro}</p>
             </div>
@@ -36,21 +36,27 @@ export default async function HomePage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              {siteConfig.targetRoles.map((item) => (
-                <div key={item} className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">站点方向</p>
-                  <p className="mt-2 text-sm font-semibold text-stone-950">{item}</p>
-                </div>
-              ))}
+              <div className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">我是谁</p>
+                <p className="mt-2 text-sm font-semibold text-stone-950">前端 / 全栈方向求职者</p>
+              </div>
+              <div className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">我解决什么</p>
+                <p className="mt-2 text-sm font-semibold text-stone-950">个人站、内容系统、数据记录闭环</p>
+              </div>
+              <div className="rounded-lg border border-stone-200 bg-stone-50/70 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">为何值得面试</p>
+                <p className="mt-2 text-sm font-semibold text-stone-950">有线上交付与复盘证据</p>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-3">
               <Link href="/projects" className="inline-flex items-center gap-2 rounded-md bg-stone-950 px-5 py-3 text-sm font-medium text-white">
-                看代表项目
+                看项目证据
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/about" className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 hover:border-stone-950 hover:text-stone-950">
-                查看 Resume
+                看岗位匹配信息
               </Link>
               <Link href={`mailto:${siteConfig.email}`} className="inline-flex items-center gap-2 rounded-md border border-stone-300 px-5 py-3 text-sm font-medium text-stone-700 hover:border-stone-950 hover:text-stone-950">
                 <Mail className="h-4 w-4" />
@@ -84,11 +90,11 @@ export default async function HomePage() {
       </section>
 
       <section className="public-section space-y-8">
-        <SectionHeading
-          eyebrow="Featured Work"
-          title="先用项目说话，再谈能力。"
-          description="优先展示项目背景、职责与结果，用交付证明能力。"
-        />
+          <SectionHeading
+            eyebrow="Featured Work"
+            title="先看证据，再看描述。"
+            description="每个项目都包含职责边界、技术取舍、可验证证据与结果指标。"
+          />
         <div className="grid gap-6">
           {featuredProjects.slice(0, 2).map((project) => (
             <ProjectCard key={project.slug} project={project} compact />
@@ -102,7 +108,7 @@ export default async function HomePage() {
 
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="public-section space-y-8">
-          <SectionHeading eyebrow="Core Skills" title="克制表达，长期维护。" description="功能不是越多越好，而是稳定可持续。"/>
+          <SectionHeading eyebrow="Core Skills" title="能力结构" description="关注可交付与可协作能力，不只罗列名词。"/>
           <div className="grid gap-4 md:grid-cols-2">
             {skillGroups.map((group) => (
               <SkillGroupCard key={group.title} title={group.title} items={group.items} />
@@ -111,7 +117,7 @@ export default async function HomePage() {
         </div>
 
         <section className="public-section space-y-6">
-          <SectionHeading eyebrow="Recent Notes" title="最近在沉淀什么" description="用稳定写作替代噪声更新。"/>
+          <SectionHeading eyebrow="Recent Notes" title="最近在沉淀什么" description="只保留问题复盘、技术决策、上线记录三类内容。"/>
           {recentPosts.length > 0 ? (
             <div className="space-y-4">
               {recentPosts.map((post) => (
@@ -120,7 +126,10 @@ export default async function HomePage() {
                     <h3 className="text-lg font-semibold text-stone-950">{post.title}</h3>
                     <span className="metric-font text-xs text-stone-500">{new Date(post.created_at).toLocaleDateString('zh-CN')}</span>
                   </div>
-                  {post.summary ? <p className="mt-3 text-sm leading-6 text-stone-600">{post.summary}</p> : null}
+                      {post.summary ? <p className="mt-3 text-sm leading-6 text-stone-600">{post.summary}</p> : null}
+                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500">
+                        结构：背景 {`->`} 方案 {`->`} 踩坑 {`->`} 结果 {`->`} 复用结论
+                      </p>
                   {post.tags?.length ? (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {post.tags.slice(0, 3).map((tag) => (
@@ -135,7 +144,7 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-stone-300 bg-white px-5 py-8 text-sm text-stone-500">
-              文章内容持续补充中。
+              暂无可公开复盘。新内容会优先补上线记录和技术决策。
             </div>
           )}
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-stone-700 hover:text-stone-950">
@@ -149,9 +158,9 @@ export default async function HomePage() {
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div className="space-y-4">
             <p className="eyebrow">Contact</p>
-            <h2 className="text-3xl font-semibold text-stone-950">如果你看到这里，欢迎直接联系我。</h2>
+            <h2 className="text-3xl font-semibold text-stone-950">如果你在评估我，建议先看项目页与博客复盘。</h2>
             <p className="max-w-2xl text-base leading-7 text-stone-600">
-              这个站点会持续沉淀项目、文章与创作记录。
+              这不是一次性包装页，而是持续维护的线上证据库。
             </p>
           </div>
           <div className="surface-panel p-6">

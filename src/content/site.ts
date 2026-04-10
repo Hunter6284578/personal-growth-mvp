@@ -22,8 +22,15 @@ export interface FeaturedProject {
   summary: string
   problem: string
   outcome: string
+  roleBoundary: string
   responsibilities: string[]
+  tradeoffs: string[]
   highlights: string[]
+  evidence: string[]
+  metrics: Array<{
+    label: string
+    value: string
+  }>
   techStack: string[]
   links: ProjectLink[]
 }
@@ -35,7 +42,7 @@ export interface FitnessCapability {
 
 export const siteConfig = {
   name: 'CagedSheep',
-  role: '清冷克制的个人创作与工程记录',
+  role: '能交付、能复盘、能持续迭代的全栈站点作者',
   roleShort: '极简个人站',
   location: '中国 · 上海时区',
   email: '996717215@qq.com',
@@ -45,22 +52,18 @@ export const siteConfig = {
   icpLink: 'https://beian.miit.gov.cn/',
   resumeUrl: '',
   description:
-    '笼中羊，一个清冷、克制、留白的极简个人博客与作品站点。',
+    'CagedSheep 是一个“用证据说话”的个人站点：项目交付、技术复盘与持续迭代并行。',
   heroIntro:
-    '在有限之境，持续记录项目、作品、文字与思考。',
-  heroFocus: [
-    '极简文艺风',
-    '内容长期沉淀',
-    '工程化可维护',
-  ],
-  targetRoles: ['博客写作', '摄影作品', '独立项目'],
+    '我把个人站当成长期产品：每个模块都要有交付结果、技术取舍与可验证证据。',
+  heroFocus: ['项目可验证', '技术可复盘', '系统可持续'],
+  targetRoles: ['前端 / 全栈实习', '内容型产品工程', '工程化协作岗位'],
   now: [
     '持续迭代站点体验与内容结构',
     '沉淀技术实践与创作过程',
     '保持克制、稳定、长期更新',
   ],
   lookingFor:
-    '这里不是一次性展示页，而是长期记录与作品归档入口。',
+    '目标岗位是前端/全栈方向实习与校招，期望参与真实业务迭代并持续交付。',
   contactLinks: [
     { label: 'GitHub', href: 'https://github.com/Hunter6284578' },
     { label: 'Email', href: 'mailto:996717215@qq.com' },
@@ -138,20 +141,35 @@ export const featuredProjects: FeaturedProject[] = [
     period: '2026',
     status: 'online',
     summary:
-      '基于 Next.js App Router 和 Supabase 搭建公开站 + 私密工作台，覆盖内容展示、记录录入、后台管理和 AI 分析能力。',
+      '基于 Next.js App Router + Supabase 重构公开站与私密工作台，并在 Vercel 上稳定部署。',
     problem:
       '把原本偏成长面板的 MVP 重构为真正服务求职展示的公开站，同时保留博客、记录和私密录入工作区。',
     outcome:
-      '形成一套既能公开展示项目能力、又能长期沉淀内容和数据记录的统一站点结构。',
+      '形成“公开展示 + 私密录入 + AI 分析”的统一架构，站点可持续迭代且可直接上线。',
+    roleBoundary: '独立完成信息架构、页面开发、Supabase 数据层与 Vercel 发布链路。',
     responsibilities: [
       '负责信息架构重构与公开站页面设计',
       '设计前后台边界与内容管理流程',
       '实现认证、内容 CRUD、训练记录和 AI 调用封装',
     ],
+    tradeoffs: [
+      '优先保证部署稳定性与可维护性，弱化花哨交互',
+      '对 AI 接口先做通用抽象，再补复杂策略',
+    ],
     highlights: [
       '将原本偏游戏化的成长记录站改造成求职导向的个人品牌站',
       '用一套代码同时承载公开展示、博客沉淀和私密录入工作区',
       '为后续博客、训练记录和 AI 建议扩展预留清晰边界',
+    ],
+    evidence: [
+      '线上域名持续可访问，主分支自动触发 Vercel 部署',
+      '公开站与工作台共享一套数据模型，避免双系统重复维护',
+      '关键页面提供 canonical、sitemap、JSON-LD 等 SEO 基础能力',
+    ],
+    metrics: [
+      { label: '核心页面', value: '5 个公开页面 + 多个工作台页面' },
+      { label: '部署方式', value: 'GitHub Push -> Vercel 自动发布' },
+      { label: '内容链路', value: '博客 CRUD + 训练记录 + AI 分析' },
     ],
     techStack: ['Next.js 16', 'React 19', 'TypeScript', 'Tailwind CSS 4', 'Supabase'],
     links: [
@@ -165,20 +183,35 @@ export const featuredProjects: FeaturedProject[] = [
     period: '2026',
     status: 'online',
     summary:
-      '将健身记录做成个人站的一部分，而不是独立 App，重点呈现自律、数据意识和持续成长。',
+      '将训练记录模块嵌入个人站，强调真实使用与长期维护，而非一次性展示。',
     problem:
       '需要在不破坏求职主线的前提下，加入真正可用的训练记录能力，而不是只放一个“我在健身”的页面。',
     outcome:
-      '支持训练日志、动作趋势和频率观察，让健身模块成为长期主义与数据意识的辅助证明。',
+      '实现日志录入、历史回看、AI 建议调用，为“记录->反馈->调整”提供闭环。',
+    roleBoundary: '独立负责训练数据结构、录入流程、趋势展示与接口联调。',
     responsibilities: [
       '设计训练日志、动作库和离线缓存流程',
       '实现周训练频率、训练容量和历史记录展示',
       '控制复杂度，保持适合长期维护的模块边界',
     ],
+    tradeoffs: [
+      '先做关键字段与核心流程，避免一次性过度建模',
+      '优先数据准确性和录入体验，再做可视化丰富度',
+    ],
     highlights: [
       '支持训练日志录入、历史查看和动作维度分析',
       '保留私密数据录入能力，同时在公开站弱化展示不抢主线',
       '为后续体重趋势、恢复状态和目标管理预留扩展空间',
+    ],
+    evidence: [
+      '已上线 /fit 工作台，支持训练与健康数据录入',
+      '训练建议由真实历史数据驱动，不是纯静态文案',
+      '数据表与接口按用户隔离，符合私密记录场景',
+    ],
+    metrics: [
+      { label: '记录范围', value: '训练动作、组次、容量、健康数据' },
+      { label: '分析周期', value: '默认近 14 天数据汇总' },
+      { label: '接口能力', value: '/api/fit/plan 可返回结构化建议' },
     ],
     techStack: ['Next.js', 'Supabase', 'Recharts', 'Local Storage'],
     links: [],
@@ -190,20 +223,35 @@ export const featuredProjects: FeaturedProject[] = [
     period: '2026',
     status: 'building',
     summary:
-      '抽象 AI Provider，兼容 OpenAI-style API，输出本周总结、恢复提醒、训练频率和负重建议，并明确免责声明。',
+      '抽象多 Provider AI 调用层，统一请求格式与错误处理，服务训练与成长分析场景。',
     problem:
       'AI 能力不能写死在单一接口和单一提示词里，必须为后续更换模型、扩展输入和保存历史留出边界。',
     outcome:
-      '已经具备通用 Provider 抽象和训练摘要逻辑，后续可以继续补分析维度和建议历史展示。',
+      '形成可替换模型的 AI 基础设施，降低后续更换服务商与扩展分析任务的成本。',
+    roleBoundary: '负责 Provider 抽象、提示词编排、接口稳定性与调用保护。',
     responsibilities: [
       '设计 provider 抽象与环境变量配置方式',
       '定义输入摘要结构和建议输出格式',
       '实现建议生成接口与前端反馈状态',
     ],
+    tradeoffs: [
+      '先保证接口统一和可回退，再追求复杂 Prompt 能力',
+      '对高成本调用增加基础限流与鉴权',
+    ],
     highlights: [
       '避免把建议逻辑写死在单一模型或单一场景里',
       '支持未来接入 OpenAI、DeepSeek、Gemini 与兼容接口',
       '输出风格强调实用和克制，不伪装成医疗系统',
+    ],
+    evidence: [
+      '支持 deepseek/openai/gemini/openai-compatible 多后端切换',
+      '分析接口增加鉴权、限流、日志与统一错误返回',
+      '可通过 revalidate 接口刷新内容缓存，保证发布链路可控',
+    ],
+    metrics: [
+      { label: 'Provider 支持', value: '4 类' },
+      { label: '接口约束', value: 'Node runtime + rate limit + auth' },
+      { label: '输出场景', value: '周分析、事件分析、训练建议' },
     ],
     techStack: ['TypeScript', 'Fetch API', 'Prompt Engineering', 'Supabase'],
     links: [],

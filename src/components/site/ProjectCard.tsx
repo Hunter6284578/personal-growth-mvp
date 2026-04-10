@@ -55,11 +55,14 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
         </div>
       </div>
 
+      <div className="mt-4 rounded-[1.5rem] border border-stone-200 bg-stone-50/80 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">职责边界</p>
+        <p className="mt-3 text-sm leading-6 text-stone-700">{project.roleBoundary}</p>
+      </div>
+
       <div className={`mt-6 grid gap-6 ${compact ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-            关键动作
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">关键动作</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
             {project.responsibilities.map((item) => (
               <li key={item}>• {item}</li>
@@ -67,15 +70,41 @@ export function ProjectCard({ project, compact = false }: ProjectCardProps) {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-            体现能力
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">难点与取舍</p>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+            {project.tradeoffs.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className={`mt-6 grid gap-6 ${compact ? 'lg:grid-cols-1' : 'lg:grid-cols-2'}`}>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">体现能力</p>
           <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
             {project.highlights.map((item) => (
               <li key={item}>• {item}</li>
             ))}
           </ul>
         </div>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">可验证证据</p>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-stone-700">
+            {project.evidence.map((item) => (
+              <li key={item}>• {item}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-3 md:grid-cols-3">
+        {project.metrics.map((metric) => (
+          <div key={metric.label} className="rounded-xl border border-stone-200 bg-white p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">{metric.label}</p>
+            <p className="mt-2 text-sm font-semibold text-stone-900">{metric.value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="mt-6 flex flex-wrap gap-2">
