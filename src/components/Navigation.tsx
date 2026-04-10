@@ -109,43 +109,37 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
     href === '/' ? pathname === href : pathname.startsWith(href)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#08111f]/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40" style={{ borderBottom: '1px solid var(--border)', background: 'color-mix(in srgb, var(--bg) 85%, transparent)', backdropFilter: 'blur(8px)' }}>
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4 sm:px-8 lg:px-0">
         <Link href="/" className="min-w-0">
-          <p className="hidden truncate text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300/80 sm:block">
-            {pickText(siteConfig.role, lang)}
+          <p className="text-sm font-normal" style={{ fontFamily: 'var(--font-title), serif', color: 'var(--text-bright)' }}>
+            {siteConfig.title}
           </p>
-          <div className="flex items-center gap-3">
-            <p className="text-lg font-semibold text-white">{siteConfig.title}</p>
-            <span className="rounded-full border border-white/10 bg-white/6 px-2.5 py-1 text-[11px] font-semibold text-slate-300 sm:hidden">
-              {pickText(siteConfig.roleShort, lang)}
-            </span>
-          </div>
         </Link>
 
-        <nav className="hidden items-center gap-2 lg:flex">
+        <nav className="hidden items-center gap-6 lg:flex">
           {publicNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                isActive(item.href)
-                  ? 'border-emerald-400/40 bg-emerald-400/12 text-white'
-                  : 'border-white/10 bg-white/6 text-slate-300 hover:border-white/20 hover:text-white'
-              }`}
+              className="text-sm transition-colors"
+              style={{
+                color: isActive(item.href) ? 'var(--text-bright)' : 'var(--text-dim)',
+              }}
             >
               {pickText(item.label, lang)}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-4 lg:flex">
           <LanguageSwitch lang={lang} />
           <Link
             href={siteConfig.github}
             target="_blank"
             rel="noreferrer"
-            className="text-sm font-medium text-slate-300 transition-colors hover:text-white"
+            className="text-sm transition-colors"
+            style={{ color: 'var(--text-dim)' }}
           >
             GitHub
           </Link>
@@ -155,26 +149,24 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="border border-white/10 bg-white/6 text-slate-100 hover:bg-white/10 hover:text-white"
+                  style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}
                 >
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
                   Studio
                 </Button>
               </Link>
               <Button
                 variant="outline"
                 size="sm"
-                className="border-white/15 bg-transparent text-slate-200 hover:bg-white/8 hover:text-white"
+                style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}
                 onClick={signOut}
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                {lang === 'zh' ? '退出' : 'Sign out'}
+                {lang === 'zh' ? '退出' : 'Out'}
               </Button>
             </>
           ) : (
             <Link href="/login">
               <Button variant="primary" size="sm">
-                {lang === 'zh' ? '登录工作台' : 'Studio Login'}
+                {lang === 'zh' ? '工作台' : 'Studio'}
               </Button>
             </Link>
           )}
@@ -185,7 +177,8 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
-            className="inline-flex rounded-full border border-white/12 bg-white/6 p-2 text-slate-200"
+            className="inline-flex rounded border p-2 transition-colors"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
             aria-label={lang === 'zh' ? '切换菜单' : 'Toggle menu'}
             aria-expanded={mobileMenuOpen}
           >
@@ -195,16 +188,17 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
       </div>
 
       {mobileMenuOpen ? (
-        <div className="border-t border-white/10 bg-[#08111f]/95 px-4 py-4 lg:hidden">
-          <div className="mb-4 rounded-[1.75rem] border border-white/10 bg-white/6 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300/80">
-              {lang === 'zh' ? '简介' : 'Intro'}
+        <div className="px-6 py-4 lg:hidden" style={{ borderTop: '1px solid var(--border)' }}>
+          <div className="mb-4" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+            <p className="text-sm" style={{ fontFamily: 'var(--font-title), serif', color: 'var(--text-bright)' }}>
+              {pickText(siteConfig.role, lang)}
             </p>
-            <p className="mt-2 text-base font-semibold text-white">{pickText(siteConfig.role, lang)}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">{pickText(siteConfig.lookingFor, lang)}</p>
+            <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
+              {pickText(siteConfig.lookingFor, lang)}
+            </p>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             {publicNavItems.map((item) => {
               const Icon = item.icon
               return (
@@ -212,11 +206,10 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium ${
-                    isActive(item.href)
-                      ? 'border-emerald-400/40 bg-emerald-400/12 text-white'
-                      : 'border-white/10 bg-white/6 text-slate-300'
-                  }`}
+                  className="flex items-center gap-3 px-3 py-2 text-sm transition-colors"
+                  style={{
+                    color: isActive(item.href) ? 'var(--text-bright)' : 'var(--text-dim)',
+                  }}
                 >
                   <Icon className="h-4 w-4" />
                   {pickText(item.label, lang)}
@@ -230,39 +223,34 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
               href={siteConfig.github}
               target="_blank"
               rel="noreferrer"
-              className="rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-slate-200"
+              className="text-sm transition-colors"
+              style={{ color: 'var(--text-dim)' }}
             >
               GitHub
             </Link>
             {user ? (
               <>
                 <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="border border-white/10 bg-white/6 text-slate-100 hover:bg-white/10 hover:text-white"
-                  >
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <Button variant="ghost" size="sm" style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}>
                     Studio
                   </Button>
                 </Link>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-white/15 bg-transparent text-slate-200 hover:bg-white/8 hover:text-white"
+                  style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}
                   onClick={() => {
                     signOut()
                     setMobileMenuOpen(false)
                   }}
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {lang === 'zh' ? '退出' : 'Sign out'}
+                  {lang === 'zh' ? '退出' : 'Out'}
                 </Button>
               </>
             ) : (
               <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="primary" size="sm">
-                  {lang === 'zh' ? '登录工作台' : 'Studio Login'}
+                  {lang === 'zh' ? '工作台' : 'Studio'}
                 </Button>
               </Link>
             )}

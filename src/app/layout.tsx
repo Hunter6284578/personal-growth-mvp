@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Noto_Sans_SC, JetBrains_Mono } from 'next/font/google'
+import { Noto_Sans_SC, Noto_Serif_SC, JetBrains_Mono } from 'next/font/google'
 import { siteConfig } from '@/content/site'
 import { getCurrentLanguage } from '@/lib/site-language.server'
 
@@ -9,6 +9,15 @@ const bodyFont = Noto_Sans_SC({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-body',
+  preload: true,
+})
+
+const titleFont = Noto_Serif_SC({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  display: 'swap',
+  variable: '--font-title',
+  preload: true,
 })
 
 const monoFont = JetBrains_Mono({
@@ -80,8 +89,11 @@ export default async function RootLayout({
   const language = await getCurrentLanguage()
 
   return (
-    <html lang={language === 'zh' ? 'zh-CN' : 'en'} className={`${bodyFont.variable} ${monoFont.variable}`}>
-      <body className={`${bodyFont.className} min-h-screen bg-[#08111f] text-slate-50 antialiased`}>
+    <html
+      lang={language === 'zh' ? 'zh-CN' : 'en'}
+      className={`${bodyFont.variable} ${titleFont.variable} ${monoFont.variable}`}
+    >
+      <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
         {children}
       </body>
     </html>

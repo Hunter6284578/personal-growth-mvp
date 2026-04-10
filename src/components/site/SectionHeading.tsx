@@ -6,21 +6,20 @@ interface SectionHeadingProps {
 
 export function SectionHeading({ eyebrow, title, description }: SectionHeadingProps) {
   return (
-    <div className="max-w-3xl space-y-3">
+    <div className="space-y-2">
       {eyebrow ? (
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300/85">
+        <p className="eyebrow">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+      <h2 className="text-xl font-normal sm:text-2xl" style={{ fontFamily: 'var(--font-title), serif' }}>
         {title}
       </h2>
       {description ? (
-        <p className="text-base leading-7 text-slate-300 sm:text-lg">
+        <p className="text-sm leading-[1.9]" style={{ color: 'var(--text-dim)' }}>
           {description}
         </p>
       ) : null}
     </div>
   )
 }
-
