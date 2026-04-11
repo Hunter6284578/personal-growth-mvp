@@ -28,25 +28,25 @@ import { LifeEvent, AIAnalysis } from '@/types'
 
 const markdownComponents: Components = {
   h2: ({ children }) => (
-    <h2 className="text-xl font-bold text-white mt-6 mb-3">{children}</h2>
+    <h2 className="text-xl font-bold mt-6 mb-3" style={{ color: 'var(--text-bright)' }}>{children}</h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-lg font-semibold text-white mt-4 mb-2">{children}</h3>
+    <h3 className="text-lg font-semibold mt-4 mb-2" style={{ color: 'var(--text-bright)' }}>{children}</h3>
   ),
   strong: ({ children }) => (
-    <strong className="text-white">{children}</strong>
+    <strong style={{ color: 'var(--text-bright)' }}>{children}</strong>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc ml-4 text-gray-300 space-y-1">{children}</ul>
+    <ul className="list-disc ml-4 space-y-1" style={{ color: 'var(--text)' }}>{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal ml-4 text-gray-300 space-y-1">{children}</ol>
+    <ol className="list-decimal ml-4 space-y-1" style={{ color: 'var(--text)' }}>{children}</ol>
   ),
   li: ({ children }) => (
-    <li className="text-gray-300 mb-1">{children}</li>
+    <li className="mb-1" style={{ color: 'var(--text)' }}>{children}</li>
   ),
   p: ({ children }) => (
-    <p className="text-gray-300 mb-2 leading-relaxed">{children}</p>
+    <p className="mb-2 leading-relaxed" style={{ color: 'var(--text)' }}>{children}</p>
   ),
 }
 
@@ -84,11 +84,11 @@ type LoadingState = 'idle' | 'loading' | 'success' | 'error'
 function SkeletonCard() {
   return (
     <div className="animate-pulse space-y-4">
-      <div className="h-4 bg-gray-700 rounded w-1/3"></div>
+      <div className="h-4 rounded w-1/3" style={{ background: 'var(--dash-card-soft)' }}></div>
       <div className="space-y-3">
-        <div className="h-20 bg-gray-800 rounded"></div>
-        <div className="h-20 bg-gray-800 rounded"></div>
-        <div className="h-20 bg-gray-800 rounded"></div>
+        <div className="h-20 rounded" style={{ background: 'var(--dash-card-soft)' }}></div>
+        <div className="h-20 rounded" style={{ background: 'var(--dash-card-soft)' }}></div>
+        <div className="h-20 rounded" style={{ background: 'var(--dash-card-soft)' }}></div>
       </div>
     </div>
   )
@@ -108,15 +108,16 @@ function EmptyState({
 }) {
   return (
     <div className="text-center py-8">
-      <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-        <Icon className="w-8 h-8 text-gray-600" />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--dash-card-soft)' }}>
+        <Icon className="w-8 h-8" style={{ color: 'var(--text-dim)' }} />
       </div>
-      <p className="text-gray-400 font-medium">{title}</p>
-      <p className="text-gray-500 text-sm mt-1">{description}</p>
+      <p className="font-medium" style={{ color: 'var(--text-muted)' }}>{title}</p>
+      <p className="text-sm mt-1" style={{ color: 'var(--text-dim)' }}>{description}</p>
       {action && (
         <a 
           href={action.href}
-          className="inline-flex items-center text-blue-400 text-sm hover:underline mt-3"
+          className="inline-flex items-center text-sm hover:underline mt-3"
+          style={{ color: 'var(--dash-info)' }}
         >
           {action.label}
           <RefreshCw className="w-3 h-3 ml-1" />
@@ -135,18 +136,19 @@ function ErrorState({
   onRetry?: () => void 
 }) {
   return (
-    <div className="bg-red-900/20 border border-red-800 rounded-lg p-6">
+    <div className="rounded-lg p-6" style={{ background: 'rgba(139, 85, 85, 0.12)', border: '1px solid var(--dash-danger)' }}>
       <div className="flex items-start">
-        <AlertCircle className="w-5 h-5 text-red-400 mr-3 mt-0.5 flex-shrink-0" />
+        <AlertCircle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{ color: 'var(--dash-danger)' }} />
         <div className="flex-1">
-          <h3 className="text-red-400 font-medium">分析失败</h3>
-          <p className="text-red-300/80 text-sm mt-1">{message}</p>
+          <h3 className="font-medium" style={{ color: 'var(--dash-danger)' }}>分析失败</h3>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>{message}</p>
           {onRetry && (
             <Button
               onClick={onRetry}
               variant="outline"
               size="sm"
-              className="mt-4 border-red-700 text-red-400 hover:bg-red-900/30"
+              className="mt-4"
+              style={{ borderColor: 'var(--dash-danger)', color: 'var(--dash-danger)' }}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               重试
@@ -161,13 +163,16 @@ function ErrorState({
 // 类型标签组件
 function TypeBadge({ type }: { type: AnalysisType }) {
   const config = {
-    weekly: { color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', label: '周报' },
-    event: { color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', label: '事件' },
-    profile: { color: 'bg-green-500/20 text-green-400 border-green-500/30', label: '画像' },
+    weekly: { bg: 'rgba(85, 114, 139, 0.2)', text: 'var(--dash-info)', border: 'rgba(85, 114, 139, 0.3)', label: '周报' },
+    event: { bg: 'rgba(107, 85, 139, 0.2)', text: 'var(--dash-stat-social)', border: 'rgba(107, 85, 139, 0.3)', label: '事件' },
+    profile: { bg: 'rgba(107, 143, 113, 0.2)', text: 'var(--dash-success)', border: 'rgba(107, 143, 113, 0.3)', label: '画像' },
   }
-  const { color, label } = config[type]
+  const { bg, text, border, label } = config[type]
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${color}`}>
+    <span 
+      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border" 
+      style={{ background: bg, color: text, borderColor: border }}
+    >
       {label}
     </span>
   )
@@ -206,7 +211,6 @@ export default function AnalysisPage() {
     }
   }, [user])
 
-  // 加载数据
   useEffect(() => {
     if (user) {
       void loadData()
@@ -251,7 +255,6 @@ export default function AnalysisPage() {
       setResult(data.result)
       setAnalysisState('success')
       
-      // 刷新历史记录
       if (data.saved) {
         const historyData = await getAIAnalyses(user.id, 10)
         setHistory(historyData)
@@ -272,17 +275,14 @@ export default function AnalysisPage() {
     })
   }
 
-  // 检查是否可以进行 event 分析
   const canDoEventAnalysis = events.length > 0
-
-
 
   if (dataLoading) {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-white">AI 分析</h1>
-          <p className="text-gray-400 mt-1">加载中...</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-bright)' }}>AI 分析</h1>
+          <p className="mt-1" style={{ color: 'var(--text-muted)' }}>加载中...</p>
         </div>
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
@@ -293,7 +293,7 @@ export default function AnalysisPage() {
           <div className="lg:col-span-2">
             <Card title="分析结果">
               <div className="h-64 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--accent)' }}></div>
               </div>
             </Card>
           </div>
@@ -306,8 +306,8 @@ export default function AnalysisPage() {
     <div className="space-y-8">
       {/* 页面标题 */}
       <div>
-        <h1 className="text-3xl font-bold text-white">AI 分析</h1>
-        <p className="text-gray-400 mt-1">基于你的真实数据生成个性化分析</p>
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--text-bright)' }}>AI 分析</h1>
+        <p className="mt-1" style={{ color: 'var(--text-muted)' }}>基于你的真实数据生成个性化分析</p>
       </div>
 
       {/* 全局错误提示 */}
@@ -331,32 +331,28 @@ export default function AnalysisPage() {
                     onClick={() => !isDisabled && setSelectedType(type.id)}
                     disabled={isDisabled}
                     className={`w-full text-left p-4 rounded-lg border transition-all ${
-                      isSelected
-                        ? 'bg-blue-600/20 border-blue-500'
-                        : isDisabled
-                        ? 'bg-gray-800/50 border-gray-800 opacity-50 cursor-not-allowed'
-                        : 'bg-gray-800 border-gray-700 hover:border-gray-600'
+                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
+                    style={{
+                      background: isSelected ? 'var(--accent-soft)' : isDisabled ? 'var(--dash-card-soft)' : 'var(--dash-card-soft)',
+                      borderColor: isSelected ? 'var(--accent)' : 'var(--dash-border)',
+                    }}
                   >
                     <div className="flex items-start">
-                      <Icon className={`w-5 h-5 mr-3 mt-0.5 ${
-                        isSelected ? 'text-blue-400' : isDisabled ? 'text-gray-600' : 'text-gray-400'
-                      }`} />
+                      <Icon className="w-5 h-5 mr-3 mt-0.5" style={{ color: isSelected ? 'var(--accent)' : isDisabled ? 'var(--text-dim)' : 'var(--text-muted)' }} />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className={`font-medium ${
-                            isSelected ? 'text-white' : isDisabled ? 'text-gray-500' : 'text-gray-300'
-                          }`}>
+                          <p className="font-medium" style={{ color: isSelected ? 'var(--text-bright)' : isDisabled ? 'var(--text-dim)' : 'var(--text)' }}>
                             {type.label}
                           </p>
                           {isDisabled && (
-                            <span className="text-xs text-gray-600">暂不可用</span>
+                            <span className="text-xs" style={{ color: 'var(--text-dim)' }}>暂不可用</span>
                           )}
                         </div>
-                        <p className={`text-sm ${isDisabled ? 'text-gray-600' : 'text-gray-500'}`}>
+                        <p className="text-sm" style={{ color: isDisabled ? 'var(--text-dim)' : 'var(--text-muted)' }}>
                           {type.description}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>
                           {type.minDataRequirement}
                         </p>
                       </div>
@@ -376,27 +372,27 @@ export default function AnalysisPage() {
                     <button
                       key={event.id}
                       onClick={() => setSelectedEvent(event.id)}
-                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                        selectedEvent === event.id
-                          ? 'bg-purple-600/20 border-purple-500'
-                          : 'bg-gray-800 border-gray-700 hover:border-gray-600'
-                      }`}
+                      className={`w-full text-left p-3 rounded-lg border transition-colors`}
+                      style={{
+                        background: selectedEvent === event.id ? 'var(--accent-soft)' : 'var(--dash-card-soft)',
+                        borderColor: selectedEvent === event.id ? 'var(--accent)' : 'var(--dash-border)',
+                      }}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-white font-medium text-sm line-clamp-1">
+                        <span className="font-medium text-sm line-clamp-1" style={{ color: 'var(--text-bright)' }}>
                           {event.title}
                         </span>
                         {event.impact_level && (
-                          <span className="text-xs text-purple-400">
+                          <span className="text-xs" style={{ color: 'var(--dash-stat-social)' }}>
                             影响 {event.impact_level}/10
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-500 text-xs mt-1">{event.event_date}</p>
+                      <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>{event.event_date}</p>
                       {event.tags && event.tags.length > 0 && (
                         <div className="flex gap-1 mt-2 flex-wrap">
                           {event.tags.slice(0, 2).map((tag) => (
-                            <span key={tag} className="text-xs px-1.5 py-0.5 bg-gray-700 text-gray-400 rounded">
+                            <span key={tag} className="text-xs px-1.5 py-0.5 rounded" style={{ background: 'var(--dash-card-soft)', color: 'var(--text-muted)' }}>
                               {tag}
                             </span>
                           ))}
@@ -418,17 +414,18 @@ export default function AnalysisPage() {
 
           {/* 无可选事件时的提示 */}
           {selectedType === 'event' && !canDoEventAnalysis && (
-            <div className="bg-yellow-900/20 border border-yellow-800 rounded-lg p-4">
+            <div className="rounded-lg p-4" style={{ background: 'rgba(139, 115, 85, 0.12)', border: '1px solid var(--dash-warning)' }}>
               <div className="flex items-start">
-                <AlertCircle className="w-5 h-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{ color: 'var(--dash-warning)' }} />
                 <div>
-                  <p className="text-yellow-400 font-medium text-sm">无法进行事件分析</p>
-                  <p className="text-yellow-300/70 text-xs mt-1">
+                  <p className="font-medium text-sm" style={{ color: 'var(--dash-warning)' }}>无法进行事件分析</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                     你还没有记录任何事件。请先前往&quot;经历事件&quot;页面添加至少一个事件。
                   </p>
                   <a 
                     href="/dashboard/events"
-                    className="inline-flex items-center text-yellow-400 text-xs hover:underline mt-2"
+                    className="inline-flex items-center text-xs hover:underline mt-2"
+                    style={{ color: 'var(--dash-warning)' }}
                   >
                     去添加事件 →
                   </a>
@@ -442,14 +439,15 @@ export default function AnalysisPage() {
             <Card 
               title={
                 <div className="flex items-center">
-                  <History className="w-4 h-4 mr-2 text-gray-400" />
+                  <History className="w-4 h-4 mr-2" style={{ color: 'var(--text-muted)' }} />
                   历史分析
                 </div>
               }
               subtitle={
                 <button 
                   onClick={() => setShowHistory(!showHistory)}
-                  className="text-blue-400 text-sm flex items-center hover:text-blue-300"
+                  className="text-sm flex items-center"
+                  style={{ color: 'var(--dash-info)' }}
                 >
                   {showHistory ? '收起' : `查看全部 (${history.length})`}
                   <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
@@ -461,19 +459,20 @@ export default function AnalysisPage() {
                   {history.map((item) => (
                     <div 
                       key={item.id} 
-                      className="p-3 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors group"
+                      className="p-3 rounded-lg cursor-pointer transition-colors group"
+                      style={{ background: 'var(--dash-card-soft)' }}
                       onClick={() => setSelectedHistoryItem(item)}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <TypeBadge type={item.analysis_type as AnalysisType} />
-                        <span className="text-gray-500 text-xs">
+                        <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
                           {formatDate(item.created_at)}
                         </span>
                       </div>
-                      <p className="text-gray-400 text-xs line-clamp-2">
+                      <p className="text-xs line-clamp-2" style={{ color: 'var(--text-muted)' }}>
                         {item.result.slice(0, 120)}...
                       </p>
-                      <div className="flex items-center text-blue-400 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--dash-info)' }}>
                         <FileText className="w-3 h-3 mr-1" />
                         点击查看详情
                       </div>
@@ -507,7 +506,7 @@ export default function AnalysisPage() {
               >
                 {analysisState === 'loading' ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 mr-2" style={{ borderColor: 'var(--text-bright)' }}></div>
                     分析中...
                   </>
                 ) : (
@@ -519,7 +518,7 @@ export default function AnalysisPage() {
               </Button>
               
               {analysisState === 'success' && (
-                <span className="ml-4 text-green-400 text-sm">
+                <span className="ml-4 text-sm" style={{ color: 'var(--dash-success)' }}>
                   ✓ 分析完成
                 </span>
               )}
@@ -537,18 +536,19 @@ export default function AnalysisPage() {
 
             {/* 分析结果 */}
             {result && analysisState === 'success' && (
-              <div className="bg-gray-900 rounded-lg p-6">
+              <div className="rounded-lg p-6" style={{ background: 'var(--dash-card-soft)' }}>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <MessageSquare className="w-5 h-5 text-blue-400 mr-2" />
-                    <h3 className="text-lg font-semibold text-white">AI 分析结果</h3>
+                    <MessageSquare className="w-5 h-5 mr-2" style={{ color: 'var(--dash-info)' }} />
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--text-bright)' }}>AI 分析结果</h3>
                   </div>
                   <button
                     onClick={() => {
                       setResult('')
                       setAnalysisState('idle')
                     }}
-                    className="text-gray-500 hover:text-gray-300 transition-colors"
+                    className="transition-colors"
+                    style={{ color: 'var(--text-dim)' }}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -564,29 +564,29 @@ export default function AnalysisPage() {
             {/* 空状态 */}
             {analysisState === 'idle' && !result && (
               <div className="text-center py-16">
-                <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Brain className="w-12 h-12 text-gray-600" />
+                <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'var(--dash-card-soft)' }}>
+                  <Brain className="w-12 h-12" style={{ color: 'var(--text-dim)' }} />
                 </div>
-                <p className="text-gray-400 text-lg">选择分析类型并点击开始</p>
-                <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                <p className="text-lg" style={{ color: 'var(--text-muted)' }}>选择分析类型并点击开始</p>
+                <p className="text-sm mt-2 max-w-md mx-auto" style={{ color: 'var(--text-dim)' }}>
                   AI 将基于你的真实记录数据生成个性化分析，包括数据概览、行为观察、具体建议等
                 </p>
                 
                 <div className="grid grid-cols-3 gap-4 mt-8 max-w-lg mx-auto">
-                  <div className="p-4 bg-gray-800 rounded-lg">
-                    <TrendingUp className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                    <p className="text-xs text-gray-400">周报分析</p>
-                    <p className="text-xs text-gray-500">7天数据总结</p>
+                  <div className="p-4 rounded-lg" style={{ background: 'var(--dash-card-soft)' }}>
+                    <TrendingUp className="w-6 h-6 mx-auto mb-2" style={{ color: 'var(--dash-info)' }} />
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>周报分析</p>
+                    <p className="text-xs" style={{ color: 'var(--text-dim)' }}>7天数据总结</p>
                   </div>
-                  <div className="p-4 bg-gray-800 rounded-lg">
-                    <Activity className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                    <p className="text-xs text-gray-400">事件分析</p>
-                    <p className="text-xs text-gray-500">单条事件影响</p>
+                  <div className="p-4 rounded-lg" style={{ background: 'var(--dash-card-soft)' }}>
+                    <Activity className="w-6 h-6 mx-auto mb-2" style={{ color: 'var(--dash-stat-social)' }} />
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>事件分析</p>
+                    <p className="text-xs" style={{ color: 'var(--text-dim)' }}>单条事件影响</p>
                   </div>
-                  <div className="p-4 bg-gray-800 rounded-lg">
-                    <User className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                    <p className="text-xs text-gray-400">人物画像</p>
-                    <p className="text-xs text-gray-500">30天行为模式</p>
+                  <div className="p-4 rounded-lg" style={{ background: 'var(--dash-card-soft)' }}>
+                    <User className="w-6 h-6 mx-auto mb-2" style={{ color: 'var(--dash-success)' }} />
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>人物画像</p>
+                    <p className="text-xs" style={{ color: 'var(--text-dim)' }}>30天行为模式</p>
                   </div>
                 </div>
               </div>
@@ -602,19 +602,21 @@ export default function AnalysisPage() {
           onClick={() => setSelectedHistoryItem(null)}
         >
           <div 
-            className="bg-gray-800 rounded-xl max-w-3xl w-full max-h-[80vh] overflow-hidden"
+            className="rounded-xl max-w-3xl w-full max-h-[80vh] overflow-hidden"
+            style={{ background: 'var(--dash-card-soft)' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-6 border-b border-gray-700 flex items-center justify-between">
+            <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid var(--dash-border)' }}>
               <div className="flex items-center gap-3">
                 <TypeBadge type={selectedHistoryItem.analysis_type as AnalysisType} />
-                <span className="text-gray-400 text-sm">
+                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   {formatDate(selectedHistoryItem.created_at)}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedHistoryItem(null)}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="transition-colors"
+                style={{ color: 'var(--text-muted)' }}
               >
                 <X className="w-6 h-6" />
               </button>
@@ -634,29 +636,29 @@ export default function AnalysisPage() {
       <Card title="分析说明" subtitle="AI 分析的工作原理">
         <div className="grid md:grid-cols-3 gap-6 text-sm">
           <div>
-            <h4 className="font-medium text-white mb-2 flex items-center">
-              <Clock className="w-4 h-4 mr-2 text-blue-400" />
+            <h4 className="font-medium mb-2 flex items-center" style={{ color: 'var(--text-bright)' }}>
+              <Clock className="w-4 h-4 mr-2" style={{ color: 'var(--dash-info)' }} />
               基于真实数据
             </h4>
-            <p className="text-gray-400">
+            <p style={{ color: 'var(--text-muted)' }}>
               AI 只分析你主动记录的数据，包括每日日志、属性评分、事件记录等，不做无依据的推测。
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-white mb-2 flex items-center">
-              <Calendar className="w-4 h-4 mr-2 text-green-400" />
+            <h4 className="font-medium mb-2 flex items-center" style={{ color: 'var(--text-bright)' }}>
+              <Calendar className="w-4 h-4 mr-2" style={{ color: 'var(--dash-success)' }} />
               时间范围
             </h4>
-            <p className="text-gray-400">
+            <p style={{ color: 'var(--text-muted)' }}>
               周报分析使用最近7天数据，人物画像使用最近30天数据。数据越多，分析越准确。
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-white mb-2 flex items-center">
-              <Sparkles className="w-4 h-4 mr-2 text-purple-400" />
+            <h4 className="font-medium mb-2 flex items-center" style={{ color: 'var(--text-bright)' }}>
+              <Sparkles className="w-4 h-4 mr-2" style={{ color: 'var(--dash-stat-social)' }} />
               隐私保护
             </h4>
-            <p className="text-gray-400">
+            <p style={{ color: 'var(--text-muted)' }}>
               分析结果仅你可见，AI 服务仅接收必要的数据片段，不会存储或用于其他用途。
             </p>
           </div>

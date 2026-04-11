@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Noto_Sans_SC, Noto_Serif_SC, JetBrains_Mono } from 'next/font/google'
 import { siteConfig } from '@/content/site'
+import { getPersonSchema, getWebsiteSchema } from '@/lib/structured-data'
 import { getCurrentLanguage } from '@/lib/site-language.server'
 
 import './globals.css'
@@ -45,6 +46,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     alternates: {
       canonical: '/',
+      types: {
+        'application/rss+xml': `${canonicalUrl}/feed.xml`,
+      },
     },
     robots: {
       index: true,
@@ -88,12 +92,36 @@ export default async function RootLayout({
 }>) {
   const language = await getCurrentLanguage()
 
+  const personSchema = getPersonSchema()
+  const websiteSchema = getWebsiteSchema()
+
+  const themeInitScript = `
+    (function(){
+      try{
+        var m=document.cookie.match(/(?:^|; )site-theme=([^;]*)/);
+        var t=m&&m[1];
+        if(t)document.documentElement.setAttribute('data-theme',t);
+      }catch(e){}
+    })()
+  `
+
   return (
     <html
       lang={language === 'zh' ? 'zh-CN' : 'en'}
       className={`${bodyFont.variable} ${titleFont.variable} ${monoFont.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         {children}
       </body>
     </html>

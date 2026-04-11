@@ -19,9 +19,9 @@ export default function OpenGraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: 'linear-gradient(160deg, rgb(8, 17, 31) 0%, rgb(15, 23, 42) 60%, rgb(6, 78, 59) 100%)',
+          background: 'linear-gradient(160deg, #0e0f11 0%, #12131a 100%)',
           padding: 56,
-          color: '#f8fafc',
+          color: '#d4d1cb',
         }}
       >
         <div
@@ -30,20 +30,20 @@ export default function OpenGraphImage() {
             alignItems: 'center',
             gap: 14,
             fontSize: 28,
-            fontWeight: 700,
+            fontWeight: 400,
             letterSpacing: 4,
-            textTransform: 'uppercase',
-            color: '#86efac',
+            color: '#7a7670',
           }}
         >
           {siteConfig.title}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 900 }}>
-          <div style={{ fontSize: 72, fontWeight: 700, lineHeight: 1.08 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 900 }}>
+          <div style={{ fontSize: 72, fontWeight: 700, lineHeight: 1.08, color: '#d4d1cb' }}>
             {siteConfig.role.zh}
           </div>
-          <div style={{ fontSize: 30, lineHeight: 1.45, color: '#cbd5e1' }}>
+          <div style={{ width: 48, height: 2, background: '#8b7355' }} />
+          <div style={{ fontSize: 30, lineHeight: 1.45, color: '#7a7670' }}>
             {siteConfig.description.zh}
           </div>
         </div>
@@ -53,8 +53,8 @@ export default function OpenGraphImage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: 24,
-            color: '#cbd5e1',
+            fontSize: 22,
+            color: '#4a4742',
           }}
         >
           <div>{siteConfig.github}</div>

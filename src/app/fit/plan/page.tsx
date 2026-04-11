@@ -56,8 +56,8 @@ export default function FitAdvisorPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">AI Fitness Advisor</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>AI Fitness Advisor</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
             基于最近训练、体重和备注生成训练建议，定位是辅助复盘，不替代教练或医疗意见。
           </p>
         </div>
@@ -71,28 +71,31 @@ export default function FitAdvisorPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
           <div className="space-y-4">
             <div>
-              <p className="text-sm font-medium text-slate-200">当前目标</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>当前目标</p>
               <div className="mt-3 grid gap-3">
                 {goalOptions.map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     onClick={() => setGoal(option.value)}
-                    className={`rounded-2xl border p-4 text-left transition-colors ${
-                      goal === option.value
-                        ? 'border-teal-400 bg-teal-500/10'
-                        : 'border-slate-700 bg-slate-900/60 hover:border-slate-500'
-                    }`}
+                    className="rounded-2xl border p-4 text-left transition-colors"
+                    style={{
+                      borderColor: goal === option.value ? 'var(--dash-success)' : 'var(--dash-border)',
+                      background: goal === option.value
+                        ? 'rgba(88, 166, 113, 0.08)'
+                        : 'var(--dash-card-soft)',
+                      color: goal === option.value ? 'var(--text-bright)' : 'var(--text)',
+                    }}
                   >
-                    <p className="text-sm font-semibold text-white">{option.label}</p>
-                    <p className="mt-2 text-xs leading-6 text-slate-400">{option.description}</p>
+                    <p className="text-sm font-semibold">{option.label}</p>
+                    <p className="mt-2 text-xs leading-6" style={{ color: 'var(--text-muted)' }}>{option.description}</p>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-200">补充说明</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>补充说明</p>
               <Textarea
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
@@ -103,31 +106,31 @@ export default function FitAdvisorPage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-700 bg-slate-900/70 p-5">
+          <div className="rounded-3xl border p-5" style={{ borderColor: 'var(--dash-border)', background: 'var(--dash-card)' }}>
             {error ? (
-              <div className="rounded-2xl border border-red-800 bg-red-900/20 p-4 text-sm text-red-300">
+              <div className="rounded-2xl border p-4 text-sm" style={{ borderColor: 'var(--dash-danger)', background: 'rgba(139, 85, 85, 0.12)', color: '#c49090' }}>
                 {error}
               </div>
             ) : null}
 
             {loading ? (
-              <div className="flex min-h-[320px] flex-col items-center justify-center text-slate-400">
-                <Loader2 className="mb-4 h-10 w-10 animate-spin text-teal-400" />
+              <div className="flex min-h-[320px] flex-col items-center justify-center" style={{ color: 'var(--text-muted)' }}>
+                <Loader2 className="mb-4 h-10 w-10 animate-spin" style={{ color: 'var(--dash-success)' }} />
                 AI 正在整理你最近的训练摘要和建议。
               </div>
             ) : advice ? (
               <div className="space-y-5">
-                <div className="flex items-center gap-3 rounded-2xl border border-amber-700/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                <div className="flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm" style={{ borderColor: 'rgba(180, 140, 60, 0.3)', background: 'rgba(200, 160, 50, 0.08)', color: '#d4c080' }}>
                   <ShieldAlert className="h-4 w-4 text-amber-300" />
                   仅供参考，不替代专业教练或医疗建议。
                 </div>
-                <div className="prose prose-invert max-w-none prose-headings:text-white prose-p:text-slate-300 prose-li:text-slate-300 prose-strong:text-white">
+                <div className="prose max-w-none" style={{ color: 'var(--text)' }}>
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{advice}</ReactMarkdown>
                 </div>
               </div>
             ) : (
-              <div className="flex min-h-[320px] flex-col items-center justify-center text-center text-slate-400">
-                <BrainCircuit className="mb-4 h-12 w-12 text-slate-600" />
+              <div className="flex min-h-[320px] flex-col items-center justify-center text-center" style={{ color: 'var(--text-muted)' }}>
+                <BrainCircuit className="mb-4 h-12 w-12" style={{ color: 'var(--text-dim)' }} />
                 <p className="text-sm">点击“生成建议”后，系统会读取最近训练与健康记录给出摘要。</p>
               </div>
             )}

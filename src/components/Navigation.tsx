@@ -6,9 +6,6 @@ import { useState } from 'react'
 import {
   Menu,
   X,
-  BriefcaseBusiness,
-  NotebookPen,
-  Dumbbell,
   FileUser,
   LayoutDashboard,
   LogOut,
@@ -23,11 +20,14 @@ import {
   Settings,
   Target,
   ChevronRight,
+  Dumbbell,
+  NotebookPen,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/Button'
 import { siteConfig } from '@/content/site'
 import { LanguageSwitch } from '@/components/site/LanguageSwitch'
+import { ThemeSwitch } from '@/components/site/ThemeSwitch'
 import { pickText, type SiteLanguage } from '@/lib/site-language'
 
 const publicNavItems = [
@@ -37,19 +37,9 @@ const publicNavItems = [
     icon: Home,
   },
   {
-    href: '/projects',
-    label: { zh: '作品', en: 'Projects' },
-    icon: BriefcaseBusiness,
-  },
-  {
     href: '/blog',
-    label: { zh: '日志', en: 'Journal' },
+    label: { zh: '博客', en: 'Blog' },
     icon: NotebookPen,
-  },
-  {
-    href: '/fitness',
-    label: { zh: '训练', en: 'Fitness' },
-    icon: Dumbbell,
   },
   {
     href: '/about',
@@ -134,6 +124,7 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
 
         <div className="hidden items-center gap-4 lg:flex">
           <LanguageSwitch lang={lang} />
+          <ThemeSwitch lang={lang} />
           <Link
             href={siteConfig.github}
             target="_blank"
@@ -174,6 +165,7 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
 
         <div className="flex items-center gap-3 lg:hidden">
           <LanguageSwitch lang={lang} />
+          <ThemeSwitch lang={lang} />
           <button
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
@@ -272,26 +264,30 @@ export function DashboardNavigation() {
   return (
     <>
       {/* 顶部导航 */}
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.06] bg-[#0a0f1a]/90 backdrop-blur-xl">
+      <nav
+        className="fixed inset-x-0 top-0 z-50 border-b backdrop-blur-xl"
+        style={{ borderColor: 'var(--dash-border)', background: 'color-mix(in srgb, var(--dash-sidebar-bg) 90%, transparent)' }}
+      >
         <div className="flex h-14 items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setSidebarOpen((open) => !open)}
-              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white lg:hidden"
+              className="rounded-md p-2 transition-colors hover:text-[var(--text-bright)]"
+              style={{ color: 'var(--text-muted)' }}
             >
               {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
             <Link href="/dashboard" className="flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20">
-                <LayoutDashboard className="h-4 w-4 text-emerald-400" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-md" style={{ border: '1px solid var(--border)' }}>
+                <LayoutDashboard className="h-4 w-4" style={{ color: 'var(--accent)' }} />
               </div>
-              <span className="text-sm font-semibold text-white">Studio</span>
+              <span className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>Studio</span>
             </Link>
             {activeItem && (
-              <div className="hidden items-center gap-1.5 text-sm text-slate-500 sm:flex">
+              <div className="hidden items-center gap-1.5 text-sm sm:flex" style={{ color: 'var(--text-dim)' }}>
                 <ChevronRight className="h-3.5 w-3.5" />
-                <span className="text-slate-300">{activeItem.label}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{activeItem.label}</span>
               </div>
             )}
           </div>
@@ -299,7 +295,8 @@ export function DashboardNavigation() {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs transition-colors hover:text-[var(--text-bright)]"
+              style={{ color: 'var(--text-dim)' }}
             >
               <Home className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">公开站</span>
@@ -307,7 +304,8 @@ export function DashboardNavigation() {
             <button
               type="button"
               onClick={signOut}
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs transition-colors hover:text-[var(--text-bright)]"
+              style={{ color: 'var(--text-dim)' }}
             >
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">退出</span>
@@ -318,14 +316,15 @@ export function DashboardNavigation() {
 
       {/* 侧边栏 */}
       <aside
-        className={`fixed inset-y-14 left-0 z-40 w-60 border-r border-white/[0.06] bg-[#0a0f1a]/95 backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-14 left-0 z-40 w-60 border-r backdrop-blur-xl transition-transform duration-200 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ borderColor: 'var(--dash-border)', background: 'color-mix(in srgb, var(--dash-sidebar-bg) 95%, transparent)' }}
       >
         <div className="flex h-full flex-col overflow-y-auto px-3 py-4">
           {dashboardNavGroups.map((group) => (
             <div key={group.title} className="mb-6 last:mb-0">
-              <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+              <p className="mb-2 px-3 text-[11px] tracking-[0.15em]" style={{ color: 'var(--text-dim)', fontFamily: 'var(--font-mono), monospace' }}>
                 {group.title}
               </p>
               <div className="space-y-0.5">
@@ -337,11 +336,11 @@ export function DashboardNavigation() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all ${
-                        active
-                          ? 'bg-emerald-500/15 text-emerald-300'
-                          : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200'
-                      }`}
+                      className="flex items-center gap-3 rounded-md px-3 py-2 text-[13px] transition-colors"
+                      style={{
+                        color: active ? 'var(--text-bright)' : 'var(--text-muted)',
+                        background: active ? 'rgba(255,255,255,0.04)' : undefined,
+                      }}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       <span>{item.label}</span>

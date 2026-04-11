@@ -55,16 +55,16 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
-        <div className="absolute inset-0 bg-gray-950/75" />
+      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero" style={{ background: 'var(--bg-warm)' }}>
+        <div className="absolute inset-0" style={{ background: 'rgba(14, 15, 17, 0.75)' }} />
         <div className="w-full max-w-md relative z-10">
           <Card>
             <div className="text-center py-8">
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <UserPlus className="w-8 h-8 text-white" />
+                <UserPlus className="w-8 h-8" style={{ color: '#fff' }} />
               </div>
-              <h1 className="text-2xl font-bold text-white mb-2">注册成功！</h1>
-              <p className="text-gray-400 mb-8">
+              <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-bright)' }}>注册成功！</h1>
+              <p className="mb-8" style={{ color: 'var(--text-muted)' }}>
                 请检查你的邮箱 {email} 完成验证，<br />
                 验证后即可登录系统。
               </p>
@@ -81,8 +81,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
-      <div className="absolute inset-0 bg-gray-950/75" />
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero" style={{ background: 'var(--bg-warm)' }}>
+      <div className="absolute inset-0" style={{ background: 'rgba(14, 15, 17, 0.75)' }} />
       <div className="w-full max-w-md relative z-10">
         <Link href="/">
           <Button variant="ghost" size="sm" className="mb-6">
@@ -94,10 +94,10 @@ export default function RegisterPage() {
         <Card>
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UserPlus className="w-8 h-8 text-white" />
+              <UserPlus className="w-8 h-8" style={{ color: '#fff' }} />
             </div>
-            <h1 className="text-2xl font-bold text-white">注册账号</h1>
-            <p className="text-gray-400 mt-2">开启你的个人成长之旅</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>注册账号</h1>
+            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>开启你的个人成长之旅</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -129,8 +129,8 @@ export default function RegisterPage() {
             />
 
             {error && (
-              <div className="p-3 bg-red-900/50 border border-red-700 rounded-lg">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(127, 29, 29, 0.5)', border: '1px solid rgba(153, 27, 27, 0.6)' }}>
+                <p className="text-sm" style={{ color: '#fca5a5' }}>{error}</p>
               </div>
             )}
 
@@ -146,9 +146,9 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
               已有账号？{' '}
-              <Link href="/login" className="text-blue-400 hover:text-blue-300">
+              <Link href="/login" style={{ color: 'var(--accent)' }}>
                 直接登录
               </Link>
             </p>

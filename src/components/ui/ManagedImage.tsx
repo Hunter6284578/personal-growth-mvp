@@ -13,6 +13,7 @@ interface ManagedImageProps {
   height?: number
   sizes?: string
   priority?: boolean
+  style?: React.CSSProperties
 }
 
 export function ManagedImage({
@@ -25,10 +26,11 @@ export function ManagedImage({
   height = 96,
   sizes,
   priority = false,
+  style,
 }: ManagedImageProps) {
   if (fill) {
     return (
-      <div className={cn('relative overflow-hidden', className)}>
+      <div className={cn('relative overflow-hidden', className)} style={style}>
         <Image
           src={src}
           alt={alt}
@@ -43,7 +45,7 @@ export function ManagedImage({
   }
 
   return (
-    <div className={cn('relative overflow-hidden', className)}>
+    <div className={cn('relative overflow-hidden', className)} style={style}>
       <Image
         src={src}
         alt={alt}

@@ -9,6 +9,8 @@ import { useAuth } from '@/hooks/useAuth'
 import type { LifeEvent } from '@/types'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ManagedImage } from '@/components/ui/ManagedImage'
+import { useToast } from '@/components/ui/Toast'
+import { useConfirm, ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 const statOptions = [
   { value: 'physical_score', label: '身体素质' },
@@ -21,12 +23,13 @@ const statOptions = [
 
 export default function EventsPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
+  const { confirm, cancel, dialogState } = useConfirm()
   const [events, setEvents] = useState<LifeEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showForm, setShowForm] = useState(false)
   
-  // 表单状态
   const [editingId, setEditingId] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -49,7 +52,6 @@ export default function EventsPage() {
     }
   }, [user])
 
-  // 加载数据
   useEffect(() => {
     if (user) {
       void loadEvents()
@@ -94,24 +96,25 @@ export default function EventsPage() {
       await loadEvents()
       resetForm()
       setShowForm(false)
-      alert(editingId ? '更新成功！' : '保存成功！')
+      toast(editingId ? '更新成功！' : '保存成功！', 'success')
     } catch (error) {
       console.error('Error saving event:', error)
-      alert('保存失败，请重试')
+      toast('保存失败，请重试', 'error')
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这条记录吗？')) return
+    const confirmed = await confirm({ message: '确定要删除这条记录吗？', variant: 'danger' })
+    if (!confirmed) return
     
     try {
       await deleteLifeEvent(id)
       await loadEvents()
     } catch (error) {
       console.error('Error deleting event:', error)
-      alert('删除失败')
+      toast('删除失败', 'error')
     }
   }
 
@@ -158,8 +161,8 @@ export default function EventsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">经历事件</h1>
-          <p className="text-gray-400 mt-1">记录人生中的重要时刻</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-bright)' }}>经历事件</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>记录人生中的重要时刻</p>
         </div>
         <Button onClick={() => { resetForm(); setShowForm(!showForm); }}>
           {showForm ? <X className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
@@ -171,9 +174,9 @@ export default function EventsPage() {
         <Card title={editingId ? '编辑事件' : '添加新事件'}>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="pg-card-soft p-4 space-y-4">
-              <div className="text-sm font-medium text-gray-300">基础信息</div>
+              <div className="text-sm font-medium" style={{ color: 'var(--text)' }}>基础信息</div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">事件标题 *</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>事件标题 *</label>
                 <input
                   type="text"
                   value={title}
@@ -184,7 +187,7 @@ export default function EventsPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">发生日期 *</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>发生日期 *</label>
                 <input
                   type="date"
                   value={eventDate}
@@ -196,35 +199,36 @@ export default function EventsPage() {
             </div>
 
             <div className="pg-card-soft p-4 space-y-4">
-              <div className="text-sm font-medium text-gray-300">影响评估</div>
+              <div className="text-sm font-medium" style={{ color: 'var(--text)' }}>影响评估</div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">影响程度: {impactLevel}/10</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>影响程度: {impactLevel}/10</label>
                 <input
                   type="range"
                   min="1"
                   max="10"
                   value={impactLevel}
                   onChange={(e) => setImpactLevel(parseInt(e.target.value))}
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, #8B5CF6 0%, #8B5CF6 ${impactLevel * 10}%, #374151 ${impactLevel * 10}%, #374151 100%)`,
+                    background: `linear-gradient(to right, var(--dash-stat-social) 0%, var(--dash-stat-social) ${impactLevel * 10}%, var(--dash-border) ${impactLevel * 10}%, var(--dash-border) 100%)`,
                   }}
                 />
-                <div className="mt-2 text-xs text-purple-300">{impactLabel}</div>
+                <div className="mt-2 text-xs" style={{ color: 'var(--dash-stat-social)' }}>{impactLabel}</div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">影响的属性</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>影响的属性</label>
                 <div className="flex flex-wrap gap-2">
                   {statOptions.map((stat) => (
                     <button
                       key={stat.value}
                       type="button"
                       onClick={() => toggleStat(stat.value)}
-                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
-                        affectedStats.includes(stat.value)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                      }`}
+                      className="px-3 py-1 rounded-full text-sm transition-colors"
+                      style={{
+                        background: affectedStats.includes(stat.value) ? 'var(--accent)' : 'var(--dash-card-soft)',
+                        color: affectedStats.includes(stat.value) ? 'var(--bg)' : 'var(--text-muted)',
+                        border: `1px solid ${affectedStats.includes(stat.value) ? 'var(--accent)' : 'var(--dash-border)'}`,
+                      }}
                     >
                       {stat.label}
                     </button>
@@ -234,9 +238,9 @@ export default function EventsPage() {
             </div>
 
             <div className="pg-card-soft p-4 space-y-4">
-              <div className="text-sm font-medium text-gray-300">内容与素材</div>
+              <div className="text-sm font-medium" style={{ color: 'var(--text)' }}>内容与素材</div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">标签</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>标签</label>
                 <input
                   type="text"
                   value={tagInput}
@@ -258,7 +262,8 @@ export default function EventsPage() {
                         key={tag}
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="px-2 py-0.5 rounded-full text-xs bg-blue-900/40 border border-blue-700/60 text-blue-300 hover:bg-blue-900/70"
+                        className="px-2 py-0.5 rounded-full text-xs transition-colors"
+                        style={{ background: 'var(--dash-card-soft)', border: '1px solid var(--dash-border)', color: 'var(--text-muted)' }}
                       >
                         #{tag} ×
                       </button>
@@ -268,7 +273,7 @@ export default function EventsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">事件描述</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>事件描述</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -279,7 +284,7 @@ export default function EventsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">图片记录 (可选)</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>图片记录 (可选)</label>
                 <ImageUpload images={images} onChange={setImages} maxImages={6} />
               </div>
             </div>
@@ -300,15 +305,15 @@ export default function EventsPage() {
 
       <Card title="事件列表" subtitle={`共 ${events.length} 条记录`}>
         {loading ? (
-          <div className="text-center py-8 text-gray-500">加载中...</div>
+          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>加载中...</div>
         ) : events.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">暂无记录</div>
+          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>暂无记录</div>
         ) : (
           <div className="space-y-4">
             {events.map((event) => (
               <div
                 key={event.id}
-                className="p-4 bg-gray-900 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                className="pg-card-soft p-4"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 flex gap-4">
@@ -319,22 +324,23 @@ export default function EventsPage() {
                         width={80}
                         height={80}
                         sizes="80px"
-                        className="h-20 w-20 rounded-lg border border-gray-700 flex-shrink-0"
+                        className="h-20 w-20 rounded-lg flex-shrink-0"
+                        style={{ border: '1px solid var(--dash-border)' }}
                       />
                     )}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-white">{event.title}</h3>
-                        <span className="text-sm text-gray-400">{event.event_date}</span>
-                        <span className="text-xs px-2 py-0.5 rounded-full border border-purple-600/50 text-purple-300 bg-purple-900/20">
+                        <h3 className="text-lg font-semibold" style={{ color: 'var(--text-bright)' }}>{event.title}</h3>
+                        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{event.event_date}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ border: '1px solid var(--dash-border)', color: 'var(--dash-info)', background: 'var(--dash-card-soft)' }}>
                           影响 {event.impact_level}/10
                         </span>
                       </div>
                       {event.description && (
-                        <p className="text-gray-400 mb-3 line-clamp-2">{event.description}</p>
+                        <p className="mb-3 line-clamp-2 text-sm" style={{ color: 'var(--text-muted)' }}>{event.description}</p>
                       )}
                       <div className="flex flex-wrap items-center gap-3">
-                        <div className="flex items-center text-purple-400">
+                        <div className="flex items-center" style={{ color: 'var(--dash-info)' }}>
                           <Star className="w-4 h-4 mr-1" />
                           <span className="text-sm">
                             {event.impact_level && event.impact_level <= 3
@@ -347,7 +353,7 @@ export default function EventsPage() {
                         {event.affected_stats && event.affected_stats.length > 0 && (
                           <div className="flex gap-1 flex-wrap">
                             {event.affected_stats.map((stat) => (
-                              <span key={stat} className="px-2 py-0.5 bg-gray-700 rounded text-xs text-gray-300">
+                              <span key={stat} className="px-2 py-0.5 rounded text-xs" style={{ background: 'var(--dash-card-soft)', color: 'var(--text-muted)' }}>
                                 {statOptions.find(s => s.value === stat)?.label}
                               </span>
                             ))}
@@ -356,7 +362,7 @@ export default function EventsPage() {
                         {event.tags && event.tags.length > 0 && (
                           <div className="flex gap-1 flex-wrap">
                             {event.tags.map((tag) => (
-                              <span key={tag} className="px-2 py-0.5 bg-blue-900/50 rounded text-xs text-blue-300">
+                              <span key={tag} className="px-2 py-0.5 rounded text-xs" style={{ background: 'var(--dash-card-soft)', color: 'var(--text-muted)' }}>
                                 #{tag}
                               </span>
                             ))}
@@ -374,7 +380,8 @@ export default function EventsPage() {
                             width={56}
                             height={56}
                             sizes="56px"
-                            className="h-14 w-14 rounded border border-gray-700 flex-shrink-0"
+                            className="h-14 w-14 rounded flex-shrink-0"
+                            style={{ border: '1px solid var(--dash-border)' }}
                           />
                         ))}
                       </div>
@@ -383,13 +390,19 @@ export default function EventsPage() {
                   <div className="flex gap-2 ml-4">
                     <button
                       onClick={() => handleEdit(event)}
-                      className="p-1 text-gray-400 hover:text-blue-400 transition-colors"
+                      className="p-1 transition-colors"
+                      style={{ color: 'var(--text-dim)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent)'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-dim)'}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(event.id)}
-                      className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                      className="p-1 transition-colors"
+                      style={{ color: 'var(--text-dim)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--dash-danger)'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-dim)'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -400,6 +413,15 @@ export default function EventsPage() {
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={dialogState.open}
+        onConfirm={dialogState.onConfirm}
+        onCancel={cancel}
+        title={dialogState.title}
+        message={dialogState.message}
+        variant={dialogState.variant}
+      />
     </div>
   )
 }

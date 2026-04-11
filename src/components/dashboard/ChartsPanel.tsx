@@ -30,33 +30,34 @@ export function ChartsPanel({ radarData, trendData }: ChartsPanelProps) {
           {radarData.some(d => d.A !== 50) ? (
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                <PolarGrid stroke="#374151" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
+                <PolarGrid stroke="var(--dash-border-hover)" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                 <Radar
                   name="当前属性"
                   dataKey="A"
-                  stroke="#3B82F6"
+                  stroke="var(--accent)"
                   strokeWidth={2}
-                  fill="#3B82F6"
-                  fillOpacity={0.3}
+                  fill="var(--accent)"
+                  fillOpacity={0.15}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1F2937',
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
+                    background: 'var(--dash-surface)',
+                    border: '1px solid var(--dash-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text)',
                   }}
                 />
               </RadarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-gray-500">
-              <div className="w-32 h-32 rounded-full border-4 border-dashed border-gray-700 flex items-center justify-center mb-4">
-                <span className="text-4xl">?</span>
+            <div className="h-full flex flex-col items-center justify-center" style={{ color: 'var(--text-muted)' }}>
+              <div className="w-28 h-28 rounded-full flex items-center justify-center mb-4" style={{ border: '2px dashed var(--dash-border)' }}>
+                <span className="text-3xl">?</span>
               </div>
               <p>暂无属性数据</p>
-              <a href="/dashboard/stats" className="text-blue-400 text-sm hover:underline mt-2">
+              <a href="/dashboard/stats" className="text-sm mt-2" style={{ color: 'var(--accent)' }}>
                 去评估属性 →
               </a>
             </div>
@@ -69,29 +70,30 @@ export function ChartsPanel({ radarData, trendData }: ChartsPanelProps) {
           {trendData.length > 1 ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
-                <YAxis domain={[0, 100]} stroke="#9CA3AF" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--dash-border)" />
+                <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={12} />
+                <YAxis domain={[0, 100]} stroke="var(--text-muted)" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#1F2937',
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
+                    background: 'var(--dash-surface)',
+                    border: '1px solid var(--dash-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text)',
                   }}
                 />
                 <Line
                   type="monotone"
                   dataKey="平均"
-                  stroke="#8B5CF6"
+                  stroke="var(--dash-stat-social)"
                   strokeWidth={2}
-                  dot={{ fill: '#8B5CF6' }}
+                  dot={{ fill: 'var(--dash-stat-social)' }}
                 />
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-gray-500">
+            <div className="h-full flex items-center justify-center" style={{ color: 'var(--text-muted)' }}>
               <div className="text-center">
-                <TrendingUp className="w-12 h-12 mx-auto mb-2 text-gray-700" />
+                <TrendingUp className="w-10 h-10 mx-auto mb-2" style={{ color: 'var(--text-dim)' }} />
                 <p>数据不足，无法显示趋势</p>
                 <p className="text-sm">至少需要2条记录</p>
               </div>

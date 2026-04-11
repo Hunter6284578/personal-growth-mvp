@@ -6,18 +6,19 @@ interface SkillGroupCardProps {
 
 export function SkillGroupCard({ title, items, countLabel }: SkillGroupCardProps) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/6 p-6 shadow-[0_18px_50px_-28px_rgba(15,23,42,0.8)] backdrop-blur-xl">
+    <div className="content-card">
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-        <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1 text-xs font-medium text-slate-300">
+        <h3 className="text-base font-semibold" style={{ color: 'var(--text-bright)' }}>{title}</h3>
+        <span className="tag-minimal">
           {items.length} {countLabel}
         </span>
       </div>
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
         {items.map((item) => (
           <span
             key={item}
-            className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-1.5 text-sm text-slate-300"
+            className="text-sm"
+            style={{ color: 'var(--text-muted)' }}
           >
             {item}
           </span>
@@ -26,4 +27,3 @@ export function SkillGroupCard({ title, items, countLabel }: SkillGroupCardProps
     </div>
   )
 }
-

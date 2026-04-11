@@ -84,8 +84,8 @@ export default function ThoughtsPage() {
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">想法与灵感</h1>
-          <p className="text-gray-400">记录瞬间的思考与感悟</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--text-bright)' }}>想法与灵感</h1>
+          <p style={{ color: 'var(--text-muted)' }}>记录瞬间的思考与感悟</p>
         </div>
         {user && (
           <Button onClick={() => setShowForm(!showForm)}>
@@ -111,14 +111,20 @@ export default function ThoughtsPage() {
                   key={template}
                   type="button"
                   onClick={() => applyTemplate(template)}
-                  className="px-2.5 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:border-blue-500/50 hover:text-blue-300 transition-colors"
+                  className="px-2.5 py-1 text-xs rounded-full transition-colors"
+                  style={{
+                    border: '1px solid var(--dash-border)',
+                    color: 'var(--text-bright)'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'; e.currentTarget.style.color = '#93c5fd' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--dash-border)'; e.currentTarget.style.color = 'var(--text-bright)' }}
                 >
                   {template}
                 </button>
               ))}
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-300 mb-2">配图 (可选)</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-bright)' }}>配图 (可选)</label>
               <ImageUpload images={images} onChange={setImages} maxImages={9} />
             </div>
             <div className="flex gap-2">
@@ -141,13 +147,19 @@ export default function ThoughtsPage() {
       )}
 
       {loading ? (
-        <div className="text-center py-8 text-gray-500">加载中...</div>
+        <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>加载中...</div>
       ) : thoughts.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">暂无想法记录</div>
+        <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>暂无想法记录</div>
       ) : (
         <div className="grid gap-6">
           {thoughts.map((thought) => (
-            <Card key={thought.id} className="relative hover:border-gray-600 transition-colors">
+            <div
+              className="relative transition-colors rounded-xl"
+              style={{ border: '1px solid var(--dash-border)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--dash-border)' }}
+            >
+            <Card key={thought.id} className="border-0 shadow-none">
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
@@ -155,7 +167,7 @@ export default function ThoughtsPage() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
+                  <p className="whitespace-pre-wrap leading-relaxed" style={{ color: 'var(--text)' }}>
                     {thought.content}
                   </p>
                   {thought.images && thought.images.length > 0 && (
@@ -167,13 +179,14 @@ export default function ThoughtsPage() {
                           alt={`想法配图 ${idx + 1}`}
                           fill
                           sizes="(max-width: 640px) 30vw, 160px"
-                          className="aspect-square rounded-md border border-gray-700"
+                          className="aspect-square rounded-md"
+                          style={{ border: '1px solid var(--dash-border)' }}
                         />
                       ))}
                     </div>
                   )}
                   <div className="mt-4 flex items-center justify-between">
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm" style={{ color: 'var(--text-dim)' }}>
                       <Calendar className="w-4 h-4 mr-1" />
                       {new Date(thought.created_at).toLocaleString('zh-CN', {
                         year: 'numeric',
@@ -186,7 +199,10 @@ export default function ThoughtsPage() {
                     {user && (
                       <button
                         onClick={() => handleDelete(thought.id)}
-                        className="p-1 text-gray-500 hover:text-red-400 transition-colors"
+                        className="p-1 transition-colors"
+                        style={{ color: 'var(--text-dim)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#f87171'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-dim)'}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -195,6 +211,7 @@ export default function ThoughtsPage() {
                 </div>
               </div>
             </Card>
+            </div>
           ))}
         </div>
       )}

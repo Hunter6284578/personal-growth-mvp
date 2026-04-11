@@ -22,8 +22,8 @@ export default async function ThoughtsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">想法管理</h1>
-        <p className="text-gray-400">随时记录你的灵感和想法</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>想法管理</h1>
+        <p style={{ color: 'var(--text-muted)' }}>随时记录你的灵感和想法</p>
       </div>
 
       <ThoughtsManager 

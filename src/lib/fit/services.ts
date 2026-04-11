@@ -121,3 +121,35 @@ export async function deleteFitLog(id: string): Promise<void> {
   const { error } = await supabase.from('fit_logs').delete().eq('id', id)
   if (error) throw error
 }
+
+// 批量创建训练记录（一次提交多个动作）
+export async function createFitLogs(
+  items: Array<{
+    userId: string
+    date: string
+    exerciseId: string
+    sets: FitSet[]
+    note?: string
+  }>
+): Promise<FitLog[]> {
+  const rows = items.map(item => {
+    const totalVolume = item.sets.reduce((sum, s) => sum + s.volume, 0)
+    return {
+      user_id: item.userId,
+      date: item.date,
+      exercise_id: item.exerciseId,
+      sets: item.sets as unknown as Record<string, unknown>[],
+      total_volume: totalVolume,
+      total_sets: item.sets.length,
+      note: item.note || null,
+    }
+  })
+
+  const { data, error } = await supabase
+    .from('fit_logs')
+    .insert(rows)
+    .select()
+
+  if (error) throw error
+  return data as FitLog[]
+}

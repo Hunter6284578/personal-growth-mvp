@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { siteConfig } from '@/content/site'
-import { getOrganizationSchema, getWebsiteSchema } from '@/lib/structured-data'
 import { pickText, type SiteLanguage } from '@/lib/site-language'
 
 interface SiteFooterProps {
@@ -8,9 +7,6 @@ interface SiteFooterProps {
 }
 
 export function SiteFooter({ lang }: SiteFooterProps) {
-  const orgSchema = getOrganizationSchema()
-  const websiteSchema = getWebsiteSchema()
-
   return (
     <footer className="mt-24 py-10" style={{ borderTop: '1px solid var(--border)' }}>
       <div className="mx-auto max-w-3xl px-6 sm:px-8 lg:px-0">
@@ -25,7 +21,7 @@ export function SiteFooter({ lang }: SiteFooterProps) {
             <Link href={siteConfig.github} target="_blank" rel="noreferrer noopener" className="transition-colors hover:text-[var(--text-bright)]">
               GitHub
             </Link>
-            <Link href="/blog" className="transition-colors hover:text-[var(--text-bright)]">{lang === 'zh' ? '日志' : 'Journal'}</Link>
+            <Link href="/blog" className="transition-colors hover:text-[var(--text-bright)]">{lang === 'zh' ? '博客' : 'Blog'}</Link>
             <Link href="/projects" className="transition-colors hover:text-[var(--text-bright)]">{lang === 'zh' ? '作品' : 'Projects'}</Link>
             <a href={siteConfig.icpLink} target="_blank" rel="noreferrer noopener nofollow" className="transition-colors hover:text-[var(--text-bright)]">
               {siteConfig.icpNo}
@@ -33,14 +29,6 @@ export function SiteFooter({ lang }: SiteFooterProps) {
           </div>
         </div>
       </div>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-      />
     </footer>
   )
 }

@@ -1,12 +1,20 @@
 import { siteConfig } from '@/content/site'
 
-export function getOrganizationSchema() {
+export function getPersonSchema() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: siteConfig.title,
+    '@type': 'Person',
+    name: siteConfig.name,
     url: siteConfig.siteUrl,
     sameAs: [siteConfig.github],
+    email: siteConfig.email,
+    knowsAbout: [
+      'Web Development',
+      'TypeScript',
+      'React',
+      'Next.js',
+      'Personal Knowledge Management',
+    ],
   }
 }
 
@@ -16,7 +24,11 @@ export function getWebsiteSchema() {
     '@type': 'WebSite',
     name: siteConfig.title,
     url: siteConfig.siteUrl,
-    inLanguage: 'zh-CN',
+    inLanguage: ['zh-CN', 'en'],
+    author: {
+      '@type': 'Person',
+      name: siteConfig.name,
+    },
   }
 }
 

@@ -10,6 +10,8 @@ import { Trash2, Tag, Plus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ManagedImage } from '@/components/ui/ManagedImage'
+import { useToast } from '@/components/ui/Toast'
+import { useConfirm, ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 interface ThoughtsManagerProps {
   initialThoughts: Thought[]
@@ -25,6 +27,8 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
   const [images, setImages] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const { toast } = useToast()
+  const { confirm, cancel, dialogState } = useConfirm()
 
   const handleAddThought = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +36,6 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
 
     setLoading(true)
     
-    // Process tags: split by comma, trim, remove empty
     const tags = tagsInput.split(/[,，]/).map(t => t.trim()).filter(Boolean)
     
     try {
@@ -54,18 +57,19 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
         setContent('')
         setTagsInput('')
         setImages([])
-        router.refresh() // Refresh server components if needed
+        router.refresh()
       }
     } catch (error) {
       console.error('Error adding thought:', error)
-      alert('添加想法失败，请重试')
+      toast('添加想法失败，请重试', 'error')
     } finally {
       setLoading(false)
     }
   }
 
   const handleDeleteThought = async (id: string) => {
-    if (!confirm('确定要删除这条想法吗？')) return
+    const confirmed = await confirm({ message: '确定要删除这条想法吗？', variant: 'danger' })
+    if (!confirmed) return
 
     try {
       const { error } = await supabase
@@ -79,7 +83,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
       router.refresh()
     } catch (error) {
       console.error('Error deleting thought:', error)
-      alert('删除失败，请重试')
+      toast('删除失败，请重试', 'error')
     }
   }
 
@@ -106,7 +110,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
           />
 
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
               配图 (可选)
             </label>
             <ImageUpload images={images} onChange={setImages} maxImages={9} />
@@ -115,7 +119,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="relative w-full sm:w-1/2">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Tag className="h-4 w-4 text-gray-400" />
+                <Tag className="h-4 w-4" style={{ color: 'var(--text-muted)' }} />
               </div>
               <input
                 type="text"
@@ -147,7 +151,8 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
                 key={tag}
                 type="button"
                 onClick={() => appendQuickTag(tag)}
-                className="px-2.5 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:border-blue-500/50 hover:text-blue-300 transition-colors"
+                className="px-2.5 py-1 text-xs rounded-full border transition-colors"
+                style={{ borderColor: 'var(--dash-border)', color: 'var(--text)' }}
                 disabled={loading}
               >
                 #{tag}
@@ -158,9 +163,9 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
       </Card>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
+        <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--text-bright)' }}>
           我的想法 
-          <span className="text-sm font-normal text-gray-400">({thoughts.length})</span>
+          <span className="text-sm font-normal" style={{ color: 'var(--text-muted)' }}>({thoughts.length})</span>
         </h2>
         
         {thoughts.length > 0 ? (
@@ -168,17 +173,18 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
             {thoughts.map((thought) => (
               <div 
                 key={thought.id} 
-                className="pg-card p-5 flex flex-col hover:border-gray-600 transition-colors group relative"
+                className="pg-card p-5 flex flex-col transition-colors group relative"
               >
                 <button
                   onClick={() => handleDeleteThought(thought.id)}
-                  className="absolute top-3 right-3 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ color: 'var(--text-dim)' }}
                   title="删除"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
                 
-                <p className="text-gray-200 whitespace-pre-wrap flex-grow mb-4">
+                <p className="whitespace-pre-wrap flex-grow mb-4" style={{ color: 'var(--text)' }}>
                   {thought.content}
                 </p>
 
@@ -191,14 +197,15 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
                         alt={`想法配图 ${idx + 1}`}
                         fill
                         sizes="(max-width: 640px) 30vw, 160px"
-                        className="aspect-square rounded-md border border-gray-700"
+                        className="aspect-square rounded-md"
+                        style={{ border: '1px solid var(--dash-border)' }}
                       />
                     ))}
                   </div>
                 )}
                 
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-700/50">
-                  <span className="text-xs text-gray-500">
+                <div className="flex items-center justify-between mt-auto pt-4" style={{ borderTop: '1px solid var(--dash-border)' }}>
+                  <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
                     {new Date(thought.created_at).toLocaleString('zh-CN', {
                       month: 'short',
                       day: 'numeric',
@@ -210,7 +217,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
                   {thought.tags && thought.tags.length > 0 && (
                     <div className="flex gap-1 flex-wrap justify-end max-w-[60%]">
                       {thought.tags.map(tag => (
-                        <span key={tag} className="text-xs px-2 py-0.5 bg-gray-700/50 text-blue-300 rounded-full">
+                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}>
                           #{tag}
                         </span>
                       ))}
@@ -221,20 +228,29 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 bg-gray-800/50 rounded-lg border border-dashed border-gray-700">
-            <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LightbulbIcon className="w-8 h-8 text-gray-600" />
+          <div className="text-center py-12 rounded-lg border border-dashed" style={{ background: 'var(--dash-card-soft)', borderColor: 'var(--dash-border)' }}>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--dash-card-soft)' }}>
+              <LightbulbIcon className="w-8 h-8" style={{ color: 'var(--text-dim)' }} />
             </div>
-            <p className="text-gray-400">还没有记录任何想法</p>
-            <p className="text-sm text-gray-500 mt-1">记录下第一个灵感吧！</p>
+            <p style={{ color: 'var(--text-muted)' }}>还没有记录任何想法</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--text-dim)' }}>记录下第一个灵感吧！</p>
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={dialogState.open}
+        onConfirm={dialogState.onConfirm}
+        onCancel={cancel}
+        title={dialogState.title}
+        message={dialogState.message}
+        variant={dialogState.variant}
+      />
     </div>
   )
 }
 
-function LightbulbIcon({ className }: { className?: string }) {
+function LightbulbIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
   return (
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
@@ -245,6 +261,7 @@ function LightbulbIcon({ className }: { className?: string }) {
       strokeLinecap="round" 
       strokeLinejoin="round" 
       className={className}
+      style={style}
     >
       <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
       <path d="M9 18h6" />

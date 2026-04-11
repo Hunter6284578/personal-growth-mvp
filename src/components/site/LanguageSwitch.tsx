@@ -1,6 +1,5 @@
 'use client'
 
-import { Languages } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { siteLanguageCookie, type SiteLanguage } from '@/lib/site-language'
 
@@ -26,11 +25,11 @@ export function LanguageSwitch({ lang }: LanguageSwitchProps) {
     <button
       type="button"
       onClick={handleToggle}
-      className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/6 px-3 py-2 text-sm font-medium text-slate-200 transition hover:border-emerald-400/40 hover:bg-white/10 hover:text-white"
+      className="text-sm transition-colors"
+      style={{ color: 'var(--text-dim)' }}
       aria-label={lang === 'zh' ? '切换到英文' : 'Switch to Chinese'}
     >
-      <Languages className="h-4 w-4" />
-      {lang === 'zh' ? 'EN' : '中文'}
+      {lang === 'zh' ? '中文 / EN' : 'EN / 中文'}
     </button>
   )
 }

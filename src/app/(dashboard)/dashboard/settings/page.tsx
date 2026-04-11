@@ -9,9 +9,11 @@ import { uploadImage } from '@/lib/upload'
 import { useAuth } from '@/hooks/useAuth'
 import type { Profile } from '@/types'
 import { ManagedImage } from '@/components/ui/ManagedImage'
+import { useToast } from '@/components/ui/Toast'
 
 export default function SettingsPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -33,14 +35,12 @@ export default function SettingsPage() {
       setAvatarUrl(data.avatar_url || '')
     } catch (error) {
       console.error('Error loading profile:', error)
-      // 如果还没有资料，使用默认值
       setCharacterName('主角')
     } finally {
       setLoading(false)
     }
   }, [user])
 
-  // 加载数据
   useEffect(() => {
     if (user) {
       void loadProfile()
@@ -52,12 +52,12 @@ export default function SettingsPage() {
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      alert('只能上传图片文件')
+      toast('只能上传图片文件', 'error')
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('图片大小不能超过 5MB')
+      toast('图片大小不能超过 5MB', 'error')
       return
     }
 
@@ -67,7 +67,7 @@ export default function SettingsPage() {
       setAvatarUrl(url)
     } catch (error) {
       console.error('上传头像失败:', error)
-      alert('上传头像失败，请重试')
+      toast('上传头像失败，请重试', 'error')
     } finally {
       setAvatarUploading(false)
       if (avatarInputRef.current) {
@@ -90,10 +90,10 @@ export default function SettingsPage() {
         avatar_url: avatarUrl,
       })
       await loadProfile()
-      alert('保存成功！')
+      toast('保存成功！', 'success')
     } catch (error) {
       console.error('Error saving profile:', error)
-      alert('保存失败，请重试')
+      toast('保存失败，请重试', 'error')
     } finally {
       setSaving(false)
     }
@@ -102,15 +102,15 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">设置</h1>
-        <p className="text-gray-400 mt-1">管理你的个人资料</p>
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--text-bright)' }}>设置</h1>
+        <p className="mt-1" style={{ color: 'var(--text-muted)' }}>管理你的个人资料</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* 个人资料 */}
         <Card title="个人资料" subtitle="编辑你的角色信息">
           {loading ? (
-            <div className="text-center py-8 text-gray-500">加载中...</div>
+            <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>加载中...</div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* 头像 - 点击上传 */}
@@ -119,7 +119,8 @@ export default function SettingsPage() {
                   type="button"
                   onClick={() => avatarInputRef.current?.click()}
                   disabled={avatarUploading}
-                  className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center overflow-hidden relative group cursor-pointer transition-all hover:ring-2 hover:ring-blue-500 disabled:opacity-50"
+                  className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden relative group cursor-pointer transition-all disabled:opacity-50"
+                  style={{ background: 'var(--dash-card-soft)' }}
                 >
                   {avatarUrl ? (
                     <ManagedImage
@@ -131,19 +132,19 @@ export default function SettingsPage() {
                       className="h-full w-full"
                     />
                   ) : (
-                    <User className="w-10 h-10 text-gray-400" />
+                    <User className="w-10 h-10" style={{ color: 'var(--text-muted)' }} />
                   )}
-                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
                     {avatarUploading ? (
-                      <Loader2 className="w-6 h-6 text-white animate-spin" />
+                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--text-bright)' }} />
                     ) : (
-                      <Camera className="w-6 h-6 text-white" />
+                      <Camera className="w-6 h-6" style={{ color: 'var(--text-bright)' }} />
                     )}
                   </div>
                 </button>
                 <div>
-                  <p className="text-sm font-medium text-gray-300">头像</p>
-                  <p className="text-xs text-gray-500">点击头像上传图片</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>头像</p>
+                  <p className="text-xs" style={{ color: 'var(--text-dim)' }}>点击头像上传图片</p>
                 </div>
               </div>
               <input
@@ -155,7 +156,7 @@ export default function SettingsPage() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                   角色名称 *
                 </label>
                 <input
@@ -164,12 +165,12 @@ export default function SettingsPage() {
                   onChange={(e) => setCharacterName(e.target.value)}
                   placeholder="你的角色名称"
                   required
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="pg-input"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                   个人简介
                 </label>
                 <textarea
@@ -177,7 +178,7 @@ export default function SettingsPage() {
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="介绍一下你自己..."
                   rows={4}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="pg-input resize-none"
                 />
               </div>
 
@@ -193,14 +194,14 @@ export default function SettingsPage() {
         <div className="space-y-6">
           <Card title="账户信息" subtitle="你的登录信息">
             <div className="space-y-4">
-              <div className="p-4 bg-gray-900 rounded-lg">
-                <p className="text-gray-300 mb-2">邮箱</p>
-                <p className="text-sm text-gray-500">{user?.email || '未登录'}</p>
+              <div className="p-4 rounded-lg" style={{ background: 'var(--dash-card-soft)' }}>
+                <p className="mb-2" style={{ color: 'var(--text)' }}>邮箱</p>
+                <p className="text-sm" style={{ color: 'var(--text-dim)' }}>{user?.email || '未登录'}</p>
               </div>
 
-              <div className="p-4 bg-gray-900 rounded-lg">
-                <p className="text-gray-300 mb-2">密码</p>
-                <p className="text-sm text-gray-500 mb-3">
+              <div className="p-4 rounded-lg" style={{ background: 'var(--dash-card-soft)' }}>
+                <p className="mb-2" style={{ color: 'var(--text)' }}>密码</p>
+                <p className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>
                   定期更改密码可以提高账户安全性
                 </p>
                 <Button variant="outline" size="sm">
@@ -212,9 +213,9 @@ export default function SettingsPage() {
 
           <Card title="数据管理" subtitle="管理你的数据">
             <div className="space-y-3">
-              <div className="p-4 bg-gray-900 rounded-lg">
-                <p className="text-gray-300 mb-2">导出数据</p>
-                <p className="text-sm text-gray-500 mb-3">
+              <div className="p-4 rounded-lg" style={{ background: 'var(--dash-card-soft)' }}>
+                <p className="mb-2" style={{ color: 'var(--text)' }}>导出数据</p>
+                <p className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>
                   下载你的所有数据备份
                 </p>
                 <Button variant="outline" size="sm">
@@ -222,12 +223,12 @@ export default function SettingsPage() {
                 </Button>
               </div>
 
-              <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg">
-                <p className="text-red-400 mb-2">危险区域</p>
-                <p className="text-sm text-gray-500 mb-3">
+              <div className="p-4 rounded-lg" style={{ background: 'rgba(139, 85, 85, 0.12)', border: '1px solid var(--dash-danger)' }}>
+                <p className="mb-2" style={{ color: 'var(--dash-danger)' }}>危险区域</p>
+                <p className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>
                   删除账户将清除所有数据，此操作不可恢复
                 </p>
-                <Button variant="outline" size="sm" className="text-red-400 border-red-800 hover:bg-red-900/30">
+                <Button variant="outline" size="sm" style={{ borderColor: 'var(--dash-danger)', color: 'var(--dash-danger)' }}>
                   删除账户
                 </Button>
               </div>

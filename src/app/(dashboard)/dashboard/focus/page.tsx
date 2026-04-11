@@ -24,9 +24,13 @@ import {
 } from '@/lib/services'
 import { useAuth } from '@/hooks/useAuth'
 import type { SkillGroup, SkillItem } from '@/types'
+import { useToast } from '@/components/ui/Toast'
+import { useConfirm, ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export default function FocusPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
+  const { confirm, cancel, dialogState } = useConfirm()
   const [groups, setGroups] = useState<(SkillGroup & { items: SkillItem[] })[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -89,23 +93,24 @@ export default function FocusPage() {
       resetGroupForm()
       setShowGroupForm(false)
       await loadGroups()
-      alert(editingGroupId ? '分组更新成功！' : '分组添加成功！')
+      toast(editingGroupId ? '分组更新成功！' : '分组添加成功！', 'success')
     } catch (error) {
       console.error('Error saving group:', error)
-      alert('保存失败，请重试')
+      toast('保存失败，请重试', 'error')
     } finally {
       setSaving(false)
     }
   }
 
   const handleDeleteGroup = async (id: string) => {
-    if (!confirm('确定删除这个分组及其所有条目吗？')) return
+    const confirmed = await confirm({ message: '确定删除这个分组及其所有条目吗？', variant: 'danger' })
+    if (!confirmed) return
     try {
       await deleteSkillGroup(id)
       await loadGroups()
     } catch (error) {
       console.error('Error deleting group:', error)
-      alert('删除失败')
+      toast('删除失败', 'error')
     }
   }
 
@@ -154,7 +159,7 @@ export default function FocusPage() {
       await loadGroups()
     } catch (error) {
       console.error('Error creating item:', error)
-      alert('添加失败')
+      toast('添加失败', 'error')
     } finally {
       setSaving(false)
     }
@@ -188,20 +193,21 @@ export default function FocusPage() {
       await loadGroups()
     } catch (error) {
       console.error('Error updating item:', error)
-      alert('更新失败')
+      toast('更新失败', 'error')
     } finally {
       setSaving(false)
     }
   }
 
   const handleDeleteItem = async (itemId: string) => {
-    if (!confirm('确定删除这条？')) return
+    const confirmed = await confirm({ message: '确定删除这条？', variant: 'danger' })
+    if (!confirmed) return
     try {
       await deleteSkillItem(itemId)
       await loadGroups()
     } catch (error) {
       console.error('Error deleting item:', error)
-      alert('删除失败')
+      toast('删除失败', 'error')
     }
   }
 
@@ -209,8 +215,8 @@ export default function FocusPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">我在聚焦什么</h1>
-          <p className="text-slate-400 mt-1 text-sm">管理首页展示的聚焦方向和技能标签</p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>我在聚焦什么</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>管理首页展示的聚焦方向和技能标签</p>
         </div>
         <Button
           onClick={() => { resetGroupForm(); setShowGroupForm(!showGroupForm); }}
@@ -226,7 +232,7 @@ export default function FocusPage() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">中文标题 *</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>中文标题 *</label>
                 <input
                   type="text"
                   value={titleZh}
@@ -237,7 +243,7 @@ export default function FocusPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">English Title</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>English Title</label>
                 <input
                   type="text"
                   value={titleEn}
@@ -263,15 +269,15 @@ export default function FocusPage() {
 
       {/* 分组列表 */}
       {loading ? (
-        <div className="text-center py-12 text-slate-500">加载中...</div>
+        <div className="text-center py-12" style={{ color: 'var(--text-dim)' }}>加载中...</div>
       ) : groups.length === 0 ? (
-        <div className="rounded-[1.75rem] border border-dashed border-white/10 bg-[#0d1520]/50 px-5 py-12 text-center">
-          <Target className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">
-            暂无内容，点击上方"添加分组"开始创建。
+        <div className="rounded-[1.75rem] border border-dashed px-5 py-12 text-center" style={{ borderColor: 'var(--dash-border)', background: 'var(--dash-card-soft)' }}>
+          <Target className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--text-dim)' }} />
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            暂无内容，点击上方&quot;添加分组&quot;开始创建。
           </p>
-          <p className="text-slate-600 text-xs mt-1">
-            创建的分组和条目将显示在首页的"我在聚焦什么"区域
+          <p className="text-xs mt-1" style={{ color: 'var(--text-dim)' }}>
+            创建的分组和条目将显示在首页的&quot;我在聚焦什么&quot;区域
           </p>
         </div>
       ) : (
@@ -285,18 +291,18 @@ export default function FocusPage() {
                 {/* 分组头部 */}
                 <div className="flex items-center justify-between cursor-pointer select-none" onClick={() => toggleExpand(group.id)}>
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <GripVertical className="w-4 h-4 text-slate-600 shrink-0" />
+                    <GripVertical className="w-4 h-4 shrink-0" style={{ color: 'var(--text-dim)' }} />
                     {isExpanded ? (
-                      <ChevronDown className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <ChevronDown className="w-4 h-4 shrink-0" style={{ color: 'var(--dash-success)' }} />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-slate-500 shrink-0" />
+                      <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'var(--text-dim)' }} />
                     )}
-                    <h3 className="text-lg font-semibold text-white truncate">{group.title_zh}</h3>
+                    <h3 className="text-lg font-semibold truncate" style={{ color: 'var(--text-bright)' }}>{group.title_zh}</h3>
                     {group.title_en && (
-                      <span className="text-xs text-slate-500 hidden sm:inline truncate">{group.title_en}</span>
+                      <span className="text-xs hidden sm:inline truncate" style={{ color: 'var(--text-dim)' }}>{group.title_en}</span>
                     )}
                     {group.items && group.items.length > 0 && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 ml-auto sm:ml-0">
+                      <span className="text-xs px-2 py-0.5 rounded-full border ml-auto sm:ml-0" style={{ background: 'rgba(107, 143, 113, 0.15)', color: 'var(--dash-success)', borderColor: 'rgba(107, 143, 113, 0.2)' }}>
                         {group.items.length} 项
                       </span>
                     )}
@@ -304,14 +310,16 @@ export default function FocusPage() {
                   <div className="flex gap-1 shrink-0 ml-3" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => handleEditGroup(group)}
-                      className="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors rounded-md hover:bg-white/5"
+                      className="p-1.5 transition-colors rounded-md"
+                      style={{ color: 'var(--text-muted)' }}
                       title="编辑分组"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteGroup(group.id)}
-                      className="p-1.5 text-slate-400 hover:text-red-400 transition-colors rounded-md hover:bg-white/5"
+                      className="p-1.5 transition-colors rounded-md"
+                      style={{ color: 'var(--text-muted)' }}
                       title="删除分组"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -321,7 +329,7 @@ export default function FocusPage() {
 
                 {/* 展开的内容：条目列表 */}
                 {isExpanded && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3">
+                  <div className="mt-4 pt-4 space-y-3" style={{ borderTop: '1px solid var(--dash-border)' }}>
                     {/* 现有条目 */}
                     {(group.items && group.items.length > 0) ? (
                       <div className="space-y-2">
@@ -329,7 +337,7 @@ export default function FocusPage() {
                           const edit = itemEditing[item.id]
                           if (edit) {
                             return (
-                              <div key={item.id} className="flex gap-2 items-start bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/15">
+                              <div key={item.id} className="flex gap-2 items-start p-3 rounded-xl border" style={{ background: 'rgba(107, 143, 113, 0.08)', borderColor: 'rgba(107, 143, 113, 0.15)' }}>
                                 <input
                                   autoFocus
                                   value={edit.textZh}
@@ -352,13 +360,15 @@ export default function FocusPage() {
                                 <div className="flex gap-1 shrink-0">
                                   <button
                                     onClick={() => handleUpdateItem(item.id)}
-                                    className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-gray-900 rounded-lg hover:bg-emerald-400 transition-colors"
+                                    className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                                    style={{ background: 'var(--dash-success)', color: 'var(--dash-bg)' }}
                                   >
                                     确定
                                   </button>
                                   <button
                                     onClick={() => cancelEditItem(item.id)}
-                                    className="px-3 py-1.5 text-xs font-medium bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors"
+                                    className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                                    style={{ background: 'var(--dash-card-soft)', color: 'var(--text)' }}
                                   >
                                     取消
                                   </button>
@@ -368,24 +378,26 @@ export default function FocusPage() {
                           }
 
                           return (
-                            <div key={item.id} className="flex items-center justify-between group/item p-2 rounded-lg hover:bg-white/[0.02]">
+                            <div key={item.id} className="flex items-center justify-between group/item p-2 rounded-lg" style={{ transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--dash-hover)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                               <div className="flex items-center gap-2 min-w-0 flex-1">
-                                <GripVertical className="w-3 h-3 text-slate-700 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0" />
-                                <span className="text-sm text-slate-200 truncate">{item.text_zh}</span>
+                                <GripVertical className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0" style={{ color: 'var(--text-dim)' }} />
+                                <span className="text-sm truncate" style={{ color: 'var(--text)' }}>{item.text_zh}</span>
                                 {item.text_en && (
-                                  <span className="text-xs text-slate-600 truncate hidden md:inline-block max-w-[150px]">{item.text_en}</span>
+                                  <span className="text-xs truncate hidden md:inline-block max-w-[150px]" style={{ color: 'var(--text-dim)' }}>{item.text_en}</span>
                                 )}
                               </div>
                               <div className="flex gap-1 shrink-0 opacity-0 group-hover/item:opacity-100 transition-opacity">
                                 <button
                                   onClick={() => startEditItem(item)}
-                                  className="p-1 text-slate-500 hover:text-emerald-400 transition-colors rounded"
+                                  className="p-1 transition-colors rounded"
+                                  style={{ color: 'var(--text-dim)' }}
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => handleDeleteItem(item.id)}
-                                  className="p-1 text-slate-500 hover:text-red-400 transition-colors rounded"
+                                  className="p-1 transition-colors rounded"
+                                  style={{ color: 'var(--text-dim)' }}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -396,13 +408,13 @@ export default function FocusPage() {
                       </div>
                     ) : (
                       !creating && (
-                        <p className="text-xs text-slate-600 text-center py-2">暂无条目，下方添加</p>
+                        <p className="text-xs text-center py-2" style={{ color: 'var(--text-dim)' }}>暂无条目，下方添加</p>
                       )
                     )}
 
                     {/* 新增条目输入框 */}
                     {creating ? (
-                      <div className="flex gap-2 items-start bg-white/[0.03] p-3 rounded-xl border border-dashed border-white/10">
+                      <div className="flex gap-2 items-start p-3 rounded-xl border border-dashed" style={{ background: 'var(--dash-hover)', borderColor: 'var(--dash-border)' }}>
                         <input
                           autoFocus
                           value={creating.textZh}
@@ -427,13 +439,15 @@ export default function FocusPage() {
                         <div className="flex gap-1 shrink-0">
                           <button
                             onClick={() => handleCreateItem(group.id)}
-                            className="px-3 py-1.5 text-xs font-medium bg-emerald-500 text-gray-900 rounded-lg hover:bg-emerald-400 transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                            style={{ background: 'var(--dash-success)', color: 'var(--dash-bg)' }}
                           >
                             确定
                           </button>
                           <button
                             onClick={() => cancelCreateItem(group.id)}
-                            className="px-3 py-1.5 text-xs font-medium bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition-colors"
+                            className="px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
+                            style={{ background: 'var(--dash-card-soft)', color: 'var(--text)' }}
                           >
                             取消
                           </button>
@@ -442,7 +456,8 @@ export default function FocusPage() {
                     ) : (
                       <button
                         onClick={() => startCreateItem(group.id)}
-                        className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-emerald-400 transition-colors px-2 py-1 rounded-md hover:bg-white/[0.02]"
+                        className="flex items-center gap-1.5 text-xs transition-colors px-2 py-1 rounded-md"
+                        style={{ color: 'var(--text-dim)' }}
                       >
                         <Plus className="w-3.5 h-3.5" />
                         添加条目
@@ -455,6 +470,15 @@ export default function FocusPage() {
           })}
         </div>
       )}
+
+      <ConfirmDialog
+        open={dialogState.open}
+        onConfirm={dialogState.onConfirm}
+        onCancel={cancel}
+        title={dialogState.title}
+        message={dialogState.message}
+        variant={dialogState.variant}
+      />
     </div>
   )
 }

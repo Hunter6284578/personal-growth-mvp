@@ -34,8 +34,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
-      <div className="absolute inset-0 bg-gray-950/75" />
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero" style={{ background: 'var(--bg-warm)' }}>
+      <div className="absolute inset-0" style={{ background: 'rgba(14, 15, 17, 0.75)' }} />
       <div className="w-full max-w-md relative z-10">
         <Link href="/">
           <Button variant="ghost" size="sm" className="mb-6">
@@ -47,10 +47,10 @@ export default function LoginPage() {
         <Card>
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-8 h-8 text-white" />
+              <Lock className="w-8 h-8" style={{ color: '#fff' }} />
             </div>
-            <h1 className="text-2xl font-bold text-white">登录</h1>
-            <p className="text-gray-400 mt-2">进入你的个人成长空间</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>登录</h1>
+            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>进入你的个人成长空间</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -73,8 +73,8 @@ export default function LoginPage() {
             />
 
             {error && (
-              <div className="p-3 bg-red-900/50 border border-red-700 rounded-lg">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="p-3 rounded-lg" style={{ background: 'rgba(127, 29, 29, 0.5)', border: '1px solid rgba(153, 27, 27, 0.6)' }}>
+                <p className="text-sm" style={{ color: '#fca5a5' }}>{error}</p>
               </div>
             )}
 
@@ -92,16 +92,17 @@ export default function LoginPage() {
           <div className="mt-4 text-right">
             <Link
               href="/forgot-password"
-              className="text-sm text-blue-400 hover:text-blue-300"
+              className="text-sm hover:opacity-80"
+              style={{ color: 'var(--accent)' }}
             >
               忘记密码？
             </Link>
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
               还没有账号？{' '}
-              <Link href="/register" className="text-blue-400 hover:text-blue-300">
+              <Link href="/register" style={{ color: 'var(--accent)' }}>
                 去注册
               </Link>
             </p>

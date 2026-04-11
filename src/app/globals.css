@@ -23,6 +23,8 @@
 }
 
 :root {
+  color-scheme: dark;
+
   --bg: #0e0f11;
   --bg-warm: #12131a;
   --text: #d4d1cb;
@@ -37,6 +39,68 @@
   --page-gradient:
     radial-gradient(ellipse 80% 50% at 20% 0%, rgba(139, 115, 85, 0.04), transparent),
     linear-gradient(180deg, #0e0f11 0%, #12131a 100%);
+
+  /* Dashboard 专属变量 */
+  --dash-bg: #0c0d10;
+  --dash-surface: rgba(20, 21, 26, 0.75);
+  --dash-sidebar-bg: #0a0b0e;
+  --dash-input-bg: rgba(18, 19, 24, 0.85);
+  --dash-card: var(--dash-surface);
+  --dash-card-soft: rgba(26, 27, 33, 0.6);
+  --dash-border: rgba(212, 209, 203, 0.1);
+  --dash-border-hover: rgba(212, 209, 203, 0.18);
+  --dash-hover: rgba(255, 255, 255, 0.03);
+
+  /* Dashboard 语义色 */
+  --dash-success: #6b8f71;
+  --dash-warning: var(--accent);
+  --dash-danger: #8b5555;
+  --dash-info: #55728b;
+
+  /* 属性图表色 — 去饱和化 */
+  --dash-stat-physical: #8b5555;
+  --dash-stat-execution: #55728b;
+  --dash-stat-focus: #6b8f71;
+  --dash-stat-emotion: #8b7355;
+  --dash-stat-social: #6b558b;
+  --dash-stat-creativity: #8b5572;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f5f3ef;
+  --bg-warm: #eae7e1;
+  --text: #2c2a26;
+  --text-bright: #1a1816;
+  --text-muted: #6b665e;
+  --text-dim: #9e978d;
+  --border: rgba(28, 26, 22, 0.08);
+  --border-hover: rgba(28, 26, 22, 0.15);
+  --accent: #7a6545;
+  --accent-soft: rgba(122, 101, 69, 0.1);
+  --surface: rgba(234, 231, 225, 0.6);
+  --page-gradient:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(122, 101, 69, 0.04), transparent),
+    linear-gradient(180deg, #f5f3ef 0%, #eae7e1 100%);
+
+  /* Dashboard 亮色覆盖 */
+  --dash-bg: #f5f3ef;
+  --dash-surface: rgba(234, 231, 225, 0.75);
+  --dash-sidebar-bg: #eae7e1;
+  --dash-input-bg: rgba(240, 238, 233, 0.9);
+  --dash-card: rgba(234, 231, 225, 0.75);
+  --dash-card-soft: rgba(226, 223, 217, 0.6);
+  --dash-hover: rgba(0, 0, 0, 0.03);
+  --dash-success: #4a7c59;
+  --dash-danger: #7c4a4a;
+  --dash-info: #4a6b7c;
+  --dash-stat-physical: #7c4a4a;
+  --dash-stat-execution: #4a6b7c;
+  --dash-stat-focus: #4a7c59;
+  --dash-stat-emotion: #7a6545;
+  --dash-stat-social: #5a4a7c;
+  --dash-stat-creativity: #7c4a5a;
 }
 
 @theme inline {
@@ -213,12 +277,35 @@ pre,
     border: 1px solid var(--border);
     border-radius: 0.375rem;
     padding: 1.25rem;
-    background: rgba(14, 15, 17, 0.3);
+    background: var(--surface);
     transition: border-color 0.3s ease;
   }
 
   .content-card:hover {
     border-color: var(--border-hover);
+  }
+
+  /* 信息子块 - 替代 rounded-[1.5rem] bg-slate-950/40 */
+  .info-block {
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    background: var(--bg-warm);
+  }
+
+  /* 极简标签 - 替代 rounded-full pill 标签 */
+  .tag-minimal {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  /* 活跃标签 - 替代 bg-emerald-400 高亮 */
+  .tag-active {
+    font-size: 0.75rem;
+    color: var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 2px;
   }
 
   /* 空状态占位 */
@@ -295,33 +382,39 @@ pre,
 
   .pg-card {
     border-radius: 0.75rem;
-    border: 1px solid var(--pg-border);
+    border: 1px solid var(--dash-border);
     padding: 1.5rem;
-    background: var(--pg-card);
-    color: white;
+    background: var(--dash-card);
+    color: var(--text);
   }
 
   .pg-card-soft {
     border-radius: 0.625rem;
-    border: 1px solid var(--pg-border-strong);
-    background: var(--pg-card-soft);
+    border: 1px solid var(--dash-border-hover);
+    background: var(--dash-card-soft);
+    color: var(--text);
   }
 
   .pg-input {
     width: 100%;
     border-radius: 0.625rem;
-    border: 1px solid var(--pg-border);
+    border: 1px solid var(--dash-border);
     padding: 0.75rem 1rem;
-    color: white;
-    background: rgba(15, 23, 42, 0.72);
+    color: var(--text);
+    background: var(--dash-input-bg);
     transition: border-color 0.2s ease;
     outline: none;
   }
 
+  .pg-input::placeholder {
+    color: var(--text-dim);
+    opacity: 1;
+  }
+
   .pg-input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--pg-ring);
-    border-color: var(--pg-ring);
+    box-shadow: 0 0 0 2px var(--accent);
+    border-color: var(--accent);
   }
 
   .pg-input:disabled {
@@ -329,11 +422,15 @@ pre,
     opacity: 0.5;
   }
 
+  /* select 下拉暗色适配 */
+  .pg-input option {
+    background: var(--bg-warm);
+    color: var(--text);
+  }
+
   .pg-page {
     min-height: 100vh;
-    background:
-      radial-gradient(ellipse 60% 40% at 10% 0%, rgba(20, 184, 166, 0.04), transparent),
-      linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    background: var(--dash-bg);
   }
 
   .prose-shell {
@@ -349,7 +446,7 @@ pre,
     padding: 1rem;
     font-size: 0.875rem;
     line-height: 1.7;
-    background: rgba(14, 15, 17, 0.8);
+    background: var(--bg-warm);
   }
 
   .prose-shell pre code {
@@ -371,7 +468,7 @@ pre,
   }
 
   .prose-shell thead {
-    background: rgba(18, 19, 26, 0.7);
+    background: var(--surface);
   }
 
   .prose-shell th,
@@ -390,16 +487,16 @@ pre,
   }
 
   .prose-shell tbody tr {
-    background: rgba(255, 255, 255, 0.01);
+    background: transparent;
   }
 
   .prose-shell tbody tr:nth-child(even) {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface);
   }
 
   .prose-shell blockquote {
     border-radius: 0 0.5rem 0.5rem 0;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--surface);
     padding: 0.75rem 1.25rem;
     border-left: 2px solid var(--accent);
     color: var(--text-muted);

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase-server'
 import { DashboardNavigation } from '@/components/Navigation'
+import { ToastProvider } from '@/components/ui/Toast'
 
 export default async function DashboardLayout({
   children,
@@ -15,13 +16,15 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#060b14]">
-      <DashboardNavigation />
-      <main className="lg:pl-60 pt-14">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-          {children}
-        </div>
-      </main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-screen" style={{ background: 'var(--dash-bg)' }}>
+        <DashboardNavigation />
+        <main className="lg:pl-60 pt-14">
+          <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+            {children}
+          </div>
+        </main>
+      </div>
+    </ToastProvider>
   )
 }

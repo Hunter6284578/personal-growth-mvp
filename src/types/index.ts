@@ -128,6 +128,7 @@ export interface BlogPost {
   tags: string[] | null
   images: string[] | null
   status: 'draft' | 'published'
+  view_count: number
   published_at: string | null
   created_at: string
   updated_at: string

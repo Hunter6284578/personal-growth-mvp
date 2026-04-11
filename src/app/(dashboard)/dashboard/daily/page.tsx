@@ -7,9 +7,13 @@ import { Calendar, Smile, Trash2, Edit2 } from 'lucide-react'
 import { getDailyLogs, getDailyLogByDate, upsertDailyLog, deleteDailyLog } from '@/lib/services'
 import { useAuth } from '@/hooks/useAuth'
 import type { DailyLog } from '@/types'
+import { useToast } from '@/components/ui/Toast'
+import { useConfirm, ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 export default function DailyLogPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
+  const { confirm, cancel, dialogState } = useConfirm()
   const [logs, setLogs] = useState<DailyLog[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -98,17 +102,18 @@ export default function DailyLogPage() {
         mood_score: moodScore,
       })
       await loadLogs()
-      alert(editingId ? '更新成功！' : '保存成功！')
+      toast(editingId ? '更新成功！' : '保存成功！', 'success')
     } catch (error) {
       console.error('Error saving log:', error)
-      alert('保存失败，请重试')
+      toast('保存失败，请重试', 'error')
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这条记录吗？')) return
+    const confirmed = await confirm({ message: '确定要删除这条记录吗？', variant: 'danger' })
+    if (!confirmed) return
     
     try {
       await deleteDailyLog(id)
@@ -118,7 +123,7 @@ export default function DailyLogPage() {
       }
     } catch (error) {
       console.error('Error deleting log:', error)
-      alert('删除失败')
+      toast('删除失败', 'error')
     }
   }
 
@@ -139,8 +144,8 @@ export default function DailyLogPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">每日记录</h1>
-        <p className="text-gray-400 mt-1">记录每一天的成长与反思</p>
+        <h1 className="text-3xl font-bold" style={{ color: 'var(--text-bright)' }}>每日记录</h1>
+        <p className="mt-1" style={{ color: 'var(--text-muted)' }}>记录每一天的成长与反思</p>
       </div>
 
       {/* 表单 */}
@@ -148,7 +153,7 @@ export default function DailyLogPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                 <Calendar className="w-4 h-4 inline mr-1" />
                 日期
               </label>
@@ -156,13 +161,13 @@ export default function DailyLogPage() {
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="pg-input"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>
                 <Smile className="w-4 h-4 inline mr-1" />
                 心情指数: {moodScore}/10 {moodEmojis[moodScore - 1]}
               </label>
@@ -172,67 +177,67 @@ export default function DailyLogPage() {
                 max="10"
                 value={moodScore}
                 onChange={(e) => setMoodScore(parseInt(e.target.value))}
-                className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer"
                 style={{
-                  background: `linear-gradient(to right, #F59E0B 0%, #F59E0B ${moodScore * 10}%, #374151 ${moodScore * 10}%, #374151 100%)`,
+                  background: `linear-gradient(to right, var(--dash-warning) 0%, var(--dash-warning) ${moodScore * 10}%, var(--dash-border) ${moodScore * 10}%, var(--dash-border) 100%)`,
                 }}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">今日总结</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>今日总结</label>
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="简单总结今天的主要活动和收获..."
               rows={3}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="pg-input resize-none"
             />
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">做得好的地方</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>做得好的地方</label>
               <textarea
                 value={goodPoints}
                 onChange={(e) => setGoodPoints(e.target.value)}
                 placeholder="今天有哪些做得好的地方？"
                 rows={3}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="pg-input resize-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">需要改进的地方</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>需要改进的地方</label>
               <textarea
                 value={badPoints}
                 onChange={(e) => setBadPoints(e.target.value)}
                 placeholder="今天有哪些可以改进的地方？"
                 rows={3}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="pg-input resize-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">深度反思</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>深度反思</label>
             <textarea
               value={reflection}
               onChange={(e) => setReflection(e.target.value)}
               placeholder="今天学到了什么？有什么感悟？"
               rows={3}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="pg-input resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">明日计划</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text)' }}>明日计划</label>
             <textarea
               value={tomorrowPlan}
               onChange={(e) => setTomorrowPlan(e.target.value)}
               placeholder="明天最重要的三件事是什么？"
               rows={2}
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="pg-input resize-none"
             />
           </div>
 
@@ -252,50 +257,67 @@ export default function DailyLogPage() {
       {/* 历史记录列表 */}
       <Card title="历史记录" subtitle={`共 ${logs.length} 条记录`}>
         {loading ? (
-          <div className="text-center py-8 text-gray-500">加载中...</div>
+          <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>加载中...</div>
         ) : logs.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">暂无记录</div>
+          <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>暂无记录</div>
         ) : (
           <div className="space-y-4">
             {logs.map((log) => (
               <div
                 key={log.id}
                 className={`p-4 rounded-lg border transition-colors ${
-                  editingId === log.id
-                    ? 'bg-blue-600/10 border-blue-500'
-                    : 'bg-gray-900 border-gray-700 hover:border-gray-600'
+                  editingId === log.id ? 'border-[var(--accent)]' : 'hover:border-[var(--border-hover)]'
                 }`}
+                style={{
+                  background: editingId === log.id ? 'var(--accent-soft)' : 'var(--dash-card-soft)',
+                  borderColor: editingId === log.id ? 'var(--accent)' : undefined,
+                }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
-                    <span className="text-white font-medium">{log.log_date}</span>
-                    <span className="text-yellow-400">
+                    <span className="font-medium" style={{ color: 'var(--text-bright)' }}>{log.log_date}</span>
+                    <span style={{ color: 'var(--dash-warning)' }}>
                       {moodEmojis[(log.mood_score || 5) - 1]} {log.mood_score}/10
                     </span>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(log)}
-                      className="p-1 text-gray-400 hover:text-blue-400 transition-colors"
+                      className="p-1 transition-colors"
+                      style={{ color: 'var(--text-muted)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--dash-info)'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(log.id)}
-                      className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                      className="p-1 transition-colors"
+                      style={{ color: 'var(--text-muted)' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--dash-danger)'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
                 {log.summary && (
-                  <p className="text-gray-400 text-sm line-clamp-2">{log.summary}</p>
+                  <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>{log.summary}</p>
                 )}
               </div>
             ))}
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={dialogState.open}
+        onConfirm={dialogState.onConfirm}
+        onCancel={cancel}
+        title={dialogState.title}
+        message={dialogState.message}
+        variant={dialogState.variant}
+      />
     </div>
   )
 }

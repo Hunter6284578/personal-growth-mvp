@@ -10,8 +10,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { KeyRound, ArrowLeft, CheckCircle } from 'lucide-react'
 
 const PageBg = ({ children }: { children: React.ReactNode }) => (
-  <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero">
-    <div className="absolute inset-0 bg-gray-950/75" />
+  <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero" style={{ background: 'var(--bg-warm)' }}>
+    <div className="absolute inset-0" style={{ background: 'rgba(14, 15, 17, 0.75)' }} />
     <div className="w-full max-w-md relative z-10">{children}</div>
   </div>
 )
@@ -63,7 +63,7 @@ export default function ResetPasswordPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-warm)' }}>
         <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full" />
       </div>
     )
@@ -75,10 +75,10 @@ export default function ResetPasswordPage() {
         <Card>
           <div className="text-center">
             <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-white" />
+              <CheckCircle className="w-8 h-8" style={{ color: '#fff' }} />
             </div>
-            <h1 className="text-2xl font-bold text-white mb-2">密码重置成功</h1>
-            <p className="text-gray-400 mb-6">
+            <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-bright)' }}>密码重置成功</h1>
+            <p className="mb-6" style={{ color: 'var(--text-muted)' }}>
               你的密码已经更新，请使用新密码登录。
             </p>
             <Link href="/login">
@@ -106,10 +106,10 @@ export default function ResetPasswordPage() {
       <Card>
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <KeyRound className="w-8 h-8 text-white" />
+            <KeyRound className="w-8 h-8" style={{ color: '#fff' }} />
           </div>
-          <h1 className="text-2xl font-bold text-white">重置密码</h1>
-          <p className="text-gray-400 mt-2">请输入你的新密码</p>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>重置密码</h1>
+          <p className="mt-2" style={{ color: 'var(--text-muted)' }}>请输入你的新密码</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -134,8 +134,8 @@ export default function ResetPasswordPage() {
           />
 
           {error && (
-            <div className="p-3 bg-red-900/50 border border-red-700 rounded-lg">
-              <p className="text-sm text-red-400">{error}</p>
+            <div className="p-3 rounded-lg" style={{ background: 'rgba(127, 29, 29, 0.5)', border: '1px solid rgba(153, 27, 27, 0.6)' }}>
+              <p className="text-sm" style={{ color: '#fca5a5' }}>{error}</p>
             </div>
           )}
 
@@ -151,9 +151,9 @@ export default function ResetPasswordPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
             没有收到邮件？{' '}
-            <Link href="/forgot-password" className="text-blue-400 hover:text-blue-300">
+            <Link href="/forgot-password" style={{ color: 'var(--accent)' }}>
               重新发送
             </Link>
           </p>

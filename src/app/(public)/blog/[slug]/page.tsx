@@ -4,15 +4,18 @@ import { notFound } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { ArrowLeft, CalendarDays, Clock3, Link as LinkIcon } from 'lucide-react'
+import { ArrowLeft, CalendarDays, Clock3, Link as LinkIcon, Eye } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Children, isValidElement } from 'react'
 
 import { getPublishedPostBySlug } from '@/lib/blog'
+import { getPublicSupabaseClient } from '@/lib/supabase-public'
 import { siteConfig } from '@/content/site'
 import { getArticleSchema } from '@/lib/structured-data'
+import { extractToc } from '@/lib/toc'
 import { formatDate, getReadingTimeLabel } from '@/lib/site-language'
 import { getCurrentLanguage } from '@/lib/site-language.server'
+import { TableOfContents } from '@/components/site/TableOfContents'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -49,11 +52,11 @@ function createHeading(level: 'h2' | 'h3') {
     const id = slugifyHeading(text)
     const Tag = level
     const className = level === 'h2'
-      ? 'anchor-heading group mt-10 scroll-mt-24 text-2xl font-semibold text-white'
-      : 'anchor-heading group mt-8 scroll-mt-24 text-xl font-semibold text-white'
+      ? 'anchor-heading group mt-10 scroll-mt-24 text-2xl font-semibold'
+      : 'anchor-heading group mt-8 scroll-mt-24 text-xl font-semibold'
 
     return (
-      <Tag id={id} className={className}>
+      <Tag id={id} className={className} style={{ color: 'var(--text-bright)' }}>
         <span className="inline-flex items-center">
           {children}
           {id ? (
@@ -71,12 +74,12 @@ function createHeading(level: 'h2' | 'h3') {
 const markdownComponents: Components = {
   h2: createHeading('h2'),
   h3: createHeading('h3'),
-  p: ({ children }) => <p className="mt-4 text-base leading-8 text-slate-300">{children}</p>,
-  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2 pl-5 text-slate-300">{children}</ul>,
-  ol: ({ children }) => <ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-300">{children}</ol>,
+  p: ({ children }) => <p className="mt-4 text-base leading-8" style={{ color: 'var(--text-muted)' }}>{children}</p>,
+  ul: ({ children }) => <ul className="mt-4 list-disc space-y-2 pl-5" style={{ color: 'var(--text-muted)' }}>{children}</ul>,
+  ol: ({ children }) => <ol className="mt-4 list-decimal space-y-2 pl-5" style={{ color: 'var(--text-muted)' }}>{children}</ol>,
   li: ({ children }) => <li className="leading-8">{children}</li>,
   a: ({ children, href }) => (
-    <a href={href} className="text-emerald-200 underline decoration-emerald-400/30 underline-offset-4 transition hover:text-white">
+    <a href={href} style={{ color: 'var(--accent)' }} className="underline decoration-[var(--border-hover)] underline-offset-4 transition hover:text-[var(--text-bright)]">
       {children}
     </a>
   ),
@@ -88,12 +91,12 @@ const markdownComponents: Components = {
     }
 
     return (
-      <code className="rounded bg-slate-950/60 px-1.5 py-0.5 text-sm text-emerald-100">{children}</code>
+      <code className="rounded px-1.5 py-0.5 text-sm" style={{ background: 'var(--bg-warm)', color: 'var(--accent)' }}>{children}</code>
     )
   },
   pre: ({ children }) => <pre>{children}</pre>,
   blockquote: ({ children }) => (
-    <blockquote className="mt-6 border-l-4 border-emerald-400/30 pl-5 text-slate-300">{children}</blockquote>
+    <blockquote className="mt-6 border-l-4 pl-5" style={{ borderColor: 'var(--accent)', color: 'var(--text-muted)' }}>{children}</blockquote>
   ),
   table: ({ children }) => (
     <div className="mt-6 overflow-x-auto">
@@ -121,9 +124,12 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   const description = post.summary || post.content.slice(0, 120)
 
+  const ogImage = `${siteConfig.siteUrl}/opengraph-image`
+
   return {
     title: post.title,
     description,
+    authors: [{ name: siteConfig.name }],
     alternates: {
       canonical: `/blog/${post.slug}`,
     },
@@ -133,6 +139,21 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       type: 'article',
       publishedTime: post.created_at,
       modifiedTime: post.updated_at,
+      url: `${siteConfig.siteUrl}/blog/${post.slug}`,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description,
+      images: [ogImage],
     },
   }
 }
@@ -146,6 +167,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   if (!post) {
     notFound()
+  }
+
+  // 异步递增浏览量（不阻塞页面渲染）
+  try {
+    const supabase = getPublicSupabaseClient()
+    await supabase.rpc('increment_post_view_count', { post_slug: slug })
+  } catch {
+    // 递增失败不影响页面显示
   }
 
   const articleSchema = getArticleSchema({
@@ -162,7 +191,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <div className="space-y-6">
       <Link
         href="/blog"
-        className="inline-flex items-center gap-2 text-sm font-medium text-slate-300 transition-colors hover:text-white"
+        className="cta-secondary"
       >
         <ArrowLeft className="h-4 w-4" />
         {lang === 'zh' ? '返回日志列表' : 'Back to journal'}
@@ -176,32 +205,36 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="max-w-3xl space-y-5">
           <div className="space-y-3">
             <p className="eyebrow">{lang === 'zh' ? '正文' : 'Article'}</p>
-            <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl" style={{ color: 'var(--text-bright)' }}>
               {post.title}
             </h1>
             {post.summary ? (
-              <p className="text-lg leading-8 text-slate-300">{post.summary}</p>
+              <p className="text-lg leading-8" style={{ color: 'var(--text-muted)' }}>{post.summary}</p>
             ) : null}
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+          <div className="flex flex-wrap items-center gap-4 text-sm" style={{ color: 'var(--text-dim)' }}>
             <span className="inline-flex items-center gap-2">
               <CalendarDays className="h-4 w-4" />
-              {formatDate(post.created_at, lang)}
+              <span className="date-note">{formatDate(post.created_at, lang)}</span>
             </span>
             <span className="inline-flex items-center gap-2">
               <Clock3 className="h-4 w-4" />
               {getReadingTimeLabel(readingTime, lang)}
             </span>
-            <span>{lang === 'zh' ? '更新于 ' : 'Updated '}{formatDate(post.updated_at, lang)}</span>
+            <span className="inline-flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              {(post as Record<string, unknown>).view_count ?? 0} {lang === 'zh' ? '次阅读' : 'views'}
+            </span>
+            <span>{lang === 'zh' ? '更新于 ' : 'Updated '}<span className="date-note">{formatDate(post.updated_at, lang)}</span></span>
           </div>
 
           {post.tags?.length ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-1 text-xs font-medium text-slate-300"
+                  className="tag-minimal"
                 >
                   #{tag}
                 </span>

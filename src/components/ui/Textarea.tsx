@@ -12,7 +12,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-muted)' }}>
             {label}
           </label>
         )}
@@ -20,13 +20,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           className={cn(
             'pg-input resize-vertical',
-            error && 'border-red-500 focus:ring-red-500',
+            error && 'border-[var(--dash-danger)]',
             className
           )}
+          style={error ? { boxShadow: '0 0 0 2px var(--dash-danger)' } : undefined}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
-        {helperText && !error && <p className="mt-1 text-sm text-gray-400">{helperText}</p>}
+        {error && <p className="mt-1 text-sm" style={{ color: 'var(--dash-danger)' }}>{error}</p>}
+        {helperText && !error && <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>{helperText}</p>}
       </div>
     )
   }

@@ -59,12 +59,23 @@ export const MUSCLE_GROUPS = [
   '胸大肌',
   '胸大肌上束',
   '胸大肌下束/三头',
+  '背阔肌',
+  '斜方肌',
+  '竖脊肌',
+  '股四头肌',
   '股四头肌/臀大肌',
+  '腘绳肌',
   '腘绳肌/臀大肌',
+  '臀大肌',
+  '小腿',
   '核心',
-  '背阔肌/二头',
+  '腹直肌',
+  '腹斜肌',
+  '前臂',
   '肱二头肌',
+  '背阔肌/二头',
   '肱三头肌',
+  '股二头肌',
 ] as const
 
 export const EQUIPMENT_LABELS: Record<string, string> = {
@@ -73,6 +84,12 @@ export const EQUIPMENT_LABELS: Record<string, string> = {
   band: '阻力带',
   cable: '绳索',
   machine: '器械',
+  smith: '史密斯机',
+  kettlebell: '壶铃',
+  medicine_ball: '药球',
+  trx: 'TRX',
+  ez_bar: 'EZ杠',
+  landmine: '地雷管',
 } as const
 
 export const CATEGORY_LABELS: Record<string, string> = {

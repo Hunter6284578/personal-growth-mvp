@@ -4,12 +4,13 @@ import {
   Activity, 
   Lightbulb,
   Award,
-  Sparkles
+  User,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { ChartsPanel } from '@/components/dashboard/ChartsPanel'
 import { STAT_CONFIG } from '@/lib/constants'
+import { ManagedImage } from '@/components/ui/ManagedImage'
 
 // 获取真实数据
 async function getDashboardData(userId: string) {
@@ -112,7 +113,7 @@ async function getDashboardData(userId: string) {
     }
   }
   
-  // 计算等级
+  // 计算平均分
   const defaultStats = {
     physical_score: 50,
     execution_score: 50,
@@ -128,21 +129,10 @@ async function getDashboardData(userId: string) {
      stats.emotion_score + stats.social_score + stats.creativity_score) / 6
   )
   
-  // 等级计算
-  let level = 1
-  let title = '新手'
-  if (avgScore >= 90) { level = 10; title = '传说' }
-  else if (avgScore >= 80) { level = 8; title = '大师' }
-  else if (avgScore >= 70) { level = 6; title = '专家' }
-  else if (avgScore >= 60) { level = 4; title = '进阶' }
-  else if (avgScore >= 50) { level = 2; title = '入门' }
-  
   return {
     profile,
     stats,
     avgScore,
-    level,
-    title,
     dailyCount: dailyCount || 0,
     eventsCount: eventsCount || 0,
     fitnessCount: fitnessCount || 0,
@@ -185,63 +175,57 @@ export default async function DashboardPage() {
     : data.avgScore
   const avgDelta = data.avgScore - previousAvgScore
   const avgDeltaLabel = avgDelta === 0 ? '持平' : `${avgDelta > 0 ? '+' : ''}${avgDelta}`
-  const avgTrendUp = avgDelta >= 0
 
   return (
     <div className="space-y-8">
-      <Card className="border-emerald-500/15 bg-gradient-to-br from-emerald-950/40 via-[#0d1520] to-[#0d1520]">
+      {/* 用户信息卡 — 去游戏化 */}
+      <Card>
         <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg shadow-emerald-900/30">
-              {data.profile?.character_name?.[0] || user.email?.[0] || '?'}
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center text-xs font-bold text-gray-900 border-2 border-[#0d1520]">
-              {data.level}
-            </div>
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-semibold overflow-hidden relative"
+            style={{
+              background: data.profile?.avatar_url ? 'transparent' : 'var(--dash-card-soft)',
+              border: '1px solid var(--dash-border)',
+              color: 'var(--text-bright)',
+            }}
+          >
+            {data.profile?.avatar_url ? (
+              <ManagedImage
+                src={data.profile.avatar_url}
+                alt={`${data.profile.character_name || '用户'}头像`}
+                width={64}
+                height={64}
+                sizes="64px"
+                className="h-full w-full"
+              />
+            ) : (
+              <User className="w-8 h-8" style={{ color: 'var(--text-muted)' }} />
+            )}
           </div>
           
           <div className="flex-1 text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
-              <h1 className="text-2xl font-bold text-white">
-                {data.profile?.character_name || '冒险者'}
-              </h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/15 text-emerald-400 text-xs font-medium rounded-full border border-emerald-500/20">
-                <Sparkles className="w-3 h-3" />
-                {data.title}
-              </span>
-            </div>
-            <p className="text-slate-400 mt-1 text-sm">
+            <h1 className="text-xl font-bold" style={{ color: 'var(--text-bright)' }}>
+              {data.profile?.character_name || '用户'}
+            </h1>
+            <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
               {data.profile?.bio || '开始你的成长之旅'}
             </p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-3 text-sm">
-              <span className="text-slate-500">
-                <span className="text-white font-medium">{data.avgScore}</span> 评分
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-3 text-sm" style={{ color: 'var(--text-muted)' }}>
+              <span>
+                <span className="font-medium" style={{ color: 'var(--text-bright)' }}>{data.avgScore}</span> 评分
               </span>
-              <span className="text-slate-700">|</span>
-              <span className="text-slate-500">
-                <span className="text-white font-medium">{data.dailyCount}</span> 天记录
+              <span style={{ color: 'var(--dash-border)' }}>|</span>
+              <span>
+                <span className="font-medium" style={{ color: 'var(--text-bright)' }}>{data.dailyCount}</span> 天记录
               </span>
-              <span className="text-slate-700">|</span>
-              <span className="text-slate-500">
-                <span className="text-white font-medium">{data.eventsCount}</span> 个事件
+              <span style={{ color: 'var(--dash-border)' }}>|</span>
+              <span>
+                <span className="font-medium" style={{ color: 'var(--text-bright)' }}>{data.eventsCount}</span> 个事件
               </span>
-              <span className="text-slate-700">|</span>
-              <span className="text-slate-500">
-                <span className="text-emerald-400 font-medium">{data.streak || 0}</span> 天连续
+              <span style={{ color: 'var(--dash-border)' }}>|</span>
+              <span>
+                <span className="font-medium" style={{ color: 'var(--dash-success)' }}>{data.streak || 0}</span> 天连续
               </span>
-            </div>
-          </div>
-          
-          {/* 等级进度 */}
-          <div className="text-center shrink-0">
-            <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-              Lv.{data.level}
-            </div>
-            <div className="w-28 h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden">
-              <div 
-                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-500"
-                style={{ width: `${data.avgScore}%` }}
-              />
             </div>
           </div>
         </div>
@@ -251,26 +235,26 @@ export default async function DashboardPage() {
         <StatCard
           label="每日记录"
           value={data.dailyCount}
-          icon={<Calendar className="w-6 h-6 text-emerald-400" />}
+          icon={<Calendar className="w-5 h-5" />}
           trend={data.streak > 0 ? `${data.streak}天连续` : '开始记录'}
           trendUp={data.streak > 0}
         />
         <StatCard
           label="经历事件"
           value={data.eventsCount}
-          icon={<Lightbulb className="w-6 h-6 text-amber-400" />}
+          icon={<Lightbulb className="w-5 h-5" />}
         />
         <StatCard
           label="体测记录"
           value={data.fitnessCount}
-          icon={<Activity className="w-6 h-6 text-teal-400" />}
+          icon={<Activity className="w-5 h-5" />}
         />
         <StatCard
           label="综合评分"
           value={data.avgScore}
-          icon={<Award className="w-6 h-6 text-violet-400" />}
+          icon={<Award className="w-5 h-5" />}
           trend={avgDelta === 0 ? '较上次持平' : `较上次 ${avgDeltaLabel}`}
-          trendUp={avgTrendUp}
+          trendUp={avgDelta >= 0}
         />
       </div>
 
@@ -281,21 +265,21 @@ export default async function DashboardPage() {
           <div className="space-y-3">
             {data.recentDailyLogs.length > 0 ? (
               data.recentDailyLogs.map((log) => (
-                <div key={log.id} className="pg-card-soft p-4 hover:border-gray-500/70 transition-colors">
+                <div key={log.id} className="pg-card-soft p-4 transition-colors" style={{ cursor: 'default' }}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-white font-medium">{log.log_date}</span>
-                    <span className="text-yellow-400">心情 {log.mood_score}/10</span>
+                    <span className="font-medium" style={{ color: 'var(--text-bright)' }}>{log.log_date}</span>
+                    <span style={{ color: 'var(--dash-warning)' }}>心情 {log.mood_score}/10</span>
                   </div>
-                  <p className="text-gray-400 text-sm line-clamp-2">{log.summary || '无总结'}</p>
+                  <p className="text-sm line-clamp-2" style={{ color: 'var(--text-muted)' }}>{log.summary || '无总结'}</p>
                 </div>
               ))
             ) : (
-              <div className="p-8 bg-gray-900/70 rounded-lg text-center border border-dashed border-gray-700">
-                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Calendar className="w-8 h-8 text-gray-600" />
+              <div className="p-8 rounded-lg text-center" style={{ border: '1px dashed var(--dash-border)' }}>
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--dash-card-soft)' }}>
+                  <Calendar className="w-7 h-7" style={{ color: 'var(--text-dim)' }} />
                 </div>
-                <p className="text-gray-400">暂无记录</p>
-                <a href="/dashboard/daily" className="text-emerald-400 text-sm hover:underline mt-2 inline-block">
+                <p style={{ color: 'var(--text-muted)' }}>暂无记录</p>
+                <a href="/dashboard/daily" className="text-sm mt-2 inline-block" style={{ color: 'var(--accent)' }}>
                   去添加第一条记录 →
                 </a>
               </div>
@@ -307,16 +291,20 @@ export default async function DashboardPage() {
           <div className="space-y-3">
             {data.recentEvents.length > 0 ? (
               data.recentEvents.map((event) => (
-                <div key={event.id} className="pg-card-soft p-4 hover:border-gray-500/70 transition-colors">
+                <div key={event.id} className="pg-card-soft p-4 transition-colors" style={{ cursor: 'default' }}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-white font-medium line-clamp-1">{event.title}</span>
-                    <span className="text-purple-400 text-sm">影响 {event.impact_level}/10</span>
+                    <span className="font-medium line-clamp-1" style={{ color: 'var(--text-bright)' }}>{event.title}</span>
+                    <span className="text-sm" style={{ color: 'var(--dash-info)' }}>影响 {event.impact_level}/10</span>
                   </div>
-                  <p className="text-gray-400 text-sm">{event.event_date}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{event.event_date}</p>
                   {event.tags && event.tags.length > 0 && (
                     <div className="flex gap-1 mt-2 flex-wrap">
                       {event.tags.map((tag: string) => (
-                        <span key={tag} className="text-xs px-2 py-0.5 bg-gray-800 text-gray-400 rounded">
+                        <span
+                          key={tag}
+                          className="text-xs px-2 py-0.5 rounded"
+                          style={{ background: 'var(--dash-card-soft)', color: 'var(--text-muted)' }}
+                        >
                           {tag}
                         </span>
                       ))}
@@ -325,12 +313,12 @@ export default async function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="p-8 bg-gray-900/70 rounded-lg text-center border border-dashed border-gray-700">
-                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Lightbulb className="w-8 h-8 text-gray-600" />
+              <div className="p-8 rounded-lg text-center" style={{ border: '1px dashed var(--dash-border)' }}>
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--dash-card-soft)' }}>
+                  <Lightbulb className="w-7 h-7" style={{ color: 'var(--text-dim)' }} />
                 </div>
-                <p className="text-gray-400">暂无事件</p>
-                <a href="/dashboard/events" className="text-emerald-400 text-sm hover:underline mt-2 inline-block">
+                <p style={{ color: 'var(--text-muted)' }}>暂无事件</p>
+                <a href="/dashboard/events" className="text-sm mt-2 inline-block" style={{ color: 'var(--accent)' }}>
                   去添加第一个事件 →
                 </a>
               </div>

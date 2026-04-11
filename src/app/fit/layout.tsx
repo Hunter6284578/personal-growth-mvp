@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, LayoutDashboard } from 'lucide-react'
 import { FitNavClient } from './FitNavClient'
 
 export default async function FitLayout({
@@ -18,21 +18,27 @@ export default async function FitLayout({
 
   return (
     <div className="pg-page">
-      <nav className="border-b border-slate-800 bg-slate-950/90 backdrop-blur-xl">
+      <nav className="border-b backdrop-blur-xl" style={{ background: 'var(--dash-surface)', borderColor: 'var(--dash-border)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/fitness" className="text-slate-400 hover:text-white mr-4 flex items-center gap-1">
+              <Link href="/dashboard" className="mr-3 flex items-center gap-1.5 transition-colors hover:text-[var(--text-bright)]" style={{ color: 'var(--text-dim)' }}>
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm">返回公开页</span>
+                <span className="text-sm">Studio</span>
               </Link>
-              <Link href="/fit" className="text-xl font-bold text-white mr-10">
+              <span style={{ color: 'var(--dash-border)' }}>/</span>
+              <Link href="/fit" className="text-xl font-bold ml-3 mr-10 flex items-center gap-2" style={{ color: 'var(--text-bright)' }}>
+                <LayoutDashboard className="w-4 h-4" style={{ color: 'var(--accent)' }} />
                 Fitness Studio
               </Link>
               <FitNavClient />
             </div>
-            <div className="flex items-center">
-              <span className="text-sm text-slate-500 mr-4">{user.email}</span>
+            <div className="flex items-center gap-3">
+              <Link href="/dashboard" className="hidden sm:inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs transition-colors hover:text-[var(--text-bright)]" style={{ color: 'var(--text-dim)' }}>
+                <LayoutDashboard className="w-3.5 h-3.5" />
+                <span>总览</span>
+              </Link>
+              <span className="text-sm" style={{ color: 'var(--text-dim)' }}>{user.email}</span>
               <FitNavClient showLogout />
             </div>
           </div>

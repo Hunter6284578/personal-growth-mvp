@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/components/ui/Toast'
 import { 
   getLatestStatScore, 
   getStatScores, 
@@ -30,6 +31,7 @@ import { TrendingUp, Target, Calendar, Sparkles } from 'lucide-react'
 
 export default function StatsPage() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [stats, setStats] = useState({
     physical_score: 50,
     execution_score: 50,
@@ -44,13 +46,18 @@ export default function StatsPage() {
   const [saving, setSaving] = useState(false)
   const [evaluating, setEvaluating] = useState(false)
   const [trendDays, setTrendDays] = useState<7 | 30>(7)
+  const mountedRef = useRef(false)
+
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   const loadData = useCallback(async () => {
     if (!user) return
     
     setLoading(true)
     try {
-      // 获取最新评分
       const latest = await getLatestStatScore(user.id)
       if (latest) {
         setStats({
@@ -64,7 +71,6 @@ export default function StatsPage() {
         if (latest.note) setNote(latest.note)
       }
       
-      // 获取历史记录（最多30条）
       const historyData = await getStatScores(user.id, 30)
       setHistory(historyData)
     } catch (error) {
@@ -74,7 +80,6 @@ export default function StatsPage() {
     }
   }, [user])
 
-  // 加载最新数据和历史记录
   useEffect(() => {
     if (user) {
       void loadData()
@@ -83,7 +88,7 @@ export default function StatsPage() {
 
   const handleAIEval = async () => {
     if (!user) {
-      alert('请先登录')
+      toast('请先登录', 'error')
       return
     }
     
@@ -115,10 +120,14 @@ export default function StatsPage() {
         setNote(result.note)
       }
       
-      alert('AI 评估完成！已自动填入建议数值，请确认后点击保存。')
+      toast('AI 评估完成！已自动填入建议数值，请确认后点击保存。', 'success')
     } catch (error) {
       console.error('AI 评估失败:', error)
-      alert(error instanceof Error ? error.message : 'AI 评估失败，请稍后重试')
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast('网络连接失败，请检查网络后重试', 'error')
+      } else {
+        toast(error instanceof Error ? error.message : 'AI 评估失败，请稍后重试', 'error')
+      }
     } finally {
       setEvaluating(false)
     }
@@ -126,7 +135,7 @@ export default function StatsPage() {
 
   const handleSave = async () => {
     if (!user) {
-      alert('请先登录')
+      toast('请先登录', 'error')
       return
     }
     
@@ -138,19 +147,17 @@ export default function StatsPage() {
         note: note || undefined,
       })
       
-      alert('保存成功！')
-      // 重新加载历史记录
+      toast('保存成功！', 'success')
       const historyData = await getStatScores(user.id, 30)
       setHistory(historyData)
     } catch (error) {
       console.error('保存失败:', error)
-      alert('保存失败，请重试')
+      toast('保存失败，请重试', 'error')
     } finally {
       setSaving(false)
     }
   }
 
-  // 计算统计数据
   const statsSummary = useMemo(() => {
     if (history.length === 0) return null
     
@@ -171,7 +178,6 @@ export default function StatsPage() {
     return { latest, avg, currentAvg, totalAvg }
   }, [history])
 
-  // 雷达图数据
   const radarData = useMemo(() => {
     if (history.length === 0) return []
     
@@ -193,7 +199,6 @@ export default function StatsPage() {
     }))
   }, [history])
 
-  // 趋势图数据
   const trendData = useMemo(() => {
     const days = trendDays
     return history.slice(0, days).reverse().map(item => ({
@@ -209,50 +214,44 @@ export default function StatsPage() {
     }))
   }, [history, trendDays])
 
-  // 找出最强和最弱属性
   const strongestStat = useMemo(() => {
     if (history.length === 0) return null
     const latest = history[0]
-    const values = [
-      { key: 'physical_score', label: '身体素质', value: latest.physical_score, color: '#EF4444' },
-      { key: 'execution_score', label: '执行力', value: latest.execution_score, color: '#3B82F6' },
-      { key: 'focus_score', label: '专注力', value: latest.focus_score, color: '#10B981' },
-      { key: 'emotion_score', label: '情绪稳定性', value: latest.emotion_score, color: '#F59E0B' },
-      { key: 'social_score', label: '社交状态', value: latest.social_score, color: '#8B5CF6' },
-      { key: 'creativity_score', label: '创造力', value: latest.creativity_score, color: '#EC4899' },
-    ]
+    const values = STAT_CONFIG.map(stat => ({
+      key: stat.key,
+      label: stat.label,
+      value: latest[stat.key as keyof StatScore] as number,
+      color: stat.color,
+    }))
     return values.sort((a, b) => b.value - a.value)[0]
   }, [history])
 
   const weakestStat = useMemo(() => {
     if (history.length === 0) return null
     const latest = history[0]
-    const values = [
-      { key: 'physical_score', label: '身体素质', value: latest.physical_score, color: '#EF4444' },
-      { key: 'execution_score', label: '执行力', value: latest.execution_score, color: '#3B82F6' },
-      { key: 'focus_score', label: '专注力', value: latest.focus_score, color: '#10B981' },
-      { key: 'emotion_score', label: '情绪稳定性', value: latest.emotion_score, color: '#F59E0B' },
-      { key: 'social_score', label: '社交状态', value: latest.social_score, color: '#8B5CF6' },
-      { key: 'creativity_score', label: '创造力', value: latest.creativity_score, color: '#EC4899' },
-    ]
+    const values = STAT_CONFIG.map(stat => ({
+      key: stat.key,
+      label: stat.label,
+      value: latest[stat.key as keyof StatScore] as number,
+      color: stat.color,
+    }))
     return values.sort((a, b) => a.value - b.value)[0]
   }, [history])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-400">加载中...</div>
+        <div style={{ color: 'var(--text-muted)' }}>加载中...</div>
       </div>
     )
   }
 
   return (
     <div className="space-y-8">
-      {/* 页面标题 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">属性面板</h1>
-          <p className="text-gray-400 mt-1">评估和追踪你的六大核心能力</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-bright)' }}>属性面板</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>评估和追踪你的六大核心能力</p>
         </div>
         <div className="flex gap-3">
           <Button 
@@ -270,40 +269,38 @@ export default function StatsPage() {
         </div>
       </div>
 
-      {/* 统计概览卡片 */}
       {statsSummary && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="text-center">
-            <div className="text-3xl font-bold text-blue-400">{statsSummary.currentAvg}</div>
-            <p className="text-gray-400 text-sm">当前综合</p>
+            <div className="text-3xl font-bold" style={{ color: 'var(--dash-info)' }}>{statsSummary.currentAvg}</div>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>当前综合</p>
           </Card>
           <Card className="text-center">
-            <div className="text-3xl font-bold text-green-400">{statsSummary.totalAvg}</div>
-            <p className="text-gray-400 text-sm">历史平均</p>
+            <div className="text-3xl font-bold" style={{ color: 'var(--dash-success)' }}>{statsSummary.totalAvg}</div>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>历史平均</p>
           </Card>
           <Card className="text-center">
             <div className="text-3xl font-bold" style={{ color: strongestStat?.color }}>
               {strongestStat?.value}
             </div>
-            <p className="text-gray-400 text-sm">最强: {strongestStat?.label}</p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>最强: {strongestStat?.label}</p>
           </Card>
           <Card className="text-center">
             <div className="text-3xl font-bold" style={{ color: weakestStat?.color }}>
               {weakestStat?.value}
             </div>
-            <p className="text-gray-400 text-sm">待提升: {weakestStat?.label}</p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>待提升: {weakestStat?.label}</p>
           </Card>
         </div>
       )}
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* 属性调整 */}
         <Card title="属性调整" subtitle="拖动滑块设置当前数值">
           <div className="space-y-5">
             {STAT_CONFIG.map((stat) => (
               <div key={stat.key}>
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-300 text-sm">{stat.label}</span>
+                  <span className="text-sm" style={{ color: 'var(--text)' }}>{stat.label}</span>
                   <span className="font-bold" style={{ color: stat.color }}>
                     {stats[stat.key as keyof typeof stats]}
                   </span>
@@ -319,9 +316,9 @@ export default function StatsPage() {
                       [stat.key]: parseInt(e.target.value),
                     }))
                   }
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 rounded-lg appearance-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, ${stat.color} 0%, ${stat.color} ${stats[stat.key as keyof typeof stats]}%, #374151 ${stats[stat.key as keyof typeof stats]}%, #374151 100%)`,
+                    background: `linear-gradient(to right, ${stat.color} 0%, ${stat.color} ${stats[stat.key as keyof typeof stats]}%, var(--dash-border) ${stats[stat.key as keyof typeof stats]}%, var(--dash-border) 100%)`,
                   }}
                 />
               </div>
@@ -329,44 +326,46 @@ export default function StatsPage() {
           </div>
         </Card>
 
-        {/* 六维雷达图 */}
         <Card title="能力分布" subtitle="当前 vs 历史平均">
           <div className="h-[320px] w-full">
-            {radarData.length > 0 ? (
+            {radarData.length > 0 && mountedRef.current ? (
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                  <PolarGrid stroke="#374151" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
+                  <PolarGrid stroke="var(--dash-border)" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
                   <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
                   <Radar
                     name="当前"
                     dataKey="当前"
-                    stroke="#3B82F6"
+                    stroke="var(--accent)"
                     strokeWidth={2}
-                    fill="#3B82F6"
-                    fillOpacity={0.3}
+                    fill="var(--accent)"
+                    fillOpacity={0.2}
                   />
                   <Radar
                     name="平均"
                     dataKey="平均"
-                    stroke="#10B981"
+                    stroke="var(--dash-success)"
                     strokeWidth={2}
-                    fill="#10B981"
-                    fillOpacity={0.1}
+                    fill="var(--dash-success)"
+                    fillOpacity={0.08}
                   />
-                  <Legend />
+                  <Legend 
+                    wrapperStyle={{ color: 'var(--text-muted)', fontSize: 12 }}
+                  />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #374151',
-                      borderRadius: '8px'
+                      background: 'var(--dash-surface)', 
+                      border: '1px solid var(--dash-border)',
+                      borderRadius: '8px',
+                      color: 'var(--text)',
                     }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-gray-500">
-                <Target className="w-16 h-16 mb-4 text-gray-700" />
+              <div className="h-full flex flex-col items-center justify-center" style={{ color: 'var(--text-muted)' }}>
+                <Target className="w-14 h-14 mb-4" style={{ color: 'var(--text-dim)' }} />
                 <p>暂无数据</p>
                 <p className="text-sm">保存第一条记录后将显示雷达图</p>
               </div>
@@ -375,41 +374,39 @@ export default function StatsPage() {
         </Card>
       </div>
 
-      {/* 备注 */}
       <Card title="备注" subtitle="记录本次评分的背景和思考">
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="为什么给出这些分数？有什么特别的考虑？"
           rows={3}
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          className="pg-input resize-none"
         />
       </Card>
 
-      {/* 历史趋势图表 */}
       <Card 
         title="历史趋势" 
         subtitle={
           <div className="flex items-center gap-2">
             <span>评分变化</span>
-            <div className="flex bg-gray-800 rounded-lg p-1">
+            <div className="flex rounded-lg p-1" style={{ background: 'var(--dash-card-soft)' }}>
               <button
                 onClick={() => setTrendDays(7)}
-                className={`px-3 py-1 text-xs rounded transition-colors ${
-                  trendDays === 7 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
+                className="px-3 py-1 text-xs rounded transition-colors"
+                style={{
+                  background: trendDays === 7 ? 'var(--accent)' : 'transparent',
+                  color: trendDays === 7 ? 'var(--bg)' : 'var(--text-muted)',
+                }}
               >
                 7天
               </button>
               <button
                 onClick={() => setTrendDays(30)}
-                className={`px-3 py-1 text-xs rounded transition-colors ${
-                  trendDays === 30 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-400 hover:text-white'
-                }`}
+                className="px-3 py-1 text-xs rounded transition-colors"
+                style={{
+                  background: trendDays === 30 ? 'var(--accent)' : 'transparent',
+                  color: trendDays === 30 ? 'var(--bg)' : 'var(--text-muted)',
+                }}
               >
                 30天
               </button>
@@ -417,21 +414,22 @@ export default function StatsPage() {
           </div>
         }
       >
-        {trendData.length > 1 ? (
+        {trendData.length > 1 && mountedRef.current ? (
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trendData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
-                <YAxis domain={[0, 100]} stroke="#9CA3AF" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--dash-border)" />
+                <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={12} />
+                <YAxis domain={[0, 100]} stroke="var(--text-muted)" fontSize={12} />
                 <Tooltip 
                   contentStyle={{ 
-                    backgroundColor: '#1F2937', 
-                    border: '1px solid #374151',
-                    borderRadius: '8px'
+                    background: 'var(--dash-surface)', 
+                    border: '1px solid var(--dash-border)',
+                    borderRadius: '8px',
+                    color: 'var(--text)',
                   }}
                 />
-                <Legend />
+                <Legend wrapperStyle={{ color: 'var(--text-muted)', fontSize: 12 }} />
                 {STAT_CONFIG.map((stat) => (
                   <Line
                     key={stat.key}
@@ -446,7 +444,7 @@ export default function StatsPage() {
                 <Line
                   type="monotone"
                   dataKey="平均"
-                  stroke="#9CA3AF"
+                  stroke="var(--text-dim)"
                   strokeWidth={2}
                   strokeDasharray="5 5"
                   dot={false}
@@ -455,15 +453,14 @@ export default function StatsPage() {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-700" />
+          <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
+            <TrendingUp className="w-14 h-14 mx-auto mb-4" style={{ color: 'var(--text-dim)' }} />
             <p>数据不足，无法显示趋势图</p>
             <p className="text-sm mt-2">至少需要2条记录才能生成图表</p>
           </div>
         )}
       </Card>
 
-      {/* 历史记录列表 */}
       {history.length > 0 && (
         <Card title="历史记录" subtitle={`共 ${history.length} 条记录`}>
           <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -478,18 +475,18 @@ export default function StatsPage() {
               const change = avg - prevAvg
               
               return (
-                <div key={record.id} className="p-4 bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors">
+                <div key={record.id} className="pg-card-soft p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                      <span className="text-white font-medium">
+                      <Calendar className="w-4 h-4" style={{ color: 'var(--text-dim)' }} />
+                      <span className="font-medium" style={{ color: 'var(--text-bright)' }}>
                         {new Date(record.score_date).toLocaleDateString('zh-CN')}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-400 text-sm">平均分: {avg}</span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>平均分: {avg}</span>
                       {change !== 0 && index < history.length - 1 && (
-                        <span className={`text-xs ${change > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <span className="text-xs" style={{ color: change > 0 ? 'var(--dash-success)' : 'var(--dash-danger)' }}>
                           {change > 0 ? '+' : ''}{change}
                         </span>
                       )}
@@ -498,7 +495,7 @@ export default function StatsPage() {
                   <div className="grid grid-cols-6 gap-2 text-sm">
                     {STAT_CONFIG.map((stat) => (
                       <div key={stat.key} className="text-center">
-                        <span className="text-gray-500 block text-xs">{stat.shortLabel}</span>
+                        <span className="block text-xs" style={{ color: 'var(--text-dim)' }}>{stat.shortLabel}</span>
                         <span style={{ color: stat.color }}>
                           {record[stat.key as keyof StatScore]}
                         </span>
@@ -506,7 +503,7 @@ export default function StatsPage() {
                     ))}
                   </div>
                   {record.note && (
-                    <p className="text-gray-400 text-sm mt-2 pt-2 border-t border-gray-800">
+                    <p className="text-sm mt-2 pt-2" style={{ color: 'var(--text-muted)', borderTop: '1px solid var(--dash-border)' }}>
                       {record.note}
                     </p>
                   )}
