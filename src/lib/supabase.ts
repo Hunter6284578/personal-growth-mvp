@@ -15,7 +15,7 @@ export function getSupabaseClient() {
 
   if (!url || !key) {
     const error = new Error(
-      'Supabase public env missing (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY) / Supabase 公共环境变量缺失'
+      'Supabase public env missing (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY)'
     )
     logError(error, { scope: 'supabase', stage: 'init' })
     throw error

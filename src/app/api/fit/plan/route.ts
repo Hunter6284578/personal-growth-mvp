@@ -68,7 +68,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: validation.error }, { status: 400 })
       }
       body = validation.data ?? {}
-    } catch {
+    } catch (error) {
+      logError(error, { endpoint: '/api/fit/plan', stage: 'parseBody' })
       return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
     }
 
