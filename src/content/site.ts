@@ -359,7 +359,7 @@ export const blogThemes: LocalizedList = {
 
 function assertNonEmpty(value: string, field: string) {
   if (!value || value.trim().length === 0) {
-    throw new Error(`内容配置缺失: ${field}`)
+    throw new Error(`Missing content config: ${field}`)
   }
 }
 
@@ -370,10 +370,10 @@ function assertLocalizedText(value: LocalizedText, field: string) {
 
 function assertLocalizedList(value: LocalizedList, field: string) {
   if (!value || !Array.isArray(value.zh) || !Array.isArray(value.en)) {
-    throw new Error(`内容配置缺失: ${field}`)
+    throw new Error(`Missing content config: ${field}`)
   }
   if (value.zh.length === 0 || value.en.length === 0) {
-    throw new Error(`内容配置为空: ${field}`)
+    throw new Error(`Empty content config: ${field}`)
   }
   value.zh.forEach((item, index) => assertNonEmpty(item, `${field}.zh[${index}]`))
   value.en.forEach((item, index) => assertNonEmpty(item, `${field}.en[${index}]`))
@@ -383,7 +383,7 @@ function assertUrl(value: string, field: string) {
   try {
     new URL(value)
   } catch {
-    throw new Error(`内容配置 URL 无效: ${field}`)
+    throw new Error(`Invalid content config URL: ${field}`)
   }
 }
 
@@ -430,7 +430,7 @@ function validateSiteContent() {
     assertLocalizedText(project.summary, `featuredProjects[${index}].summary`)
     assertLocalizedList(project.techStack, `featuredProjects[${index}].techStack`)
     if (projectSlugs.has(project.slug)) {
-      throw new Error(`featuredProjects slug 重复: ${project.slug}`)
+      throw new Error(`Duplicate featuredProjects slug: ${project.slug}`)
     }
     projectSlugs.add(project.slug)
     project.links.forEach((link, linkIndex) => {

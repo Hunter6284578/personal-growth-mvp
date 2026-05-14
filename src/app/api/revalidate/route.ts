@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   const ip = headerStore.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   const limit = checkRateLimit(getRequestKey(ip, 'api-revalidate'))
   if (limit.limited) {
-    return NextResponse.json({ error: '请求过于频繁，请稍后重试' }, { status: 429 })
+    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
   }
 
   const token = headerStore.get('x-revalidate-token')
@@ -22,14 +22,14 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => null)) as { type?: string; slug?: string } | null
   if (body && typeof body !== 'object') {
-    return NextResponse.json({ error: '请求体必须为 JSON 对象' }, { status: 400 })
+    return NextResponse.json({ error: 'Request body must be a JSON object.' }, { status: 400 })
   }
 
   const type = body?.type || 'all'
   const slug = body?.slug?.trim()
 
   if (!['all', 'blog'].includes(type)) {
-    return NextResponse.json({ error: 'type 参数无效' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid type parameter.' }, { status: 400 })
   }
 
   if (type === 'blog') {

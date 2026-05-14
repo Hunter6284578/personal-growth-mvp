@@ -27,18 +27,18 @@ function normalizeGoal(goal: string | undefined): FitnessGoal {
 
 function validateRequest(body: unknown): { data?: RequestBody; error?: string } {
   if (!body || typeof body !== 'object') {
-    return { error: '请求体必须为 JSON 对象' }
+    return { error: 'Request body must be a JSON object.' }
   }
 
   const { goal, note } = body as Record<string, unknown>
   if (goal && typeof goal !== 'string') {
-    return { error: 'goal 必须是字符串' }
+    return { error: 'goal must be a string.' }
   }
   if (note && typeof note !== 'string') {
-    return { error: 'note 必须是字符串' }
+    return { error: 'note must be a string.' }
   }
   if (typeof note === 'string' && note.length > MAX_NOTE_LENGTH) {
-    return { error: `note 不能超过 ${MAX_NOTE_LENGTH} 字` }
+    return { error: `note must be ${MAX_NOTE_LENGTH} characters or fewer.` }
   }
 
   return { data: { goal: goal as FitnessGoal | undefined, note: note as string | undefined } }
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       }
       body = validation.data ?? {}
     } catch {
-      return NextResponse.json({ error: '无效的 JSON 请求体' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
     }
 
     const goal = normalizeGoal(body.goal)

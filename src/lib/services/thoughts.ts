@@ -39,7 +39,7 @@ export async function updateThought(id: string, thought: Partial<Thought>) {
   return data as Thought
 }
 
-export async function deleteThought(id: string, userId?: string) {
+export async function deleteThought(id: string, userId: string) {
   const supabase = getSupabaseClient()
   const { data: thought, error: fetchError } = await supabase
     .from('thoughts')
@@ -49,16 +49,11 @@ export async function deleteThought(id: string, userId?: string) {
 
   handleSupabaseError(fetchError, { action: 'deleteThought', stage: 'fetch', thoughtId: id, userId })
 
-  let deleteQuery = supabase
+  const { error } = await supabase
     .from('thoughts')
     .delete()
     .eq('id', id)
-  
-  if (userId) {
-    deleteQuery = deleteQuery.eq('user_id', userId)
-  }
-
-  const { error } = await deleteQuery
+    .eq('user_id', userId)
   handleSupabaseError(error, { action: 'deleteThought', stage: 'delete', thoughtId: id, userId })
 
   if (thought?.images && thought.images.length > 0) {

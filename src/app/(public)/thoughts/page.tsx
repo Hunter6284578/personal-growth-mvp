@@ -67,9 +67,10 @@ export default function ThoughtsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('确定要删除这条想法吗？')) return
+    if (!user) return
 
     try {
-      await deleteThought(id, user?.id)
+      await deleteThought(id, user.id)
       await loadThoughts()
     } catch (error) {
       console.error('Error deleting thought:', error)
