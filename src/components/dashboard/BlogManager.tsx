@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabaseClient, handleSupabaseError } from '@/lib/supabase'
 import { BlogPost } from '@/types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
+import { StateMessage } from '@/components/ui/StateMessage'
 import { Trash2, Edit2, Plus, Loader2, FileText } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/ui/ImageUpload'
@@ -20,6 +21,7 @@ interface BlogManagerProps {
 }
 
 export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
+  const supabase = getSupabaseClient()
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts)
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -88,6 +90,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
           .from('blog_posts')
           .update(postData)
           .eq('id', currentPostId)
+          .eq('user_id', userId)
           .select()
           .single()
         data = result.data
@@ -102,7 +105,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
         error = result.error
       }
 
-      if (error) throw error
+      handleSupabaseError(error, { action: 'saveBlogPost', userId, postId: currentPostId ?? undefined })
 
       if (data) {
         if (currentPostId) {
@@ -130,8 +133,9 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
         .from('blog_posts')
         .delete()
         .eq('id', id)
+        .eq('user_id', userId)
 
-      if (error) throw error
+      handleSupabaseError(error, { action: 'deleteBlogPost', userId, postId: id })
 
       setPosts(posts.filter(p => p.id !== id))
       router.refresh()
@@ -345,19 +349,16 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 rounded-lg border border-dashed" style={{ background: 'var(--dash-card-soft)', borderColor: 'var(--dash-border)' }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--dash-card-soft)' }}>
-                <FileText className="w-8 h-8" style={{ color: 'var(--text-dim)' }} />
-              </div>
-              <p style={{ color: 'var(--text-muted)' }}>还没有写过文章</p>
-              <Button 
-                variant="outline" 
-                className="mt-4"
-                onClick={() => setIsEditing(true)}
-              >
-                开始第一篇创作
-              </Button>
-            </div>
+            <StateMessage
+              variant="empty"
+              title="还没有写过文章"
+              description="开始第一篇创作吧"
+              action={
+                <Button variant="outline" onClick={() => setIsEditing(true)}>
+                  开始第一篇创作
+                </Button>
+              }
+            />
           )}
         </div>
       )}

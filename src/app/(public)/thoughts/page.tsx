@@ -10,6 +10,7 @@ import { ImageUpload } from '@/components/ui/ImageUpload'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { ManagedImage } from '@/components/ui/ManagedImage'
+import { StateMessage } from '@/components/ui/StateMessage'
 
 const quickTemplates = ['今天最大的收获是', '我准备开始做', '一个值得复盘的问题']
 
@@ -17,6 +18,7 @@ export default function ThoughtsPage() {
   const { user } = useAuth()
   const [thoughts, setThoughts] = useState<Thought[]>([])
   const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [newThought, setNewThought] = useState('')
   const [images, setImages] = useState<string[]>([])
@@ -31,8 +33,10 @@ export default function ThoughtsPage() {
     try {
       const data = await getThoughts(50)
       setThoughts(data)
+      setErrorMessage(null)
     } catch (error) {
       console.error('Error loading thoughts:', error)
+      setErrorMessage('加载想法失败')
     } finally {
       setLoading(false)
     }
@@ -40,11 +44,12 @@ export default function ThoughtsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newThought.trim()) return
+    if (!user || !newThought.trim()) return
 
     setSaving(true)
     try {
       await createThought({ 
+        user_id: user.id,
         content: newThought.trim(),
         images: images.length > 0 ? images : null 
       })
@@ -64,7 +69,7 @@ export default function ThoughtsPage() {
     if (!confirm('确定要删除这条想法吗？')) return
 
     try {
-      await deleteThought(id)
+      await deleteThought(id, user?.id)
       await loadThoughts()
     } catch (error) {
       console.error('Error deleting thought:', error)
@@ -147,9 +152,20 @@ export default function ThoughtsPage() {
       )}
 
       {loading ? (
-        <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>加载中...</div>
+        <StateMessage variant="loading" title="正在加载想法" description="同步你的灵感记录中" />
+      ) : errorMessage ? (
+        <StateMessage
+          variant="error"
+          title={errorMessage}
+          description="请稍后重试或刷新页面"
+          action={
+            <Button variant="outline" onClick={() => void loadThoughts()}>
+              重新加载
+            </Button>
+          }
+        />
       ) : thoughts.length === 0 ? (
-        <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>暂无想法记录</div>
+        <StateMessage variant="empty" title="暂无想法记录" description="记录下第一个想法吧" />
       ) : (
         <div className="grid gap-6">
           {thoughts.map((thought) => (

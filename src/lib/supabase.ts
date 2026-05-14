@@ -1,8 +1,35 @@
 import { createBrowserClient } from '@supabase/ssr'
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js'
+import { logError } from '@/lib/logger'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
-const fallbackUrl = supabaseUrl && supabaseUrl.length > 0 ? supabaseUrl : 'https://example.supabase.co'
-const fallbackKey = supabaseAnonKey && supabaseAnonKey.length > 0 ? supabaseAnonKey : 'placeholder-anon-key'
+let browserClient: SupabaseClient | null = null
 
-export const supabase = createBrowserClient(fallbackUrl, fallbackKey)
+function getSupabaseEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+  return { url, key }
+}
+
+export function getSupabaseClient() {
+  const { url, key } = getSupabaseEnv()
+
+  if (!url || !key) {
+    const error = new Error('Supabase public client 环境变量缺失')
+    logError(error, { scope: 'supabase', stage: 'init' })
+    throw error
+  }
+
+  if (!browserClient) {
+    browserClient = createBrowserClient(url, key)
+  }
+
+  return browserClient
+}
+
+export function handleSupabaseError(error: PostgrestError | null, context?: Record<string, unknown>) {
+  if (!error) return
+  logError(error, { scope: 'supabase', code: error.code, ...(context ?? {}) })
+  const wrapped = new Error(error.message)
+  ;(wrapped as Error & { code?: string }).code = error.code
+  throw wrapped
+}

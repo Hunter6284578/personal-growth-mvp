@@ -15,12 +15,33 @@ interface RequestBody {
   note?: string
 }
 
+const MAX_NOTE_LENGTH = 500
+
 function normalizeGoal(goal: string | undefined): FitnessGoal {
   if (goal === 'fat_loss' || goal === 'maintenance' || goal === 'strength') {
     return goal
   }
 
   return 'muscle_gain'
+}
+
+function validateRequest(body: unknown): { data?: RequestBody; error?: string } {
+  if (!body || typeof body !== 'object') {
+    return { error: '请求体必须为 JSON 对象' }
+  }
+
+  const { goal, note } = body as Record<string, unknown>
+  if (goal && typeof goal !== 'string') {
+    return { error: 'goal 必须是字符串' }
+  }
+  if (note && typeof note !== 'string') {
+    return { error: 'note 必须是字符串' }
+  }
+  if (typeof note === 'string' && note.length > MAX_NOTE_LENGTH) {
+    return { error: `note 不能超过 ${MAX_NOTE_LENGTH} 字` }
+  }
+
+  return { data: { goal: goal as FitnessGoal | undefined, note: note as string | undefined } }
 }
 
 export async function POST(request: Request) {
@@ -32,19 +53,23 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (authError || !user) {
+      logError(authError ?? new Error('missing user'), { endpoint: '/api/fit/plan', stage: 'auth' })
       return NextResponse.json({ error: '未登录' }, { status: 401 })
     }
 
     let body: RequestBody = {}
     try {
-      body = (await request.json()) as RequestBody
+      const parsedBody = await request.json()
+      const validation = validateRequest(parsedBody)
+      if (validation.error) {
+        return NextResponse.json({ error: validation.error }, { status: 400 })
+      }
+      body = validation.data ?? {}
     } catch {
-      body = {}
+      return NextResponse.json({ error: '无效的 JSON 请求体' }, { status: 400 })
     }
 
     const goal = normalizeGoal(body.goal)
