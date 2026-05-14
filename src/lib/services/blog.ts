@@ -57,7 +57,7 @@ export async function updateBlogPost(id: string, post: Partial<BlogPost>) {
   return data as BlogPost
 }
 
-export async function deleteBlogPost(id: string, userId?: string) {
+export async function deleteBlogPost(id: string, userId: string) {
   const supabase = getSupabaseClient()
   const { data: post, error: fetchError } = await supabase
     .from('blog_posts')
@@ -67,16 +67,11 @@ export async function deleteBlogPost(id: string, userId?: string) {
 
   handleSupabaseError(fetchError, { action: 'deleteBlogPost', stage: 'fetch', postId: id, userId })
 
-  let deleteQuery = supabase
+  const { error } = await supabase
     .from('blog_posts')
     .delete()
     .eq('id', id)
-  
-  if (userId) {
-    deleteQuery = deleteQuery.eq('user_id', userId)
-  }
-
-  const { error } = await deleteQuery
+    .eq('user_id', userId)
   handleSupabaseError(error, { action: 'deleteBlogPost', stage: 'delete', postId: id, userId })
 
   if (post?.images && post.images.length > 0) {

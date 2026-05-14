@@ -41,19 +41,15 @@ export async function updateFitnessRecord(id: string, record: Partial<FitnessRec
   return data as FitnessRecord
 }
 
-export async function deleteFitnessRecord(id: string, userId?: string) {
+export async function deleteFitnessRecord(id: string, userId: string) {
   const supabase = getSupabaseClient()
-  let query = supabase
+  const { error } = await supabase
     .from('fitness_records')
     .delete()
     .eq('id', id)
+    .eq('user_id', userId)
 
-  if (userId) {
-    query = query.eq('user_id', userId)
-  }
-
-  const { error } = await query
-  handleSupabaseError(error, { action: 'deleteFitnessRecord', userId })
+  handleSupabaseError(error, { action: 'deleteFitnessRecord', recordId: id, userId })
 }
 
 // ==================== Daily Health ====================

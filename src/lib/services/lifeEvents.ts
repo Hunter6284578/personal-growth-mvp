@@ -40,7 +40,7 @@ export async function updateLifeEvent(id: string, event: Partial<LifeEvent>) {
   return data as LifeEvent
 }
 
-export async function deleteLifeEvent(id: string, userId?: string) {
+export async function deleteLifeEvent(id: string, userId: string) {
   const supabase = getSupabaseClient()
   const { data: event, error: fetchError } = await supabase
     .from('life_events')
@@ -50,16 +50,11 @@ export async function deleteLifeEvent(id: string, userId?: string) {
 
   handleSupabaseError(fetchError, { action: 'deleteLifeEvent', stage: 'fetch', eventId: id, userId })
 
-  let deleteQuery = supabase
+  const { error } = await supabase
     .from('life_events')
     .delete()
     .eq('id', id)
-
-  if (userId) {
-    deleteQuery = deleteQuery.eq('user_id', userId)
-  }
-
-  const { error } = await deleteQuery
+    .eq('user_id', userId)
   handleSupabaseError(error, { action: 'deleteLifeEvent', stage: 'delete', eventId: id, userId })
 
   if (event?.images && event.images.length > 0) {

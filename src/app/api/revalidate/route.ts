@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json().catch(() => null)) as { type?: string; slug?: string } | null
-  if (body && typeof body !== 'object') {
+  if (body && (typeof body !== 'object' || Array.isArray(body))) {
     return NextResponse.json({ error: 'Request body must be a JSON object.' }, { status: 400 })
   }
 

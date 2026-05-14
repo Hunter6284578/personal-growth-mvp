@@ -41,17 +41,13 @@ export async function upsertDailyLog(log: Partial<DailyLog>) {
   return data as DailyLog
 }
 
-export async function deleteDailyLog(id: string, userId?: string) {
+export async function deleteDailyLog(id: string, userId: string) {
   const supabase = getSupabaseClient()
-  let query = supabase
+  const { error } = await supabase
     .from('daily_logs')
     .delete()
     .eq('id', id)
+    .eq('user_id', userId)
 
-  if (userId) {
-    query = query.eq('user_id', userId)
-  }
-
-  const { error } = await query
-  handleSupabaseError(error, { action: 'deleteDailyLog', userId })
+  handleSupabaseError(error, { action: 'deleteDailyLog', logId: id, userId })
 }

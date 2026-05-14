@@ -15,6 +15,7 @@ export default function DailyLogPage() {
   const { user } = useAuth()
   const { toast } = useToast()
   const { confirm, cancel, dialogState } = useConfirm()
+  const notifyError = useCallback((message: string) => toast(message, 'error'), [toast])
   const [logs, setLogs] = useState<DailyLog[]>([])
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -61,9 +62,9 @@ export default function DailyLogPage() {
       }
     } catch (error) {
       console.error('Error loading log:', error)
-      toast('加载记录失败，请稍后重试', 'error')
+      notifyError('加载记录失败，请稍后重试')
     }
-  }, [user, toast])
+  }, [user, notifyError])
 
   // 加载数据
   useEffect(() => {

@@ -26,7 +26,7 @@ function normalizeGoal(goal: string | undefined): FitnessGoal {
 }
 
 function validateRequest(body: unknown): { data?: RequestBody; error?: string } {
-  if (!body || typeof body !== 'object') {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return { error: 'Request body must be a JSON object.' }
   }
 
