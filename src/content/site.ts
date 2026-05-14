@@ -367,8 +367,8 @@ function assertLocalizedText(value: LocalizedText, field: string) {
   if (!value || typeof value !== 'object') {
     throw new Error(`Missing content config: ${field}`)
   }
-  assertNonEmpty(value?.zh ?? '', `${field}.zh`)
-  assertNonEmpty(value?.en ?? '', `${field}.en`)
+  assertNonEmpty(value.zh ?? '', `${field}.zh`)
+  assertNonEmpty(value.en ?? '', `${field}.en`)
 }
 
 function assertLocalizedList(value: LocalizedList, field: string) {
