@@ -1,27 +1,29 @@
-import { supabase } from '../supabase'
+import { getSupabaseClient, handleSupabaseError } from '@/lib/supabase'
 import type { FitExercise, FitLog, FitSet } from '@/types/fit'
 
 // ==================== 动作库 ====================
 
 export async function getExercises(): Promise<FitExercise[]> {
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('fit_exercises')
     .select('*')
     .order('target_muscle', { ascending: true })
 
-  if (error) throw error
-  return data as FitExercise[]
+  handleSupabaseError(error, { action: 'getExercises' })
+  return (data ?? []) as FitExercise[]
 }
 
 export async function getExercisesByMuscle(targetMuscle: string): Promise<FitExercise[]> {
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('fit_exercises')
     .select('*')
     .eq('target_muscle', targetMuscle)
     .order('name', { ascending: true })
 
-  if (error) throw error
-  return data as FitExercise[]
+  handleSupabaseError(error, { action: 'getExercisesByMuscle', targetMuscle })
+  return (data ?? []) as FitExercise[]
 }
 
 // ==================== 训练记录 ====================
@@ -33,6 +35,7 @@ export async function createFitLog(
   sets: FitSet[],
   note?: string
 ): Promise<FitLog> {
+  const supabase = getSupabaseClient()
   const totalVolume = sets.reduce((sum, s) => sum + s.volume, 0)
   const totalSets = sets.length
 
@@ -50,7 +53,7 @@ export async function createFitLog(
     .select()
     .single()
 
-  if (error) throw error
+  handleSupabaseError(error, { action: 'createFitLog', userId, exerciseId })
   return data as FitLog
 }
 
@@ -59,6 +62,7 @@ export async function getFitLogs(
   startDate?: string,
   endDate?: string
 ): Promise<(FitLog & { exercise: FitExercise })[]> {
+  const supabase = getSupabaseClient()
   let query = supabase
     .from('fit_logs')
     .select('*, exercise:fit_exercises(*)')
@@ -70,24 +74,26 @@ export async function getFitLogs(
 
   const { data, error } = await query
 
-  if (error) throw error
-  return data as (FitLog & { exercise: FitExercise })[]
+  handleSupabaseError(error, { action: 'getFitLogs', userId })
+  return (data ?? []) as (FitLog & { exercise: FitExercise })[]
 }
 
 export async function getFitLogDates(userId: string): Promise<string[]> {
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('fit_logs')
     .select('date')
     .eq('user_id', userId)
 
-  if (error) throw error
-  return [...new Set((data as { date: string }[]).map(d => d.date))].sort()
+  handleSupabaseError(error, { action: 'getFitLogDates', userId })
+  return [...new Set(((data ?? []) as { date: string }[]).map(d => d.date))].sort()
 }
 
 export async function getShoulderVolumeTrend(
   userId: string,
   days: number = 14
 ): Promise<{ date: string; volume: number }[]> {
+  const supabase = getSupabaseClient()
   const startDate = new Date()
   startDate.setDate(startDate.getDate() - days)
   const startStr = startDate.toISOString().split('T')[0]
@@ -106,11 +112,11 @@ export async function getShoulderVolumeTrend(
     .gte('date', startStr)
     .order('date', { ascending: true })
 
-  if (error) throw error
+  handleSupabaseError(error, { action: 'getShoulderVolumeTrend', userId })
 
   // 按日期聚合
   const volumeByDate: Record<string, number> = {}
-  for (const row of data as { date: string; total_volume: number }[]) {
+  for (const row of (data ?? []) as { date: string; total_volume: number }[]) {
     volumeByDate[row.date] = (volumeByDate[row.date] || 0) + row.total_volume
   }
 
@@ -118,8 +124,9 @@ export async function getShoulderVolumeTrend(
 }
 
 export async function deleteFitLog(id: string): Promise<void> {
+  const supabase = getSupabaseClient()
   const { error } = await supabase.from('fit_logs').delete().eq('id', id)
-  if (error) throw error
+  handleSupabaseError(error, { action: 'deleteFitLog', logId: id })
 }
 
 // 批量创建训练记录（一次提交多个动作）
@@ -132,6 +139,7 @@ export async function createFitLogs(
     note?: string
   }>
 ): Promise<FitLog[]> {
+  const supabase = getSupabaseClient()
   const rows = items.map(item => {
     const totalVolume = item.sets.reduce((sum, s) => sum + s.volume, 0)
     return {
@@ -150,6 +158,6 @@ export async function createFitLogs(
     .insert(rows)
     .select()
 
-  if (error) throw error
-  return data as FitLog[]
+  handleSupabaseError(error, { action: 'createFitLogs', count: items.length })
+  return (data ?? []) as FitLog[]
 }

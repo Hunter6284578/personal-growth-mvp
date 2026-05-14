@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { StateMessage } from '@/components/ui/StateMessage'
 import { Plus, Star, Trash2, Edit2, X } from 'lucide-react'
 import { getLifeEvents, createLifeEvent, updateLifeEvent, deleteLifeEvent } from '@/lib/services'
 import { useAuth } from '@/hooks/useAuth'
@@ -27,6 +28,7 @@ export default function EventsPage() {
   const { confirm, cancel, dialogState } = useConfirm()
   const [events, setEvents] = useState<LifeEvent[]>([])
   const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [showForm, setShowForm] = useState(false)
   
@@ -45,8 +47,10 @@ export default function EventsPage() {
     try {
       const data = await getLifeEvents(user.id, 50)
       setEvents(data)
+      setErrorMessage(null)
     } catch (error) {
       console.error('Error loading events:', error)
+      setErrorMessage('加载事件失败')
     } finally {
       setLoading(false)
     }
@@ -110,7 +114,7 @@ export default function EventsPage() {
     if (!confirmed) return
     
     try {
-      await deleteLifeEvent(id)
+      await deleteLifeEvent(id, user.id)
       await loadEvents()
     } catch (error) {
       console.error('Error deleting event:', error)
@@ -305,9 +309,20 @@ export default function EventsPage() {
 
       <Card title="事件列表" subtitle={`共 ${events.length} 条记录`}>
         {loading ? (
-          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>加载中...</div>
+          <StateMessage variant="loading" title="正在加载事件" description="同步你的事件记录中" />
+        ) : errorMessage ? (
+          <StateMessage
+            variant="error"
+            title={errorMessage}
+            description="请稍后重试或刷新页面"
+            action={
+              <Button variant="outline" onClick={() => void loadEvents()}>
+                重新加载
+              </Button>
+            }
+          />
         ) : events.length === 0 ? (
-          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>暂无记录</div>
+          <StateMessage variant="empty" title="暂无记录" description="记录下第一个重要时刻" />
         ) : (
           <div className="space-y-4">
             {events.map((event) => (

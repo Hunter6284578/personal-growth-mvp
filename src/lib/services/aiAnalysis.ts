@@ -1,7 +1,8 @@
-import { supabase } from '../supabase'
+import { getSupabaseClient, handleSupabaseError } from '@/lib/supabase'
 import type { AIAnalysis } from '@/types'
 
 export async function getAIAnalyses(userId: string, limit = 10) {
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('ai_analyses')
     .select('*')
@@ -9,17 +10,18 @@ export async function getAIAnalyses(userId: string, limit = 10) {
     .order('created_at', { ascending: false })
     .limit(limit)
   
-  if (error) throw error
-  return data as AIAnalysis[]
+  handleSupabaseError(error, { action: 'getAIAnalyses', userId })
+  return (data ?? []) as AIAnalysis[]
 }
 
 export async function createAIAnalysis(analysis: Partial<AIAnalysis>) {
+  const supabase = getSupabaseClient()
   const { data, error } = await supabase
     .from('ai_analyses')
     .insert(analysis)
     .select()
     .single()
   
-  if (error) throw error
+  handleSupabaseError(error, { action: 'createAIAnalysis' })
   return data as AIAnalysis
 }

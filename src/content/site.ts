@@ -36,7 +36,29 @@ export interface FitnessCapability {
   description: LocalizedText
 }
 
-export const siteConfig = {
+export interface SiteConfig {
+  name: string
+  title: string
+  role: LocalizedText
+  roleShort: LocalizedText
+  location: LocalizedText
+  email: string
+  github: string
+  siteUrl: string
+  icpNo: string
+  icpLink: string
+  resumeUrl: string
+  description: LocalizedText
+  heroTitle: LocalizedText
+  heroIntro: LocalizedText
+  heroFocus: LocalizedList
+  targetRoles: LocalizedList
+  now: LocalizedList
+  lookingFor: LocalizedText
+  contactLinks: SocialLink[]
+}
+
+export const siteConfig: SiteConfig = {
   name: 'Hunter',
   title: 'Hunter · Growth Log',
   role: {
@@ -333,4 +355,106 @@ export const homeSignals = [
 export const blogThemes: LocalizedList = {
   zh: ['项目复盘', '技术笔记', '成长日志'],
   en: ['Project Reviews', 'Technical Notes', 'Growth Logs'],
+}
+
+function assertNonEmpty(value: string, field: string) {
+  if (!value || value.trim().length === 0) {
+    throw new Error(`Missing content config: ${field}`)
+  }
+}
+
+function assertLocalizedText(value: LocalizedText, field: string) {
+  if (!value || typeof value !== 'object') {
+    throw new Error(`Missing content config: ${field}`)
+  }
+  assertNonEmpty(value.zh ?? '', `${field}.zh`)
+  assertNonEmpty(value.en ?? '', `${field}.en`)
+}
+
+function assertLocalizedList(value: LocalizedList, field: string) {
+  if (!value || !Array.isArray(value.zh) || !Array.isArray(value.en)) {
+    throw new Error(`Missing content config: ${field}`)
+  }
+  if (value.zh.length === 0 || value.en.length === 0) {
+    throw new Error(`Empty content config: ${field}`)
+  }
+  value.zh.forEach((item, index) => assertNonEmpty(item, `${field}.zh[${index}]`))
+  value.en.forEach((item, index) => assertNonEmpty(item, `${field}.en[${index}]`))
+}
+
+function assertUrl(value: string, field: string) {
+  try {
+    new URL(value)
+  } catch {
+    throw new Error(`Invalid content config URL: ${field}`)
+  }
+}
+
+function validateSiteContent() {
+  assertNonEmpty(siteConfig.name, 'siteConfig.name')
+  assertNonEmpty(siteConfig.title, 'siteConfig.title')
+  assertNonEmpty(siteConfig.email, 'siteConfig.email')
+  assertNonEmpty(siteConfig.github, 'siteConfig.github')
+  assertNonEmpty(siteConfig.siteUrl, 'siteConfig.siteUrl')
+  assertLocalizedText(siteConfig.role, 'siteConfig.role')
+  assertLocalizedText(siteConfig.roleShort, 'siteConfig.roleShort')
+  assertLocalizedText(siteConfig.location, 'siteConfig.location')
+  assertLocalizedText(siteConfig.description, 'siteConfig.description')
+  assertLocalizedText(siteConfig.heroTitle, 'siteConfig.heroTitle')
+  assertLocalizedText(siteConfig.heroIntro, 'siteConfig.heroIntro')
+  assertLocalizedList(siteConfig.heroFocus, 'siteConfig.heroFocus')
+  assertLocalizedList(siteConfig.targetRoles, 'siteConfig.targetRoles')
+  assertLocalizedList(siteConfig.now, 'siteConfig.now')
+  assertLocalizedText(siteConfig.lookingFor, 'siteConfig.lookingFor')
+  assertUrl(siteConfig.siteUrl, 'siteConfig.siteUrl')
+  assertUrl(siteConfig.github, 'siteConfig.github')
+  if (siteConfig.icpLink) {
+    assertUrl(siteConfig.icpLink, 'siteConfig.icpLink')
+  }
+  if (siteConfig.resumeUrl) {
+    assertUrl(siteConfig.resumeUrl, 'siteConfig.resumeUrl')
+  }
+  siteConfig.contactLinks.forEach((link, index) => {
+    assertLocalizedText(link.label, `siteConfig.contactLinks[${index}].label`)
+    assertNonEmpty(link.href, `siteConfig.contactLinks[${index}].href`)
+  })
+
+  skillGroups.forEach((group, index) => {
+    assertLocalizedText(group.title, `skillGroups[${index}].title`)
+    assertLocalizedList(group.items, `skillGroups[${index}].items`)
+  })
+
+  const projectSlugs = new Set<string>()
+  featuredProjects.forEach((project, index) => {
+    assertNonEmpty(project.slug, `featuredProjects[${index}].slug`)
+    assertLocalizedText(project.title, `featuredProjects[${index}].title`)
+    assertLocalizedText(project.tagline, `featuredProjects[${index}].tagline`)
+    assertNonEmpty(project.period, `featuredProjects[${index}].period`)
+    assertLocalizedText(project.summary, `featuredProjects[${index}].summary`)
+    assertLocalizedList(project.techStack, `featuredProjects[${index}].techStack`)
+    if (projectSlugs.has(project.slug)) {
+      throw new Error(`Duplicate featuredProjects slug: ${project.slug}`)
+    }
+    projectSlugs.add(project.slug)
+    project.links.forEach((link, linkIndex) => {
+      assertLocalizedText(link.label, `featuredProjects[${index}].links[${linkIndex}].label`)
+      assertNonEmpty(link.href, `featuredProjects[${index}].links[${linkIndex}].href`)
+    })
+  })
+
+  fitnessCapabilities.forEach((item, index) => {
+    assertLocalizedText(item.title, `fitnessCapabilities[${index}].title`)
+    assertLocalizedText(item.description, `fitnessCapabilities[${index}].description`)
+  })
+
+  homeSignals.forEach((signal, index) => {
+    assertLocalizedText(signal.label, `homeSignals[${index}].label`)
+    assertLocalizedText(signal.value, `homeSignals[${index}].value`)
+  })
+
+  assertLocalizedList(blogThemes, 'blogThemes')
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  validateSiteContent()
 }

@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabaseClient, handleSupabaseError } from '@/lib/supabase'
 import { Thought } from '@/types'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
+import { StateMessage } from '@/components/ui/StateMessage'
 import { Trash2, Tag, Plus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ImageUpload } from '@/components/ui/ImageUpload'
@@ -21,6 +22,7 @@ interface ThoughtsManagerProps {
 const quickTags = ['复盘', '学习', '灵感', '执行', '情绪', '健康']
 
 export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProps) {
+  const supabase = getSupabaseClient()
   const [thoughts, setThoughts] = useState<Thought[]>(initialThoughts)
   const [content, setContent] = useState('')
   const [tagsInput, setTagsInput] = useState('')
@@ -50,7 +52,7 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
         .select()
         .single()
 
-      if (error) throw error
+      handleSupabaseError(error, { action: 'addThought', userId })
 
       if (data) {
         setThoughts([data as Thought, ...thoughts])
@@ -76,8 +78,9 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
         .from('thoughts')
         .delete()
         .eq('id', id)
+        .eq('user_id', userId)
 
-      if (error) throw error
+      handleSupabaseError(error, { action: 'deleteThought', userId, thoughtId: id })
 
       setThoughts(thoughts.filter(t => t.id !== id))
       router.refresh()
@@ -228,13 +231,11 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 rounded-lg border border-dashed" style={{ background: 'var(--dash-card-soft)', borderColor: 'var(--dash-border)' }}>
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--dash-card-soft)' }}>
-              <LightbulbIcon className="w-8 h-8" style={{ color: 'var(--text-dim)' }} />
-            </div>
-            <p style={{ color: 'var(--text-muted)' }}>还没有记录任何想法</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-dim)' }}>记录下第一个灵感吧！</p>
-          </div>
+          <StateMessage
+            variant="empty"
+            title="还没有记录任何想法"
+            description="记录下第一个灵感吧！"
+          />
         )}
       </div>
 
@@ -247,25 +248,5 @@ export function ThoughtsManager({ initialThoughts, userId }: ThoughtsManagerProp
         variant={dialogState.variant}
       />
     </div>
-  )
-}
-
-function LightbulbIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-      style={style}
-    >
-      <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-1 1.5-2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-      <path d="M9 18h6" />
-      <path d="M10 22h4" />
-    </svg>
   )
 }

@@ -1,6 +1,8 @@
-import { supabase } from './supabase'
+import { getSupabaseClient } from './supabase'
+import { logError } from './logger'
 
 export async function uploadImage(file: File, bucket = 'images'): Promise<string> {
+  const supabase = getSupabaseClient()
   const fileExt = file.name.split('.').pop()
   const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
   const filePath = `${fileName}`
@@ -10,6 +12,7 @@ export async function uploadImage(file: File, bucket = 'images'): Promise<string
     .upload(filePath, file)
 
   if (uploadError) {
+    logError(uploadError, { action: 'uploadImage', bucket })
     throw uploadError
   }
 
@@ -21,6 +24,7 @@ export async function uploadImage(file: File, bucket = 'images'): Promise<string
 }
 
 export async function deleteImage(url: string, bucket = 'images'): Promise<void> {
+  const supabase = getSupabaseClient()
   // Extract file path from public URL
   const pathMatch = url.match(new RegExp(`${bucket}/(.+)$`))
   if (!pathMatch || !pathMatch[1]) return
@@ -32,6 +36,7 @@ export async function deleteImage(url: string, bucket = 'images'): Promise<void>
     .remove([filePath])
 
   if (error) {
+    logError(error, { action: 'deleteImage', bucket })
     throw error
   }
 }

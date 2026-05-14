@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { StateMessage } from '@/components/ui/StateMessage'
 import { Calendar, Smile, Trash2, Edit2 } from 'lucide-react'
 import { getDailyLogs, getDailyLogByDate, upsertDailyLog, deleteDailyLog } from '@/lib/services'
 import { useAuth } from '@/hooks/useAuth'
@@ -16,6 +17,7 @@ export default function DailyLogPage() {
   const { confirm, cancel, dialogState } = useConfirm()
   const [logs, setLogs] = useState<DailyLog[]>([])
   const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   
   // 表单状态
@@ -33,8 +35,10 @@ export default function DailyLogPage() {
     try {
       const data = await getDailyLogs(user.id, 30)
       setLogs(data)
+      setErrorMessage(null)
     } catch (error) {
       console.error('Error loading logs:', error)
+      setErrorMessage('加载记录失败')
     } finally {
       setLoading(false)
     }
@@ -57,8 +61,9 @@ export default function DailyLogPage() {
       }
     } catch (error) {
       console.error('Error loading log:', error)
+      toast('加载记录失败，请稍后重试', 'error')
     }
-  }, [user])
+  }, [user, toast])
 
   // 加载数据
   useEffect(() => {
@@ -116,7 +121,7 @@ export default function DailyLogPage() {
     if (!confirmed) return
     
     try {
-      await deleteDailyLog(id)
+      await deleteDailyLog(id, user.id)
       await loadLogs()
       if (editingId === id) {
         resetForm()
@@ -257,9 +262,20 @@ export default function DailyLogPage() {
       {/* 历史记录列表 */}
       <Card title="历史记录" subtitle={`共 ${logs.length} 条记录`}>
         {loading ? (
-          <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>加载中...</div>
+          <StateMessage variant="loading" title="正在加载记录" description="同步你的每日记录中" />
+        ) : errorMessage ? (
+          <StateMessage
+            variant="error"
+            title={errorMessage}
+            description="请稍后重试或刷新页面"
+            action={
+              <Button variant="outline" onClick={() => void loadLogs()}>
+                重新加载
+              </Button>
+            }
+          />
         ) : logs.length === 0 ? (
-          <div className="text-center py-8" style={{ color: 'var(--text-dim)' }}>暂无记录</div>
+          <StateMessage variant="empty" title="暂无记录" description="记录下第一天的成长吧" />
         ) : (
           <div className="space-y-4">
             {logs.map((log) => (

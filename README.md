@@ -117,6 +117,50 @@ src/
 └─ types/
 ```
 
+## 架构概览与模块边界
+
+- 公开站（`src/app/(public)`）
+  - 内容来源：`src/content/site.ts`（公开内容配置）、`src/lib/blog.ts`（公开博客读取）
+  - 数据访问：只读公开数据，使用 `supabase-public` 客户端
+  - 缓存策略：页面级 `revalidate` + `/api/revalidate` 主动刷新
+- 私密工作台（`src/app/(dashboard)`）
+  - 内容来源：`src/lib/services/*` 与 Supabase（需要登录）
+  - 数据访问：Server Component 使用 `supabase-server`，Client 组件统一通过 `getSupabaseClient`
+  - 权限边界：所有写操作必须绑定 `user_id`，依赖 Supabase RLS
+- 训练工作台（`src/app/fit`）
+  - 内容来源：`src/lib/fit/services` + `fit_*` 表
+  - AI 建议：`/api/fit/plan` 使用近期训练与恢复数据
+
+## 数据与服务层规范
+
+- 统一入口：客户端与服务层使用 `getSupabaseClient`，服务层遇到 Supabase 错误统一抛出并记录日志。
+- 职责边界：
+  - `src/lib/services/*`：成长/日志/博客/事件/技能等业务数据。
+  - `src/lib/fit/services`：训练动作、训练日志、训练趋势。
+  - `src/lib/blog.ts`：公开站博客数据的只读访问。
+
+## 数据库迁移与回滚
+
+1. 按顺序执行 `supabase/migrations` 下的 SQL（文件名时间戳顺序）。
+2. 如果线上库来自旧版本，先对比 `blog_posts`、`thoughts`、`profiles` 等表结构。
+3. 回滚策略：
+   - 迁移脚本建议在事务内执行（`BEGIN`/`COMMIT`）。
+   - 回滚时按相反顺序执行删除/恢复脚本，并确认没有线上数据依赖。
+   - 对已有表字段的修改，建议先备份再执行变更。
+
+## 安全与权限核对
+
+- Supabase RLS：确保 `user_id` 相关表仅允许本人读写。
+- API 鉴权：`/api/analysis` 与 `/api/fit/plan` 均要求登录；`/api/revalidate` 使用 token 保护。
+- 输入校验：API 请求体必须为 JSON，字符串字段需限制长度，避免异常 prompt 或 SQL 风险。
+
+## 回归检查清单（发布前）
+
+- [ ] 公开站首页、博客列表、博客详情是否可正常访问
+- [ ] 登录后工作台（dashboard）是否能读取并写入数据
+- [ ] `/api/analysis` 与 `/api/fit/plan` 能在登录状态下返回结果
+- [ ] `/api/revalidate` token 校验生效，内容可刷新
+
 ## 后续建议
 
 - 把 `src/content/site.ts` 替换成真实姓名、教育经历、项目结果和简历链接

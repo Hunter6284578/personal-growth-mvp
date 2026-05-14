@@ -15,12 +15,33 @@ interface RequestBody {
   note?: string
 }
 
+const MAX_NOTE_LENGTH = 500
+
 function normalizeGoal(goal: string | undefined): FitnessGoal {
   if (goal === 'fat_loss' || goal === 'maintenance' || goal === 'strength') {
     return goal
   }
 
   return 'muscle_gain'
+}
+
+function validateRequest(body: unknown): { data?: RequestBody; error?: string } {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return { error: 'Request body must be a JSON object.' }
+  }
+
+  const { goal, note } = body as Record<string, unknown>
+  if (goal && typeof goal !== 'string') {
+    return { error: 'goal must be a string.' }
+  }
+  if (note && typeof note !== 'string') {
+    return { error: 'note must be a string.' }
+  }
+  if (typeof note === 'string' && note.length > MAX_NOTE_LENGTH) {
+    return { error: `note must be ${MAX_NOTE_LENGTH} characters or fewer.` }
+  }
+
+  return { data: { goal: goal as FitnessGoal | undefined, note: note as string | undefined } }
 }
 
 export async function POST(request: Request) {
@@ -32,19 +53,24 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (authError || !user) {
+      logError(authError ?? new Error('missing user'), { endpoint: '/api/fit/plan', stage: 'auth' })
       return NextResponse.json({ error: '未登录' }, { status: 401 })
     }
 
     let body: RequestBody = {}
     try {
-      body = (await request.json()) as RequestBody
-    } catch {
-      body = {}
+      const parsedBody = await request.json()
+      const validation = validateRequest(parsedBody)
+      if (validation.error) {
+        return NextResponse.json({ error: validation.error }, { status: 400 })
+      }
+      body = validation.data ?? {}
+    } catch (error) {
+      logError(error, { endpoint: '/api/fit/plan', stage: 'parseBody' })
+      return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 })
     }
 
     const goal = normalizeGoal(body.goal)
