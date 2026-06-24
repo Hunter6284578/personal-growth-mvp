@@ -26,6 +26,7 @@ if (supabaseHostname) {
 }
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns,
   },
