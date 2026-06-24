@@ -13,7 +13,7 @@ export default async function PublicLayout({
   return (
     <div className="public-shell">
       <PublicNavigation lang={lang} />
-      <main className="mx-auto max-w-3xl px-6 py-12 sm:px-8 lg:px-0 lg:py-20">
+      <main className="mx-auto max-w-2xl px-6 py-10 sm:px-8 lg:px-0 lg:py-16">
         {children}
       </main>
       <SiteFooter lang={lang} />

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase-server'
 import { BlogManager } from '@/components/dashboard/BlogManager'
+import { isSiteAdmin } from '@/lib/site-admin'
 import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
@@ -13,10 +14,15 @@ export default async function BlogPage() {
     redirect('/login')
   }
 
+  const admin = await isSiteAdmin(supabase, user)
+
+  if (!admin) {
+    redirect('/login')
+  }
+
   const { data: posts } = await supabase
     .from('blog_posts')
     .select('*')
-    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   return (

@@ -6,45 +6,36 @@ import { useState } from 'react'
 import {
   Menu,
   X,
-  FileUser,
   LayoutDashboard,
   LogOut,
   Home,
-  CalendarDays,
-  BarChart3,
-  Lightbulb,
-  HeartPulse,
-  MessageSquareText,
   PenLine,
-  Sparkles,
-  Settings,
-  Target,
+  MessageCircle,
   ChevronRight,
-  Dumbbell,
   NotebookPen,
+  FlaskConical,
+  UserRound,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { Button } from '@/components/ui/Button'
 import { siteConfig } from '@/content/site'
 import { LanguageSwitch } from '@/components/site/LanguageSwitch'
-import { ThemeSwitch } from '@/components/site/ThemeSwitch'
 import { pickText, type SiteLanguage } from '@/lib/site-language'
 
 const publicNavItems = [
   {
-    href: '/',
-    label: { zh: '首页', en: 'Home' },
-    icon: Home,
+    href: '/blog',
+    label: { zh: '文章', en: 'Writing' },
+    icon: NotebookPen,
   },
   {
-    href: '/blog',
-    label: { zh: '博客', en: 'Blog' },
-    icon: NotebookPen,
+    href: '/projects',
+    label: { zh: '作品', en: 'Works' },
+    icon: FlaskConical,
   },
   {
     href: '/about',
     label: { zh: '关于', en: 'About' },
-    icon: FileUser,
+    icon: UserRound,
   },
 ]
 
@@ -57,29 +48,10 @@ interface DashboardNavItem {
 
 const dashboardNavGroups: Array<{ title: string; items: DashboardNavItem[] }> = [
   {
-    title: '工作台',
+    title: '博客',
     items: [
-      { href: '/dashboard', label: '总览', icon: LayoutDashboard },
-      { href: '/dashboard/daily', label: '每日记录', icon: CalendarDays },
-      { href: '/dashboard/events', label: '事件库', icon: Lightbulb },
-      { href: '/dashboard/thoughts', label: '短记录', icon: MessageSquareText },
-      { href: '/dashboard/focus', label: '聚焦方向', icon: Target },
       { href: '/dashboard/blog', label: '文章管理', icon: PenLine },
-    ],
-  },
-  {
-    title: '数据',
-    items: [
-      { href: '/dashboard/stats', label: '属性评分', icon: BarChart3 },
-      { href: '/dashboard/fitness', label: '健康记录', icon: HeartPulse },
-      { href: '/fit', label: '健身训练', icon: Dumbbell },
-      { href: '/dashboard/analysis', label: 'AI 分析', icon: Sparkles },
-    ],
-  },
-  {
-    title: '账户',
-    items: [
-      { href: '/dashboard/settings', label: '设置', icon: Settings },
+      { href: '/dashboard/comments', label: '评论审核', icon: MessageCircle },
     ],
   },
 ]
@@ -99,10 +71,10 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
     href === '/' ? pathname === href : pathname.startsWith(href)
 
   return (
-    <header className="sticky top-0 z-40" style={{ borderBottom: '1px solid var(--border)', background: 'color-mix(in srgb, var(--bg) 85%, transparent)', backdropFilter: 'blur(8px)' }}>
-      <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-6 py-4 sm:px-8 lg:px-0">
+    <header className="z-40" style={{ borderBottom: '1px solid var(--border)' }}>
+      <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 px-6 py-5 sm:px-8 lg:px-0">
         <Link href="/" className="min-w-0">
-          <p className="text-sm font-normal" style={{ fontFamily: "'LXGW WenKai', 'STKaiti', 'Kaiti SC', cursive", color: 'var(--text-bright)' }}>
+          <p className="text-sm font-medium" style={{ color: 'var(--text-bright)' }}>
             {siteConfig.title}
           </p>
         </Link>
@@ -122,50 +94,31 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-5 lg:flex">
           <LanguageSwitch lang={lang} />
-          <ThemeSwitch lang={lang} />
-          <Link
-            href={siteConfig.github}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm transition-colors"
-            style={{ color: 'var(--text-dim)' }}
-          >
-            GitHub
-          </Link>
           {user ? (
             <>
-              <Link href="/dashboard">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}
-                >
-                  Studio
-                </Button>
+              <Link
+                href="/dashboard/blog"
+                className="text-sm transition-colors"
+                style={{ color: 'var(--text-dim)' }}
+              >
+                写作
               </Link>
-              <Button
-                variant="outline"
-                size="sm"
-                style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}
+              <button
+                type="button"
+                className="text-sm transition-colors"
+                style={{ color: 'var(--text-dim)' }}
                 onClick={signOut}
               >
                 {lang === 'zh' ? '退出' : 'Out'}
-              </Button>
+              </button>
             </>
-          ) : (
-            <Link href="/login">
-              <Button variant="primary" size="sm">
-                {lang === 'zh' ? '工作台' : 'Studio'}
-              </Button>
-            </Link>
-          )}
+          ) : null}
         </div>
 
         <div className="flex items-center gap-3 lg:hidden">
           <LanguageSwitch lang={lang} />
-          <ThemeSwitch lang={lang} />
           <button
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
@@ -181,15 +134,6 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
 
       {mobileMenuOpen ? (
         <div className="px-6 py-4 lg:hidden" style={{ borderTop: '1px solid var(--border)' }}>
-          <div className="mb-4" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
-            <p className="text-sm" style={{ fontFamily: 'var(--font-title), serif', color: 'var(--text-bright)' }}>
-              {pickText(siteConfig.role, lang)}
-            </p>
-            <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-              {pickText(siteConfig.lookingFor, lang)}
-            </p>
-          </div>
-
           <div className="space-y-1">
             {publicNavItems.map((item) => {
               const Icon = item.icon
@@ -211,41 +155,29 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href={siteConfig.github}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm transition-colors"
-              style={{ color: 'var(--text-dim)' }}
-            >
-              GitHub
-            </Link>
             {user ? (
               <>
-                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" size="sm" style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}>
-                    Studio
-                  </Button>
+                <Link
+                  href="/dashboard/blog"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-sm transition-colors"
+                  style={{ color: 'var(--text-dim)' }}
+                >
+                  写作
                 </Link>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  style={{ color: 'var(--text-muted)', border: '1px solid var(--border)', background: 'transparent' }}
+                <button
+                  type="button"
+                  className="text-sm transition-colors"
+                  style={{ color: 'var(--text-dim)' }}
                   onClick={() => {
                     signOut()
                     setMobileMenuOpen(false)
                   }}
                 >
                   {lang === 'zh' ? '退出' : 'Out'}
-                </Button>
+                </button>
               </>
-            ) : (
-              <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="primary" size="sm">
-                  {lang === 'zh' ? '工作台' : 'Studio'}
-                </Button>
-              </Link>
-            )}
+            ) : null}
           </div>
         </div>
       ) : null}

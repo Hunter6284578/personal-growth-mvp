@@ -22,6 +22,7 @@ export interface FeaturedProject {
   period: string
   status: 'online' | 'building'
   summary: LocalizedText
+  note?: LocalizedText
   techStack: LocalizedList
   links: ProjectLink[]
 }
@@ -31,21 +32,22 @@ export interface SkillGroup {
   items: LocalizedList
 }
 
-export interface FitnessCapability {
+export interface HomeEntryPoint {
   title: LocalizedText
   description: LocalizedText
+  href: string
 }
 
 export const siteConfig = {
   name: 'Hunter',
-  title: 'Hunter · Growth Log',
+  title: 'Hunter',
   role: {
-    zh: '做项目，记成长，持续成为想成为的人',
-    en: 'Build projects, document growth, and keep becoming.',
+    zh: '生物医学工程学生 · AI 学习档案',
+    en: 'Biomedical Engineering Student · AI Learning Archive',
   },
   roleShort: {
-    zh: '成长日志',
-    en: 'Growth Log',
+    zh: 'AI 学习档案',
+    en: 'AI Learning Archive',
   },
   location: {
     zh: '中国 · 上海时区',
@@ -58,40 +60,40 @@ export const siteConfig = {
   icpLink: 'https://beian.miit.gov.cn/',
   resumeUrl: '',
   description: {
-    zh: 'Hunter · Growth Log 是一个记录项目、思考与长期成长过程的个人网站。',
-    en: 'Hunter · Growth Log is a personal website for projects, reflections, and long-term growth.',
+    zh: '一个生物医学工程学生的 AI 学习档案，记录深度学习、大模型、医工交叉项目，以及那些真实卡住又慢慢解开的 Bug。',
+    en: 'An AI learning archive by a biomedical engineering student, collecting deep learning notes, LLM explorations, biomedical projects, and bugs slowly untangled.',
   },
   heroTitle: {
-    zh: '公开构建，认真成长。',
-    en: 'Building, learning, and growing in public.',
+    zh: '在医工和 AI 之间，慢慢把问题拆开。',
+    en: 'Taking problems apart between biomedical engineering and AI.',
   },
   heroIntro: {
-    zh: '这是我的个人空间：放项目、放思考，也记录自己如何一步步把想法变成现实。',
-    en: 'This is my personal space for projects, reflections, and the process of turning ideas into reality.',
+    zh: '我目前是生物医学工程大二学生，对深度学习、大模型和医学健康场景里的 AI 应用很感兴趣。这个网站用来留下学习过程：问题、报错、尝试、失败、解决，以及一些正在成形的作品。',
+    en: 'I am a sophomore studying biomedical engineering, interested in deep learning, large language models, and AI in health contexts. This site keeps the process: questions, errors, attempts, failures, fixes, and small projects taking shape.',
   },
   heroFocus: {
-    zh: ['项目', '写作', '成长系统'],
-    en: ['Projects', 'Writing', 'Growth Systems'],
+    zh: ['深度学习', '大模型', '医工交叉'],
+    en: ['Deep Learning', 'LLMs', 'Biomedical AI'],
   },
   targetRoles: {
-    zh: ['Web 开发', 'AI 应用', '长期主义'],
-    en: ['Web Development', 'AI Experiments', 'Long-term Growth'],
+    zh: ['AI 学习', 'Bug 复盘', '项目实验'],
+    en: ['AI Learning', 'Bug Reviews', 'Project Experiments'],
   },
   now: {
     zh: [
-      '重构个人网站的公开表达层',
-      '持续整理项目与阶段复盘',
-      '实验 AI + 内容工作流',
+      '整理深度学习和大模型学习记录',
+      '把遇到的 Bug 和排查过程写完整',
+      '慢慢积累医工方向的小实验和作品',
     ],
     en: [
-      'Refining the public layer of my personal site',
-      'Organizing projects and reflection notes',
-      'Experimenting with AI-powered content workflows',
+      'Organizing deep learning and LLM notes',
+      'Writing down bugs and debugging paths',
+      'Growing small biomedical engineering experiments',
     ],
   },
   lookingFor: {
-    zh: '我希望这个网站像一份长期更新的成长日志，而不是一次性完成的展示页。',
-    en: 'I want this website to feel like a living growth log, not a one-off portfolio page.',
+    zh: '我希望这个网站像一本长期打开的实验记录本，而不是一次性写完的展示页。',
+    en: 'I want this site to feel like a long-running lab notebook, not a one-off showcase.',
   },
   contactLinks: [
     {
@@ -105,33 +107,53 @@ export const siteConfig = {
   ] as SocialLink[],
 }
 
+export const homeEntryPoints: HomeEntryPoint[] = [
+  {
+    title: { zh: '学习记录', en: 'Learning Notes' },
+    description: {
+      zh: '记录深度学习、大模型、医工课程和工具使用中一点点弄明白的东西。',
+      en: 'Notes on deep learning, LLMs, biomedical coursework, and tools I slowly understand.',
+    },
+    href: '/blog?category=深度学习',
+  },
+  {
+    title: { zh: 'Bug 复盘', en: 'Bug Reviews' },
+    description: {
+      zh: '保留报错、猜测、排查路径和最后解决方式，不把弯路擦掉。',
+      en: 'Keeping errors, guesses, debugging paths, and fixes without erasing the detours.',
+    },
+    href: '/blog?category=Bug 复盘',
+  },
+  {
+    title: { zh: '作品 / 实验', en: 'Works / Experiments' },
+    description: {
+      zh: '放一些正在做、已经做完或还在整理的小项目，像一个慢慢扩展的作品架。',
+      en: 'A slowly expanding shelf of small projects: finished, ongoing, or still being tidied.',
+    },
+    href: '/projects',
+  },
+]
+
 export const skillGroups: SkillGroup[] = [
   {
-    title: { zh: '构建', en: 'Building' },
+    title: { zh: '正在学', en: 'Learning' },
     items: {
-      zh: ['Next.js', 'React', 'TypeScript', '个人产品'],
-      en: ['Next.js', 'React', 'TypeScript', 'Personal Products'],
+      zh: ['深度学习', '大模型', 'PyTorch', '医学健康场景'],
+      en: ['Deep Learning', 'LLMs', 'PyTorch', 'Health Contexts'],
     },
   },
   {
-    title: { zh: '学习', en: 'Learning' },
+    title: { zh: '记录', en: 'Writing' },
     items: {
-      zh: ['Supabase', 'PostgreSQL', 'AI 工作流', '系统化思考'],
-      en: ['Supabase', 'PostgreSQL', 'AI Workflows', 'Structured Thinking'],
+      zh: ['Bug 复盘', '技术笔记', '项目过程', '论文阅读'],
+      en: ['Bug Reviews', 'Technical Notes', 'Project Process', 'Paper Reading'],
     },
   },
   {
-    title: { zh: '表达', en: 'Reflecting' },
+    title: { zh: '偏好', en: 'Taste' },
     items: {
-      zh: ['项目复盘', '技术笔记', '成长日志', '公开写作'],
-      en: ['Project Reviews', 'Technical Notes', 'Growth Logs', 'Writing in Public'],
-    },
-  },
-  {
-    title: { zh: '原则', en: 'Principles' },
-    items: {
-      zh: ['先完成再完美', '小步迭代', '长期持续', '用作品说话'],
-      en: ['Build Before Perfect', 'Iterate in Small Steps', 'Stay Consistent', 'Let Work Speak'],
+      zh: ['清楚一点', '克制一点', '能长期维护', '不要太吵'],
+      en: ['Clearer', 'Quieter', 'Maintainable', 'Less noisy'],
     },
   },
 ]
@@ -141,12 +163,12 @@ export const resumeBlocks: ResumeBlock[] = [
     title: { zh: '我是谁', en: 'Who I Am' },
     items: {
       zh: [
-        '我是 Hunter，对 Web 开发、个人系统和长期成长感兴趣。',
-        '我更相信持续构建与长期记录，而不是短期冲刺。',
+        '我是 Hunter，目前是生物医学工程大二学生。',
+        '我对深度学习、大模型和医学健康场景里的 AI 应用感兴趣。',
       ],
       en: [
-        "I'm Hunter, interested in web development, personal systems, and long-term growth.",
-        'I believe more in consistent building and documentation than short bursts of intensity.',
+        "I'm Hunter, a sophomore studying biomedical engineering.",
+        'I am interested in deep learning, LLMs, and AI applications in health contexts.',
       ],
     },
   },
@@ -154,14 +176,14 @@ export const resumeBlocks: ResumeBlock[] = [
     title: { zh: '我在意什么', en: 'What I Care About' },
     items: {
       zh: [
-        '清晰而诚实的表达',
-        '能长期维护的系统与节奏',
-        '把想法真正做出来，而不是停留在概念层面',
+        '把问题拆开，而不是只留下最后答案',
+        '记录真实排查路径，包括走错的路',
+        '让作品慢慢长出来，而不是一次性包装好',
       ],
       en: [
-        'Clear and honest expression',
-        'Systems and rhythms that can last',
-        'Turning ideas into something real instead of leaving them abstract',
+        'Taking problems apart instead of keeping only final answers',
+        'Recording real debugging paths, including wrong turns',
+        'Letting projects grow slowly instead of packaging them too early',
       ],
     },
   },
@@ -169,14 +191,14 @@ export const resumeBlocks: ResumeBlock[] = [
     title: { zh: '这个网站是什么', en: 'What This Site Is' },
     items: {
       zh: [
-        '一个展示项目、思考与成长过程的个人网站',
-        '一个不断迭代中的数字花园',
-        '一个让我对自己保持诚实的公开空间',
+        '一本公开的学习记录本',
+        '一个放 Bug、项目、论文和实验的小档案馆',
+        '一个以后可以写进简历，但不被简历格式绑住的空间',
       ],
       en: [
-        'A personal website for projects, reflections, and growth in progress',
-        'A digital garden that keeps evolving',
-        'A public space that helps me stay honest with myself',
+        'A public learning notebook',
+        'A small archive for bugs, projects, papers, and experiments',
+        'A space that can support a resume without being shaped like one',
       ],
     },
   },
@@ -186,33 +208,33 @@ export const timeline = [
   {
     year: { zh: '现在', en: 'Now' },
     title: {
-      zh: '把个人网站重做成成长日志',
-      en: 'Reframing the site as a growth log',
+      zh: '把个人网站重做成 AI 学习档案',
+      en: 'Reworking the personal site into an AI learning archive',
     },
     description: {
-      zh: '从传统展示页转向更真实、更长期可维护的个人表达。',
-      en: 'Shifting from a static portfolio into a more honest and maintainable personal space.',
+      zh: '从普通博客转向更贴近学习过程、Bug 复盘和医工 AI 项目的记录方式。',
+      en: 'Shifting from a generic blog toward learning notes, bug reviews, and biomedical AI experiments.',
     },
   },
   {
     year: { zh: '近期', en: 'Recent' },
     title: {
-      zh: '整理项目、博客与阶段复盘',
-      en: 'Organizing projects, blog content, and reflection notes',
+      zh: '整理学习系列、项目和阶段复盘',
+      en: 'Organizing learning series, projects, and reflection notes',
     },
     description: {
-      zh: '把散落的成果和想法整理成可回看的结构化内容。',
-      en: 'Turning scattered work and thoughts into structured content worth revisiting.',
+      zh: '把散落的成果和困惑整理成以后能回看的路径。',
+      en: 'Turning scattered work and questions into paths worth revisiting later.',
     },
   },
   {
     year: { zh: '接下来', en: 'Next' },
     title: {
       zh: '继续公开构建',
-      en: 'Keep building in public',
+      en: 'Keep publishing small updates',
     },
     description: {
-      zh: '持续发布小而真实的更新，让网站始终保持生命力。',
+      zh: '持续发布小而真实的更新，让网站保持生命力。',
       en: 'Keep publishing small but real updates so the website stays alive.',
     },
   },
@@ -220,109 +242,44 @@ export const timeline = [
 
 export const featuredProjects: FeaturedProject[] = [
   {
-    slug: 'growth-log-site',
-    title: { zh: 'Growth Log 个人网站', en: 'Growth Log Personal Website' },
+    slug: 'ai-learning-archive',
+    title: { zh: 'AI 学习档案网站', en: 'AI Learning Archive Site' },
     tagline: {
-      zh: '把个人品牌、项目展示和成长记录放进同一个叙事框架。',
-      en: 'Combining personal branding, project showcase, and growth journaling in one narrative.',
+      zh: '一个尽量轻的个人网站，用来记录学习、Bug、项目和慢慢变清楚的问题。',
+      en: 'A deliberately light personal site for learning notes, bugs, projects, and questions becoming clearer.',
     },
     period: '2026',
     status: 'online',
     summary: {
-      zh: '重写了公开站的结构与文案，让它不再只是"我会什么"，而是更像"我在持续做什么"。支持中英文切换，围绕长期成长这条主线展开。',
-      en: 'Rewrote the public site structure and copy so it feels less like "what I know" and more like "what I keep building." Supports bilingual switching, centered on long-term growth.',
+      zh: '这个网站本身也是一个作品：它不追求功能很多，而是服务长期记录。现在它更像一本公开的学习笔记，放下真实的过程，而不是只展示整理好的结果。',
+      en: 'This site is itself a small project: it is not trying to be feature-heavy, but to support long-term notes. It works more like a public notebook than a polished-only portfolio.',
+    },
+    note: {
+      zh: '现在卡在：怎样让它既能帮助未来找实习，又不失去个人记录的松弛感。',
+      en: 'Current tension: making it useful for future internships without losing the looseness of a personal notebook.',
     },
     techStack: {
-      zh: ['Next.js', 'TypeScript', 'Tailwind CSS', '内容设计'],
-      en: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Content Design'],
+      zh: ['Next.js', 'TypeScript', 'Supabase', '内容整理'],
+      en: ['Next.js', 'TypeScript', 'Supabase', 'Content Editing'],
     },
     links: [
       { label: { zh: 'GitHub', en: 'GitHub' }, href: 'https://github.com/Hunter6284578' },
     ],
   },
-  {
-    slug: 'fitness-tracker',
-    title: { zh: '训练记录系统', en: 'Fitness Tracking System' },
-    tagline: {
-      zh: '把训练、恢复和阶段反馈整理成可回看的长期记录。',
-      en: 'Turning training, recovery, and feedback into a long-term system worth revisiting.',
-    },
-    period: '2026',
-    status: 'online',
-    summary: {
-      zh: '训练记录、趋势回看和 AI 辅助建议的闭环。不做成复杂健身 App，优先保证记录可持续、可回看。',
-      en: 'A loop of training logs, trend review, and AI-assisted suggestions. Not a complex fitness app—sustainable logging first.',
-    },
-    techStack: {
-      zh: ['Supabase', 'Recharts', 'AI 接口'],
-      en: ['Supabase', 'Recharts', 'AI APIs'],
-    },
-    links: [],
-  },
-  {
-    slug: 'ai-workflow-experiment',
-    title: { zh: 'AI 工作流实验', en: 'AI Workflow Experiment' },
-    tagline: {
-      zh: '把 AI 当作辅助整理和增强执行力的工具，而不是替代思考。',
-      en: 'Using AI to assist organization and execution without replacing human judgment.',
-    },
-    period: '2026',
-    status: 'building',
-    summary: {
-      zh: '探索如何把 AI 更自然地接入内容整理、分析和个人系统。不追求全自动，保留人工判断与最终编辑权。',
-      en: 'Exploring how AI can be integrated more naturally into content organization and personal systems. No full automation—human judgment stays in the loop.',
-    },
-    techStack: {
-      zh: ['Prompting', 'API 集成', '工作流设计'],
-      en: ['Prompting', 'API Integration', 'Workflow Design'],
-    },
-    links: [],
-  },
-]
-
-export const fitnessCapabilities: FitnessCapability[] = [
-  {
-    title: { zh: '记录', en: 'Log' },
-    description: {
-      zh: '记录训练日期、动作、组数、重量、有氧、体重和备注。',
-      en: 'Log training date, exercises, sets, weights, cardio, body weight, and notes.',
-    },
-  },
-  {
-    title: { zh: '回看', en: 'Review' },
-    description: {
-      zh: '按日期和动作维度回看历史数据，观察长期趋势。',
-      en: 'Review historical data by date and exercise to see long-term trends.',
-    },
-  },
-  {
-    title: { zh: '总结', en: 'Summarize' },
-    description: {
-      zh: '把零散记录变成能指导下个阶段的复盘信息。',
-      en: 'Turn raw logs into reflections that can guide the next stage.',
-    },
-  },
-  {
-    title: { zh: '辅助建议', en: 'Assist' },
-    description: {
-      zh: '基于近期记录生成 AI 建议，作为参考而不是结论。',
-      en: 'Generate AI suggestions from recent logs as guidance rather than authority.',
-    },
-  },
 ]
 
 export const homeSignals = [
   {
-    label: { zh: '核心模块', en: 'Core Modules' },
-    value: { zh: '项目 / 日志 / 时间线', en: 'Projects / Journal / Timeline' },
+    label: { zh: '身份', en: 'Identity' },
+    value: { zh: '生物医学工程 / AI 学习', en: 'Biomedical Engineering / AI Learning' },
   },
   {
-    label: { zh: '语言', en: 'Language' },
-    value: { zh: '中文默认 / 英文切换', en: 'Chinese default / English toggle' },
+    label: { zh: '内容', en: 'Content' },
+    value: { zh: 'Bug / 笔记 / 项目 / 论文', en: 'Bugs / Notes / Projects / Papers' },
   },
   {
     label: { zh: '更新方式', en: 'Update Style' },
-    value: { zh: '小步快跑，持续迭代', en: 'Small steps, steady iteration' },
+    value: { zh: '慢慢写，慢慢改', en: 'Write slowly, revise slowly' },
   },
   {
     label: { zh: '联系', en: 'Contact' },
@@ -331,6 +288,6 @@ export const homeSignals = [
 ]
 
 export const blogThemes: LocalizedList = {
-  zh: ['项目复盘', '技术笔记', '成长日志'],
-  en: ['Project Reviews', 'Technical Notes', 'Growth Logs'],
+  zh: ['Bug 复盘', '深度学习', '大模型', '医工笔记', '项目记录'],
+  en: ['Bug Reviews', 'Deep Learning', 'LLMs', 'Biomedical Notes', 'Project Notes'],
 }

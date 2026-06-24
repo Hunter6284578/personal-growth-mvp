@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: isZh ? '关于' : 'About',
     description: isZh
-      ? '关于 Hunter、这个网站，以及我为什么持续公开构建。'
-      : 'About Hunter, this website, and why I keep building in public.',
+      ? '关于 Hunter 和这个 AI 学习档案。'
+      : 'About Hunter and this AI learning archive.',
     alternates: {
       canonical: '/about',
     },
@@ -27,22 +27,22 @@ export default async function AboutPage() {
   const lang = await getCurrentLanguage()
 
   return (
-    <div className="space-y-8 lg:space-y-10">
+    <div className="space-y-10">
       <section className="public-section space-y-6">
         <SectionHeading
           eyebrow={lang === 'zh' ? '关于' : 'About'}
-          title={lang === 'zh' ? '关于我，和我为什么做这个网站。' : "About me, and why I'm building this site."}
+          title={lang === 'zh' ? '关于我，和这个网站。' : 'About me, and this site.'}
         />
         <div className="max-w-2xl space-y-5">
           <p className="text-base leading-7" style={{ color: 'var(--text-muted)' }}>
             {lang === 'zh'
-              ? '我是 Hunter，对 Web 开发、个人系统和长期成长感兴趣。我更相信持续构建与长期记录，而不是短期冲刺。'
-              : "I'm Hunter, interested in web development, personal systems, and long-term growth. I believe more in consistent building and documentation than short bursts of intensity."}
+              ? '我是 Hunter，目前是生物医学工程大二学生，对深度学习、大模型，以及 AI 在医学健康场景里的应用很感兴趣。'
+              : "I'm Hunter, a sophomore studying biomedical engineering, interested in deep learning, LLMs, and AI in health contexts."}
           </p>
           <p className="text-base leading-7" style={{ color: 'var(--text-muted)' }}>
             {lang === 'zh'
-              ? '这个网站是我的公开空间：放项目、放思考，也记录自己如何一步步把想法变成现实。比起展示"我会什么"，我更想说明我在意什么、如何做事。'
-              : 'This site is my public space for projects, reflections, and the process of turning ideas into reality. More than listing skills, I want to show what I care about and how I work.'}
+              ? '这个网站是我的公开学习档案：放 Bug 复盘、技术笔记、项目实验和一些还没完全想清楚的问题。比起塞进很多模块，我更想让它保持安静、清楚、好维护。'
+              : 'This site is my public learning archive for bug reviews, technical notes, project experiments, and questions still becoming clear. Instead of packing it with modules, I want it quiet, clear, and easy to maintain.'}
           </p>
           <p className="text-base leading-7" style={{ color: 'var(--text-muted)' }}>
             {pickText(siteConfig.lookingFor, lang)}
@@ -72,12 +72,12 @@ export default async function AboutPage() {
       <section className="public-section space-y-6">
         <SectionHeading
           eyebrow={lang === 'zh' ? '聚焦方向' : 'Focus'}
-          title={lang === 'zh' ? '构建、学习、反思。' : 'Building, learning, reflecting.'}
+          title={lang === 'zh' ? '医工、AI、问题记录。' : 'Biomedical engineering, AI, and problem notes.'}
         />
         <div className="space-y-5">
           {skillGroups.map((group) => (
             <div key={pickText(group.title, lang)}>
-              <h3 className="text-sm font-normal" style={{ color: 'var(--text-bright)', fontFamily: 'var(--font-title), serif' }}>
+              <h3 className="text-sm font-normal" style={{ color: 'var(--text-bright)' }}>
                 {pickText(group.title, lang)}
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
@@ -91,8 +91,8 @@ export default async function AboutPage() {
       <section>
         <p className="hand-note">
           {lang === 'zh'
-            ? '如果你愿意，可以继续看作品和日志。'
-            : "If you'd like, the best next step is to explore the projects and journal."}
+            ? '如果你愿意，可以继续看作品和博客。'
+            : "If you'd like, the best next step is to explore the projects and blog."}
         </p>
         <div className="mt-3 flex flex-wrap gap-4">
           <Link href="/projects" className="cta-secondary text-sm">

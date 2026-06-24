@@ -1,31 +1,9 @@
 import type { Metadata } from 'next'
-import { Noto_Sans_SC, Noto_Serif_SC, JetBrains_Mono } from 'next/font/google'
 import { siteConfig } from '@/content/site'
 import { getPersonSchema, getWebsiteSchema } from '@/lib/structured-data'
 import { getCurrentLanguage } from '@/lib/site-language.server'
 
 import './globals.css'
-
-const bodyFont = Noto_Sans_SC({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-body',
-  preload: true,
-})
-
-const titleFont = Noto_Serif_SC({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  display: 'swap',
-  variable: '--font-title',
-  preload: true,
-})
-
-const monoFont = JetBrains_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-mono',
-})
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 const canonicalUrl = siteConfig.siteUrl || siteUrl
@@ -56,8 +34,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     applicationName: siteConfig.title,
     keywords: isZh
-      ? ['个人网站', '个人品牌', '作品集', '成长日志', 'Next.js', 'Portfolio']
-      : ['personal website', 'personal brand', 'portfolio', 'growth log', 'Next.js'],
+      ? ['生物医学工程', '深度学习', '大模型', 'AI 学习', 'Bug 复盘']
+      : ['biomedical engineering', 'deep learning', 'large language models', 'AI learning', 'bug reviews'],
     authors: [{ name: siteConfig.name }],
     creator: siteConfig.name,
     openGraph: {
@@ -108,7 +86,6 @@ export default async function RootLayout({
   return (
     <html
       lang={language === 'zh' ? 'zh-CN' : 'en'}
-      className={`${bodyFont.variable} ${titleFont.variable} ${monoFont.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

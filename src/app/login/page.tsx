@@ -50,7 +50,7 @@ export default function LoginPage() {
               <Lock className="w-8 h-8" style={{ color: '#fff' }} />
             </div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>登录</h1>
-            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>进入你的个人成长空间</p>
+            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>进入博客后台</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -101,10 +101,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
-              还没有账号？{' '}
-              <Link href="/register" style={{ color: 'var(--accent)' }}>
-                去注册
-              </Link>
+              这是站主后台，不开放公共注册。
             </p>
           </div>
         </Card>

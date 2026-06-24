@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase-server'
 import { DashboardNavigation } from '@/components/Navigation'
 import { ToastProvider } from '@/components/ui/Toast'
+import { isSiteAdmin } from '@/lib/site-admin'
 
 export default async function DashboardLayout({
   children,
@@ -12,6 +13,12 @@ export default async function DashboardLayout({
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
+    redirect('/login')
+  }
+
+  const admin = await isSiteAdmin(supabase, user)
+
+  if (!admin) {
     redirect('/login')
   }
 

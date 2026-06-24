@@ -21,7 +21,7 @@ export function ProjectCard({ project, lang }: ProjectCardProps) {
               {project.status === 'online' ? (lang === 'zh' ? '已上线' : 'Live') : lang === 'zh' ? '迭代中' : 'Building'}
             </span>
           </div>
-          <h3 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--text-bright)' }}>
+          <h3 className="text-xl font-semibold" style={{ color: 'var(--text-bright)' }}>
             {pickText(project.title, lang)}
           </h3>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{pickText(project.tagline, lang)}</p>
@@ -29,6 +29,12 @@ export function ProjectCard({ project, lang }: ProjectCardProps) {
       </div>
 
       <p className="mt-4 text-sm leading-7" style={{ color: 'var(--text-muted)' }}>{pickText(project.summary, lang)}</p>
+
+      {project.note ? (
+        <p className="project-note mt-4">
+          {pickText(project.note, lang)}
+        </p>
+      ) : null}
 
       <div className="mt-5 flex flex-wrap gap-3">
         {techStack.map((tech) => (

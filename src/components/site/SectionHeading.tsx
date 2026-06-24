@@ -13,7 +13,6 @@ export function SectionHeading({ eyebrow, title, description }: SectionHeadingPr
       <h2
         className="mt-2 text-xl font-normal sm:text-[1.375rem]"
         style={{
-          fontFamily: 'var(--font-title), serif',
           color: 'var(--text-bright)',
           lineHeight: 1.55,
         }}

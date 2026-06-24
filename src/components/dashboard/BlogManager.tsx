@@ -1,18 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { BlogPost } from '@/types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
-import { Trash2, Edit2, Plus, Loader2, FileText } from 'lucide-react'
+import { Trash2, Edit2, Plus, Loader2, FileText, ImagePlus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { ImageUpload } from '@/components/ui/ImageUpload'
 import { ManagedImage } from '@/components/ui/ManagedImage'
 import { useToast } from '@/components/ui/Toast'
 import { useConfirm, ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { uploadImage } from '@/lib/upload'
 
 interface BlogManagerProps {
   initialPosts: BlogPost[]
@@ -26,21 +26,26 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
   const router = useRouter()
   const { toast } = useToast()
   const { confirm, cancel, dialogState } = useConfirm()
+  const contentRef = useRef<HTMLTextAreaElement>(null)
+  const inlineImageInputRef = useRef<HTMLInputElement>(null)
 
   // Form state
   const [currentPostId, setCurrentPostId] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
+  const [category, setCategory] = useState('')
   const [summary, setSummary] = useState('')
   const [content, setContent] = useState('')
   const [tagsInput, setTagsInput] = useState('')
   const [images, setImages] = useState<string[]>([])
   const [status, setStatus] = useState<'draft' | 'published'>('draft')
+  const [uploadingInlineImage, setUploadingInlineImage] = useState(false)
 
   const resetForm = () => {
     setCurrentPostId(null)
     setTitle('')
     setSlug('')
+    setCategory('')
     setSummary('')
     setContent('')
     setTagsInput('')
@@ -53,12 +58,80 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
     setCurrentPostId(post.id)
     setTitle(post.title)
     setSlug(post.slug)
+    setCategory(post.category || '')
     setSummary(post.summary || '')
     setContent(post.content)
     setTagsInput(post.tags ? post.tags.join(', ') : '')
     setImages(post.images || [])
     setStatus(post.status)
     setIsEditing(true)
+  }
+
+  const insertContentAtCursor = (snippet: string) => {
+    const textarea = contentRef.current
+
+    if (!textarea) {
+      setContent((prev) => `${prev}${prev.trim() ? '\n\n' : ''}${snippet}`)
+      return
+    }
+
+    const start = textarea.selectionStart ?? content.length
+    const end = textarea.selectionEnd ?? content.length
+    const before = content.slice(0, start)
+    const after = content.slice(end)
+    const prefix = before && !before.endsWith('\n\n') ? (before.endsWith('\n') ? '\n' : '\n\n') : ''
+    const suffix = after && !after.startsWith('\n\n') ? (after.startsWith('\n') ? '\n' : '\n\n') : ''
+    const nextContent = `${before}${prefix}${snippet}${suffix}${after}`
+    const cursor = before.length + prefix.length + snippet.length
+
+    setContent(nextContent)
+    requestAnimationFrame(() => {
+      textarea.focus()
+      textarea.setSelectionRange(cursor, cursor)
+    })
+  }
+
+  const handleInlineImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (!files.length) return
+
+    setUploadingInlineImage(true)
+
+    try {
+      const uploadedUrls: string[] = []
+      const snippets: string[] = []
+
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) {
+          toast('只能上传图片文件', 'error')
+          continue
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          toast('图片大小不能超过 5MB', 'error')
+          continue
+        }
+
+        const url = await uploadImage(file)
+        const alt = file.name.replace(/\.[^.]+$/, '') || '文章图片'
+        uploadedUrls.push(url)
+        snippets.push(`![${alt}](${url})`)
+      }
+
+      if (snippets.length) {
+        insertContentAtCursor(snippets.join('\n\n'))
+        setImages((currentImages) => Array.from(new Set([...currentImages, ...uploadedUrls])))
+        toast('图片已插入正文', 'success')
+      }
+    } catch (error) {
+      console.error('上传图片失败:', error)
+      toast('上传图片失败，请重试', 'error')
+    } finally {
+      setUploadingInlineImage(false)
+      if (inlineImageInputRef.current) {
+        inlineImageInputRef.current.value = ''
+      }
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +145,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
       user_id: userId,
       title: title.trim(),
       slug: slug.trim() || title.trim().toLowerCase().replace(/\s+/g, '-'),
+      category: category.trim() || null,
       summary: summary.trim() || null,
       content: content.trim(),
       tags: tags.length > 0 ? tags : null,
@@ -175,29 +249,68 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
               />
             </div>
             
-            <Textarea
-              label="摘要"
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              placeholder="简短的介绍..."
-              rows={2}
-            />
-            
-            <Textarea
-              label="正文内容 (支持 Markdown)"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="开始写作..."
-              rows={15}
-              required
-              className="font-mono"
-            />
+            <div className="grid md:grid-cols-2 gap-6">
+              <Input
+                label="主分类 / 系列"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="Bug 复盘 / 深度学习 / 大模型 / 项目记录"
+                list="blog-category-suggestions"
+              />
+              <datalist id="blog-category-suggestions">
+                <option value="Bug 复盘" />
+                <option value="深度学习" />
+                <option value="大模型" />
+                <option value="医工笔记" />
+                <option value="项目记录" />
+                <option value="随笔" />
+              </datalist>
+              <Textarea
+                label="摘要"
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                placeholder="简短的介绍..."
+                rows={2}
+              />
+            </div>
             
             <div className="space-y-1">
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
-                配图 (可选)
-              </label>
-              <ImageUpload images={images} onChange={setImages} maxImages={5} />
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+                <label className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+                  正文内容
+                </label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => inlineImageInputRef.current?.click()}
+                  disabled={uploadingInlineImage}
+                >
+                  {uploadingInlineImage ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <ImagePlus className="w-4 h-4 mr-2" />
+                  )}
+                  插入图片
+                </Button>
+              </div>
+              <Textarea
+                ref={contentRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="开始写作..."
+                rows={18}
+                required
+                className="font-mono"
+              />
+              <input
+                ref={inlineImageInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleInlineImageChange}
+              />
             </div>
             
             <div className="grid md:grid-cols-2 gap-6">
@@ -205,7 +318,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
                 label="标签"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="技术, 成长, 随笔 (用逗号分隔)"
+                placeholder="技术, 项目, 随笔 (用逗号分隔)"
               />
               
               <div className="space-y-1">
@@ -298,6 +411,7 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
                       <span>
                         {new Date(post.created_at).toLocaleDateString('zh-CN')}
                       </span>
+                      {post.category ? <span>{post.category}</span> : null}
                       {post.tags && post.tags.length > 0 && (
                         <div className="flex gap-2">
                           {post.tags.map(tag => (

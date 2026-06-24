@@ -1,26 +1,17 @@
-# Personal Career Site
+# Personal Blog
 
-一个基于 `Next.js + TypeScript + Tailwind CSS + Supabase` 的个人站点，当前目标是把公开站重构为求职导向的个人品牌页，同时保留私密工作台用于内容沉淀、训练记录与 AI 建议。
+一个基于 `Next.js + TypeScript + Tailwind CSS + Supabase` 的个人博客。当前代码只保留公开博客展示和登录后的文章管理后台。
 
-## 当前定位
+## 功能范围
 
-- 公开站：求职展示、项目介绍、技术博客、Fitness 模块说明
-- 私密工作台：文章管理、记录录入、训练日志、AI 分析
-- 技术原则：先把结构做清楚，再逐步扩展，不为了“高级感”堆复杂度
-
-## 公开页面
-
-- `/`：首页，突出个人定位、技能、代表项目、最近更新和联系方式
-- `/about`：Resume 风格的个人介绍页
-- `/projects`：代表项目页
-- `/blog`：技术记录 / 项目复盘 / 阶段总结
-- `/fitness`：健身模块说明页
-
-## 私密页面
-
-- `/dashboard/*`：内容工作台与成长记录后台
-- `/fit`：训练记录工作台
-- `/fit/plan`：AI Fitness Advisor
+- `/`：个人博客首页
+- `/about`：简短个人介绍
+- `/projects`：项目记录
+- `/blog`：文章列表
+- `/blog/[slug]`：文章详情
+- `/dashboard/blog`：登录后的文章管理
+- `/dashboard/comments`：评论审核
+- `/login`、`/register`、`/forgot-password`、`/reset-password`：后台登录与账户恢复
 
 ## 技术栈
 
@@ -28,8 +19,7 @@
 - `React 19`
 - `TypeScript`
 - `Tailwind CSS 4`
-- `Supabase Auth + Database`
-- `Recharts`
+- `Supabase Auth + Database + Storage`
 
 ## 快速开始
 
@@ -44,29 +34,32 @@ npm install
 复制 `.env.local.example` 为 `.env.local` 并填写：
 
 ```env
+NEXT_PUBLIC_SITE_URL=https://cagedsheep.cn
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
-NEXT_PUBLIC_SITE_URL=https://cagedsheep.cn
-
-AI_PROVIDER=deepseek
-AI_API_KEY=...
-AI_BASE_URL=
-AI_MODEL=
 REVALIDATE_TOKEN=...
+SITE_OWNER_EMAIL=your@email.com
 ```
 
 说明：
 
-- `NEXT_PUBLIC_SITE_URL` 用于 sitemap、robots 和 metadata
-- `REVALIDATE_TOKEN` 用于 `/api/revalidate` 的内容主动刷新鉴权
-- `AI_PROVIDER` 当前支持 `openai`、`deepseek`、`gemini`、`openai-compatible`
-- `AI_BASE_URL` 仅在你使用代理或兼容 OpenAI 的网关时需要
+- `NEXT_PUBLIC_SITE_URL` 用于 sitemap、robots、RSS 和 metadata。
+- `REVALIDATE_TOKEN` 用于 `/api/revalidate` 的内容主动刷新鉴权。
+- `SITE_OWNER_EMAIL` 用于后台站主识别。数据库权限仍以 `site_admins` 表为准。
+- Supabase Storage 需要一个公开的 `images` bucket，迁移文件会创建它。
 
 ### 3. 初始化数据库
 
-按顺序执行 `supabase/migrations` 下的 SQL。  
-如果你的线上库来自旧版本，请先核对 `blog_posts`、`thoughts`、`profiles` 等表结构是否与当前代码一致。
+按顺序执行 `supabase/migrations` 下的 SQL。核心表是 `blog_posts`、`blog_comments` 和 `site_admins`，`002_drop_legacy_non_blog_tables.sql` 用来清理旧版成长/健身/AI 模块留下的表。
+
+执行完迁移后，把你的 Supabase 用户 ID 加入站主表：
+
+```sql
+insert into public.site_admins (user_id)
+values ('你的 auth.users.id')
+on conflict (user_id) do nothing;
+```
 
 ### 4. 启动开发环境
 
@@ -83,43 +76,37 @@ npm run build
 
 ## 内容配置
 
-公开站的个人信息、项目卡片、技能分组等内容集中在：
+公开站的个人信息、项目卡片、技能展示等静态内容集中在：
 
 ```txt
 src/content/site.ts
 ```
 
-如果你要替换成真实求职内容，优先修改这里。
+文章内容来自 Supabase 的 `blog_posts` 表，登录后在 `/dashboard/blog` 管理。
 
 ## 重要目录
 
 ```txt
 src/
 ├─ app/
-│  ├─ (public)/        # 求职导向公开站
-│  ├─ (dashboard)/     # 私密内容工作台
-│  ├─ fit/             # 训练记录工作台
-│  ├─ api/             # AI 分析与健身建议接口
+│  ├─ (public)/        # 公开博客页面
+│  ├─ (dashboard)/     # 文章管理后台
+│  ├─ feed.xml/        # RSS
+│  ├─ api/revalidate/  # 主动刷新
 │  ├─ robots.ts
 │  ├─ sitemap.ts
 │  └─ opengraph-image.tsx
 ├─ components/
+│  ├─ dashboard/       # 文章管理组件
 │  ├─ site/            # 公开站组件
-│  ├─ dashboard/       # 工作台组件
 │  └─ ui/              # 基础 UI 组件
 ├─ content/
-│  └─ site.ts          # 站点内容配置
+│  └─ site.ts          # 静态站点内容
 ├─ lib/
-│  ├─ blog.ts
-│  ├─ ai-service.ts
-│  ├─ supabase-public.ts
-│  └─ fit/advisor.ts
+│  ├─ blog.ts          # 公开博客读取
+│  ├─ supabase*.ts     # Supabase 客户端
+│  ├─ upload.ts        # 图片上传
+│  └─ toc.ts           # 文章目录生成
 └─ types/
+   └─ index.ts
 ```
-
-## 后续建议
-
-- 把 `src/content/site.ts` 替换成真实姓名、教育经历、项目结果和简历链接
-- 逐步整理旧版 dashboard 的 lint warning 和 `<img>` 优化
-- 如果博客文章量增加，可进一步拆为 `Blog` 与 `Notes` 两类内容
-- 如果健身数据需要长期保留，可将 `fitness_advice` 从 `ai_analyses` 中拆成独立历史表

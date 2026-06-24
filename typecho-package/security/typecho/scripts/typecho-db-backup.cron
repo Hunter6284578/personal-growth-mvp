@@ -1,4 +1,0 @@
-SHELL=/bin/bash
-PATH=/usr/sbin:/usr/bin:/sbin:/bin
-
-30 3 * * * root /usr/local/sbin/typecho_db_backup.sh >> /var/log/typecho-db-backup.log 2>&1

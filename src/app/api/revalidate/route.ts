@@ -23,7 +23,6 @@ export async function POST(request: Request) {
     revalidatePath('/')
     revalidatePath('/about')
     revalidatePath('/projects')
-    revalidatePath('/fitness')
     revalidatePath('/blog')
     revalidatePath('/sitemap.xml')
   }

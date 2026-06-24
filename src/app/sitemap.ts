@@ -9,11 +9,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getPublishedPosts()
   const now = new Date()
 
-  const staticRoutes = ['', '/about', '/projects', '/blog', '/fitness'].map((path) => ({
+  const staticRoutes = ['', '/blog', '/projects', '/about'].map((path) => ({
     url: `${siteUrl}${path}`,
     lastModified: now,
     changeFrequency: (path === '' ? 'weekly' : 'monthly') as 'weekly' | 'monthly',
-    priority: path === '' ? 1 : 0.7,
+    priority: path === '' ? 1 : path === '/blog' ? 0.8 : 0.6,
   }))
 
   const blogRoutes = posts.map((post) => ({

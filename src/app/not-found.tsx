@@ -7,7 +7,7 @@ export default function NotFound() {
         <p className="eyebrow">404</p>
         <h1
           className="mt-4 text-4xl font-semibold"
-          style={{ color: 'var(--text-bright)', fontFamily: 'var(--font-title), serif' }}
+          style={{ color: 'var(--text-bright)' }}
         >
           这个页面不存在。
         </h1>

@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { fetchViaPublicDns } from '@/lib/supabase-node-fetch'
 
 let publicClient: SupabaseClient | null = null
 
@@ -11,6 +12,9 @@ export function getPublicSupabaseClient() {
 
   if (!publicClient) {
     publicClient = createClient(fallbackUrl, fallbackKey, {
+      global: {
+        fetch: fetchViaPublicDns,
+      },
       auth: {
         persistSession: false,
         autoRefreshToken: false,

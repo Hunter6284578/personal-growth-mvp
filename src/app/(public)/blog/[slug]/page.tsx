@@ -8,14 +8,13 @@ import { ArrowLeft, CalendarDays, Clock3, Link as LinkIcon, Eye } from 'lucide-r
 import type { ReactNode } from 'react'
 import { Children, isValidElement } from 'react'
 
-import { getPublishedPostBySlug } from '@/lib/blog'
+import { getApprovedComments, getPublishedPostBySlug, getPublishedPosts } from '@/lib/blog'
 import { getPublicSupabaseClient } from '@/lib/supabase-public'
 import { siteConfig } from '@/content/site'
 import { getArticleSchema } from '@/lib/structured-data'
-import { extractToc } from '@/lib/toc'
 import { formatDate, getReadingTimeLabel } from '@/lib/site-language'
 import { getCurrentLanguage } from '@/lib/site-language.server'
-import { TableOfContents } from '@/components/site/TableOfContents'
+import { CommentsSection } from '@/components/site/CommentsSection'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -98,6 +97,15 @@ const markdownComponents: Components = {
   blockquote: ({ children }) => (
     <blockquote className="mt-6 border-l-4 pl-5" style={{ borderColor: 'var(--accent)', color: 'var(--text-muted)' }}>{children}</blockquote>
   ),
+  img: ({ alt, src }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src ?? ''}
+      alt={alt ?? ''}
+      className="article-image"
+      loading="lazy"
+    />
+  ),
   table: ({ children }) => (
     <div className="mt-6 overflow-x-auto">
       <table>{children}</table>
@@ -163,7 +171,10 @@ export const revalidate = 3600
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const lang = await getCurrentLanguage()
   const { slug } = await params
-  const post = await getPublishedPostBySlug(slug)
+  const [post, posts] = await Promise.all([
+    getPublishedPostBySlug(slug),
+    getPublishedPosts(),
+  ])
 
   if (!post) {
     notFound()
@@ -186,6 +197,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   })
 
   const readingTime = Math.max(1, Math.ceil((post.content?.length || 0) / 320))
+  const sameSeriesPosts = post.category
+    ? posts
+        .filter((item) => item.id !== post.id && item.category === post.category)
+        .slice(0, 3)
+    : []
+  const comments = await getApprovedComments(post.id)
 
   return (
     <div className="space-y-6">
@@ -205,7 +222,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="max-w-3xl space-y-5">
           <div className="space-y-3">
             <p className="eyebrow">{lang === 'zh' ? '正文' : 'Article'}</p>
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl" style={{ color: 'var(--text-bright)' }}>
+            <h1 className="text-3xl font-semibold sm:text-4xl" style={{ color: 'var(--text-bright)' }}>
               {post.title}
             </h1>
             {post.summary ? (
@@ -224,21 +241,39 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </span>
             <span className="inline-flex items-center gap-2">
               <Eye className="h-4 w-4" />
-              {(post as Record<string, unknown>).view_count ?? 0} {lang === 'zh' ? '次阅读' : 'views'}
+              {post.view_count ?? 0} {lang === 'zh' ? '次阅读' : 'views'}
             </span>
             <span>{lang === 'zh' ? '更新于 ' : 'Updated '}<span className="date-note">{formatDate(post.updated_at, lang)}</span></span>
           </div>
 
           {post.tags?.length ? (
             <div className="flex flex-wrap gap-3">
+              {post.category ? (
+                <Link
+                  href={`/blog?category=${encodeURIComponent(post.category)}`}
+                  className="tag-active"
+                >
+                  {post.category}
+                </Link>
+              ) : null}
               {post.tags.map((tag) => (
-                <span
+                <Link
                   key={tag}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
                   className="tag-minimal"
                 >
                   #{tag}
-                </span>
+                </Link>
               ))}
+            </div>
+          ) : post.category ? (
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href={`/blog?category=${encodeURIComponent(post.category)}`}
+                className="tag-active"
+              >
+                {post.category}
+              </Link>
             </div>
           ) : null}
         </div>
@@ -249,6 +284,42 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </ReactMarkdown>
         </div>
       </article>
+
+      <CommentsSection postId={post.id} initialComments={comments} />
+
+      {sameSeriesPosts.length > 0 ? (
+        <section className="series-next">
+          <div>
+            <p className="eyebrow">{lang === 'zh' ? '同系列' : 'Same Series'}</p>
+            <h2 className="mt-2 text-xl font-normal" style={{ color: 'var(--text-bright)' }}>
+              {lang === 'zh' ? `继续看「${post.category}」` : `More in ${post.category}`}
+            </h2>
+          </div>
+
+          <div className="mt-4 space-y-0">
+            {sameSeriesPosts.map((item, idx) => (
+              <Link
+                key={item.id}
+                href={`/blog/${item.slug}`}
+                className="group block py-4 hover-paper"
+                style={{ borderBottom: idx < sameSeriesPosts.length - 1 ? '1px solid var(--border)' : 'none' }}
+              >
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <h3 className="text-sm font-normal transition-colors group-hover:text-[var(--accent)]" style={{ color: 'var(--text-bright)' }}>
+                      {item.title}
+                    </h3>
+                    {item.summary ? (
+                      <p className="mt-1 text-sm line-clamp-1" style={{ color: 'var(--text-dim)' }}>{item.summary}</p>
+                    ) : null}
+                  </div>
+                  <span className="date-note shrink-0">{formatDate(item.created_at, lang)}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   )
 }

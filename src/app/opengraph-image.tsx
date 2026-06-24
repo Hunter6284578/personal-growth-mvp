@@ -19,9 +19,9 @@ export default function OpenGraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: 'linear-gradient(160deg, #0e0f11 0%, #12131a 100%)',
+          background: '#fbfbfa',
           padding: 56,
-          color: '#d4d1cb',
+          color: '#222222',
         }}
       >
         <div
@@ -32,18 +32,18 @@ export default function OpenGraphImage() {
             fontSize: 28,
             fontWeight: 400,
             letterSpacing: 4,
-            color: '#7a7670',
+            color: '#858b93',
           }}
         >
           {siteConfig.title}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 900 }}>
-          <div style={{ fontSize: 72, fontWeight: 700, lineHeight: 1.08, color: '#d4d1cb' }}>
+          <div style={{ fontSize: 72, fontWeight: 700, lineHeight: 1.08, color: '#111111' }}>
             {siteConfig.role.zh}
           </div>
-          <div style={{ width: 48, height: 2, background: '#8b7355' }} />
-          <div style={{ fontSize: 30, lineHeight: 1.45, color: '#7a7670' }}>
+          <div style={{ width: 48, height: 2, background: '#1e5aa8' }} />
+          <div style={{ fontSize: 30, lineHeight: 1.45, color: '#555555' }}>
             {siteConfig.description.zh}
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function OpenGraphImage() {
             justifyContent: 'space-between',
             alignItems: 'center',
             fontSize: 22,
-            color: '#4a4742',
+            color: '#858b93',
           }}
         >
           <div>{siteConfig.github}</div>

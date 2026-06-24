@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Filter, Eye } from 'lucide-react'
-import { getBlogTags, getPublishedPosts } from '@/lib/blog'
+import { Filter, FolderOpen } from 'lucide-react'
+import { getBlogCategories, getBlogTags, getPublishedPosts } from '@/lib/blog'
 import { SectionHeading } from '@/components/site/SectionHeading'
 import { formatDate, getReadingTimeLabel } from '@/lib/site-language'
 import { getCurrentLanguage } from '@/lib/site-language.server'
@@ -11,10 +11,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const isZh = lang === 'zh'
 
   return {
-    title: isZh ? '日志' : 'Journal',
+    title: isZh ? '博客' : 'Blog',
     description: isZh
-      ? '记录项目、技术与阶段性思考的公开日志。'
-      : 'A public journal of projects, technical notes, and periodic reflection.',
+      ? '所有公开文章。'
+      : 'All public writing.',
     alternates: {
       canonical: '/blog',
     },
@@ -23,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 interface BlogPageProps {
   searchParams: Promise<{
+    category?: string
     tag?: string
   }>
 }
@@ -42,43 +43,93 @@ function stripMarkdown(content: string) {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const lang = await getCurrentLanguage()
-  const { tag } = await searchParams
-  const [posts, tags] = await Promise.all([getPublishedPosts(), getBlogTags()])
+  const { category, tag } = await searchParams
+  const [posts, categories, tags] = await Promise.all([
+    getPublishedPosts(),
+    getBlogCategories(),
+    getBlogTags(),
+  ])
 
+  const activeCategory = category?.trim() || ''
   const activeTag = tag?.trim() || ''
-  const filteredPosts = activeTag
-    ? posts.filter((post) => post.tags?.includes(activeTag))
-    : posts
+  const filteredPosts = posts.filter((post) => {
+    const matchesCategory = activeCategory ? post.category === activeCategory : true
+    const matchesTag = activeTag ? post.tags?.includes(activeTag) : true
+    return matchesCategory && matchesTag
+  })
 
   return (
     <div className="space-y-8 lg:space-y-10">
       <section className="space-y-6">
         <SectionHeading
-          eyebrow={lang === 'zh' ? '日志' : 'Journal'}
-          title={lang === 'zh' ? '写下当下，留给未来。' : 'Writing down the present for the future.'}
-          description={lang === 'zh' ? '这里的内容更像慢速笔记，而不是即时观点。' : 'The writing here feels more like slow notes than instant opinions.'}
+          eyebrow={lang === 'zh' ? '学习档案' : 'Learning Archive'}
+          title={lang === 'zh' ? '按系列翻看学习过程。' : 'Browse the learning process by series.'}
+          description={lang === 'zh' ? '系列是一篇文章的主线，标签是路上留下的小标记。' : 'A series is the main thread; tags are smaller markers along the way.'}
         />
 
-        {tags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 tag-minimal">
-              <Filter className="h-3.5 w-3.5" />
-            </span>
-            <Link
-              href="/blog"
-              className={activeTag ? 'tag-minimal' : 'tag-active'}
-            >
-              {lang === 'zh' ? '全部' : 'All'}
-            </Link>
-            {tags.map((currentTag) => (
-              <Link
-                key={currentTag}
-                href={`/blog?tag=${encodeURIComponent(currentTag)}`}
-                className={currentTag === activeTag ? 'tag-active' : 'tag-minimal'}
-              >
-                #{currentTag}
-              </Link>
-            ))}
+        {(categories.length > 0 || tags.length > 0) && (
+          <div className="filter-panel space-y-4">
+            {categories.length > 0 ? (
+              <div className="space-y-2">
+                <span className="inline-flex items-center gap-2 filter-label">
+                  <FolderOpen className="h-3.5 w-3.5" />
+                  {lang === 'zh' ? '系列' : 'Series'}
+                </span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href={activeTag ? `/blog?tag=${encodeURIComponent(activeTag)}` : '/blog'}
+                    className={activeCategory ? 'series-link' : 'series-link-active'}
+                  >
+                    {lang === 'zh' ? '全部' : 'All'}
+                  </Link>
+                  {categories.map((currentCategory) => {
+                    const href = activeTag
+                      ? `/blog?category=${encodeURIComponent(currentCategory)}&tag=${encodeURIComponent(activeTag)}`
+                      : `/blog?category=${encodeURIComponent(currentCategory)}`
+
+                    return (
+                      <Link
+                        key={currentCategory}
+                        href={href}
+                        className={currentCategory === activeCategory ? 'series-link-active' : 'series-link'}
+                      >
+                        {currentCategory}
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {tags.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 filter-label">
+                  <Filter className="h-3.5 w-3.5" />
+                  {lang === 'zh' ? '标签' : 'Tags'}
+                </span>
+                <Link
+                  href={activeCategory ? `/blog?category=${encodeURIComponent(activeCategory)}` : '/blog'}
+                  className={activeTag ? 'tag-minimal' : 'tag-active'}
+                >
+                  {lang === 'zh' ? '全部' : 'All'}
+                </Link>
+                {tags.map((currentTag) => {
+                  const href = activeCategory
+                    ? `/blog?category=${encodeURIComponent(activeCategory)}&tag=${encodeURIComponent(currentTag)}`
+                    : `/blog?tag=${encodeURIComponent(currentTag)}`
+
+                  return (
+                    <Link
+                      key={currentTag}
+                      href={href}
+                      className={currentTag === activeTag ? 'tag-active' : 'tag-minimal'}
+                    >
+                      #{currentTag}
+                    </Link>
+                  )
+                })}
+              </div>
+            ) : null}
           </div>
         )}
       </section>
@@ -99,16 +150,19 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   <div className="min-w-0 flex-1">
                     <h2
                       className="text-base font-normal transition-colors group-hover:text-[var(--accent)]"
-                      style={{ fontFamily: 'var(--font-title), serif', color: 'var(--text-bright)' }}
+                      style={{ color: 'var(--text-bright)' }}
                     >
                       {post.title}
                     </h2>
                     <p className="mt-1.5 text-sm leading-relaxed line-clamp-2" style={{ color: 'var(--text-dim)' }}>
                       {post.summary?.trim() || stripMarkdown(post.content).slice(0, 140) || (lang === 'zh' ? '这篇记录还没有补摘要，后续会继续完善。' : 'This note does not have a summary yet, but I may refine it later.')}
                     </p>
-                    {post.tags?.length ? (
+                    {post.category || post.tags?.length ? (
                       <div className="mt-2 flex flex-wrap gap-3">
-                        {post.tags.map((item) => (
+                        {post.category ? (
+                          <span className="tag-active">{post.category}</span>
+                        ) : null}
+                        {post.tags?.map((item) => (
                           <span key={`${post.id}-${item}`} className="tag-minimal">#{item}</span>
                         ))}
                       </div>
@@ -128,7 +182,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           })
         ) : (
           <div className="empty-state">
-            {lang === 'zh' ? '当前标签下还没有内容，可以先回到全部文章看看其他记录。' : 'There is no content under this tag yet. You can go back to all notes and browse the rest.'}
+            {lang === 'zh' ? '当前筛选下还没有内容，可以先回到全部文章看看其他记录。' : 'There is no content under this filter yet. You can go back to all notes and browse the rest.'}
           </div>
         )}
       </section>

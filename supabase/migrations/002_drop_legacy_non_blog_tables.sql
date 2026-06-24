@@ -1,0 +1,14 @@
+DROP TABLE IF EXISTS public.skill_items CASCADE;
+DROP TABLE IF EXISTS public.skill_groups CASCADE;
+DROP TABLE IF EXISTS public.fit_logs CASCADE;
+DROP TABLE IF EXISTS public.fit_exercises CASCADE;
+DROP TABLE IF EXISTS public.daily_health CASCADE;
+DROP TABLE IF EXISTS public.fitness_tests CASCADE;
+DROP TABLE IF EXISTS public.fitness_records CASCADE;
+DROP TABLE IF EXISTS public.stat_scores CASCADE;
+DROP TABLE IF EXISTS public.daily_logs CASCADE;
+DROP TABLE IF EXISTS public.life_events CASCADE;
+DROP TABLE IF EXISTS public.thoughts CASCADE;
+DROP TABLE IF EXISTS public.ai_analyses CASCADE;
+DROP TABLE IF EXISTS public.uploaded_files CASCADE;
+DROP TABLE IF EXISTS public.profiles CASCADE;

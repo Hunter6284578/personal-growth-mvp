@@ -1,85 +1,9 @@
-'use client'
-
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ArrowLeft, LockKeyhole } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
-import { useAuth } from '@/hooks/useAuth'
-import { UserPlus, ArrowLeft } from 'lucide-react'
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const { signUp } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    if (password !== confirmPassword) {
-      setError('两次输入的密码不一致')
-      setLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError('密码长度至少需要6位')
-      setLoading(false)
-      return
-    }
-
-    const { data, error } = await signUp(email, password)
-
-    if (error) {
-      setError(error.message || '注册失败，请稍后重试')
-      setLoading(false)
-    } else {
-      // 如果有会话，说明不需要邮箱验证或已自动登录
-      if (data?.session) {
-        router.push('/dashboard')
-      } else {
-        // 需要邮箱验证
-        setSuccess(true)
-        setLoading(false)
-      }
-    }
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero" style={{ background: 'var(--bg-warm)' }}>
-        <div className="absolute inset-0" style={{ background: 'rgba(14, 15, 17, 0.75)' }} />
-        <div className="w-full max-w-md relative z-10">
-          <Card>
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <UserPlus className="w-8 h-8" style={{ color: '#fff' }} />
-              </div>
-              <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-bright)' }}>注册成功！</h1>
-              <p className="mb-8" style={{ color: 'var(--text-muted)' }}>
-                请检查你的邮箱 {email} 完成验证，<br />
-                验证后即可登录系统。
-              </p>
-              <Link href="/login">
-                <Button variant="primary" size="lg" className="w-full">
-                  前往登录
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden pg-bg-hero" style={{ background: 'var(--bg-warm)' }}>
       <div className="absolute inset-0" style={{ background: 'rgba(14, 15, 17, 0.75)' }} />
@@ -92,66 +16,26 @@ export default function RegisterPage() {
         </Link>
 
         <Card>
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UserPlus className="w-8 h-8" style={{ color: '#fff' }} />
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-neutral-700 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LockKeyhole className="w-8 h-8" style={{ color: '#fff' }} />
             </div>
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>注册账号</h1>
-            <p className="mt-2" style={{ color: 'var(--text-muted)' }}>开启你的个人成长之旅</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Input
-              type="email"
-              label="邮箱"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-
-            <Input
-              type="password"
-              label="密码"
-              placeholder="至少6位字符"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
-            <Input
-              type="password"
-              label="确认密码"
-              placeholder="再次输入密码"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-
-            {error && (
-              <div className="p-3 rounded-lg" style={{ background: 'rgba(127, 29, 29, 0.5)', border: '1px solid rgba(153, 27, 27, 0.6)' }}>
-                <p className="text-sm" style={{ color: '#fca5a5' }}>{error}</p>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              loading={loading}
-              className="w-full"
-            >
-              注册
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
-              已有账号？{' '}
-              <Link href="/login" style={{ color: 'var(--accent)' }}>
-                直接登录
-              </Link>
+            <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-bright)' }}>注册已关闭</h1>
+            <p className="leading-7" style={{ color: 'var(--text-muted)' }}>
+              这是个人网站的站主后台，不开放公共注册。访客可以阅读文章，评论功能会走公开提交和审核流程。
             </p>
+            <div className="mt-8 flex flex-col gap-3">
+              <Link href="/login">
+                <Button variant="primary" size="lg" className="w-full">
+                  站主登录
+                </Button>
+              </Link>
+              <Link href="/blog">
+                <Button variant="ghost" size="lg" className="w-full">
+                  阅读文章
+                </Button>
+              </Link>
+            </div>
           </div>
         </Card>
       </div>
