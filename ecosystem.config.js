@@ -2,8 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'personal-growth-mvp',
-      script: 'node_modules/next/dist/bin/next',
-      args: 'start',
+      script: 'server.js',
       cwd: process.env.APP_DIR || __dirname,
       instances: 1,
       autorestart: true,

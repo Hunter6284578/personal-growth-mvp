@@ -2,7 +2,7 @@
 
 这个项目推荐部署到 Ubuntu ECS：`Nginx -> PM2 -> Next.js`。
 
-当前部署脚本只会打包 **Git 当前 commit**，所以先提交，再部署。这样线上版本和本地历史能对应起来，后面排查问题会轻松很多。
+当前部署脚本会在本地构建 Next.js standalone 产物，然后上传到 ECS。2 核 2G 机器不适合直接跑 `next build`，这样能减少服务器卡死风险。
 
 ## 1. 服务器初始化
 
@@ -91,13 +91,12 @@ Linux / macOS / Git Bash：
 
 部署脚本会执行：
 
-1. 用 `git archive HEAD` 打包当前 commit
-2. 上传到 `/tmp/personal-growth-mvp.zip`
-3. 在临时目录构建新版本，保留旧站点直到构建成功
-4. 在服务器上执行 `npm ci`
-5. 执行 `npm run build`
-6. 执行 `npm prune --omit=dev`
-7. 用 PM2 重启 `personal-growth-mvp`
+1. 在本地执行 `npm run build`
+2. 打包 `.next/standalone`、`.next/static`、`public` 和 `ecosystem.config.js`
+3. 上传到 `/tmp/personal-growth-mvp-standalone.zip`
+4. 在服务器临时目录解压新版本
+5. 保留服务器已有环境变量和日志
+6. 替换旧站点目录并用 PM2 重启 `personal-growth-mvp`
 
 ## 6. Nginx 配置
 
