@@ -22,30 +22,30 @@
   --surface: transparent;
   --page-gradient: var(--bg);
 
-  /* Dashboard 专属变量 */
-  --dash-bg: #0c0d10;
-  --dash-surface: rgba(20, 21, 26, 0.75);
-  --dash-sidebar-bg: #0a0b0e;
-  --dash-input-bg: rgba(18, 19, 24, 0.85);
-  --dash-card: var(--dash-surface);
-  --dash-card-soft: rgba(26, 27, 33, 0.6);
-  --dash-border: rgba(212, 209, 203, 0.1);
-  --dash-border-hover: rgba(212, 209, 203, 0.18);
-  --dash-hover: rgba(255, 255, 255, 0.03);
+  /* Dashboard 专属变量（默认浅色，与公开站一致） */
+  --dash-bg: #f5f3ef;
+  --dash-surface: rgba(234, 231, 225, 0.75);
+  --dash-sidebar-bg: #eae7e1;
+  --dash-input-bg: rgba(240, 238, 233, 0.9);
+  --dash-card: rgba(234, 231, 225, 0.75);
+  --dash-card-soft: rgba(226, 223, 217, 0.6);
+  --dash-border: rgba(180, 175, 165, 0.25);
+  --dash-border-hover: rgba(150, 145, 135, 0.4);
+  --dash-hover: rgba(0, 0, 0, 0.03);
 
   /* Dashboard 语义色 */
-  --dash-success: #6b8f71;
+  --dash-success: #4a7c59;
   --dash-warning: var(--accent);
-  --dash-danger: #8b5555;
-  --dash-info: #55728b;
+  --dash-danger: #7c4a4a;
+  --dash-info: #4a6b7c;
 
   /* 属性图表色 — 去饱和化 */
-  --dash-stat-physical: #8b5555;
-  --dash-stat-execution: #55728b;
-  --dash-stat-focus: #6b8f71;
-  --dash-stat-emotion: #8b7355;
-  --dash-stat-social: #6b558b;
-  --dash-stat-creativity: #8b5572;
+  --dash-stat-physical: #7c4a4a;
+  --dash-stat-execution: #4a6b7c;
+  --dash-stat-focus: #4a7c59;
+  --dash-stat-emotion: #7a6545;
+  --dash-stat-social: #5a4a7c;
+  --dash-stat-creativity: #7c4a5a;
 }
 
 [data-theme="light"] {
@@ -369,6 +369,21 @@ pre,
 
   .comment-item:last-child {
     border-bottom: 0;
+  }
+
+  .guestbook-list {
+    border-top: 1px solid var(--border);
+  }
+
+  .guestbook-entry {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 0;
+  }
+
+  .guestbook-form {
+    max-width: 42rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
   }
 
   /* 空状态占位 */

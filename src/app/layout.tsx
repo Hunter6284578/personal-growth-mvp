@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { siteConfig } from '@/content/site'
 import { getPersonSchema, getWebsiteSchema } from '@/lib/structured-data'
 import { getCurrentLanguage } from '@/lib/site-language.server'
+import { PageViewTracker } from '@/components/PageViewTracker'
 
 import './globals.css'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 const canonicalUrl = siteConfig.siteUrl || siteUrl
+const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL
+const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 
 export async function generateMetadata(): Promise<Metadata> {
   const language = await getCurrentLanguage()
@@ -99,6 +103,14 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
         />
+        {umamiScriptUrl && umamiWebsiteId ? (
+          <Script
+            src={umamiScriptUrl}
+            data-website-id={umamiWebsiteId}
+            strategy="afterInteractive"
+          />
+        ) : null}
+        <PageViewTracker />
         {children}
       </body>
     </html>

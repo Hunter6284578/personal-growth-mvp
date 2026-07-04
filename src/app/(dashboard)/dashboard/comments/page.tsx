@@ -22,13 +22,14 @@ export default async function CommentsPage() {
   const { data: comments } = await supabase
     .from('blog_comments')
     .select('*, blog_posts(title, slug)')
+    .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false })
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>评论审核</h1>
-        <p style={{ color: 'var(--text-muted)' }}>审核访客提交的评论，只有通过后的评论会显示在文章页。</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-bright)' }}>评论管理</h1>
+        <p style={{ color: 'var(--text-muted)' }}>管理文章评论，可置顶和删除。</p>
       </div>
 
       <CommentsManager initialComments={comments ?? []} />

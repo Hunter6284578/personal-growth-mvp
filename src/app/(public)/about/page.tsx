@@ -13,8 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: isZh ? '关于' : 'About',
     description: isZh
-      ? '关于 Hunter 和这个 AI 学习档案。'
-      : 'About Hunter and this AI learning archive.',
+      ? '关于 cagedsheep 和这个 AI 学习档案。'
+      : 'About cagedsheep and this AI learning archive.',
     alternates: {
       canonical: '/about',
     },
@@ -36,8 +36,8 @@ export default async function AboutPage() {
         <div className="max-w-2xl space-y-5">
           <p className="text-base leading-7" style={{ color: 'var(--text-muted)' }}>
             {lang === 'zh'
-              ? '我是 Hunter，目前是生物医学工程大二学生，对深度学习、大模型，以及 AI 在医学健康场景里的应用很感兴趣。'
-              : "I'm Hunter, a sophomore studying biomedical engineering, interested in deep learning, LLMs, and AI in health contexts."}
+              ? '我是 cagedsheep，目前是生物医学工程大二学生，对深度学习、大模型，以及 AI 在医学健康场景里的应用很感兴趣。'
+              : "I'm cagedsheep, a sophomore studying biomedical engineering, interested in deep learning, LLMs, and AI in health contexts."}
           </p>
           <p className="text-base leading-7" style={{ color: 'var(--text-muted)' }}>
             {lang === 'zh'

@@ -90,6 +90,7 @@ export async function getApprovedComments(postId: string) {
     .select('*')
     .eq('post_id', postId)
     .eq('status', 'approved')
+    .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: true })
 
   if (error) {

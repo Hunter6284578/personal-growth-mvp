@@ -39,8 +39,8 @@ export interface HomeEntryPoint {
 }
 
 export const siteConfig = {
-  name: 'Hunter',
-  title: 'Hunter',
+  name: 'cagedsheep',
+  title: 'cagedsheep',
   role: {
     zh: '生物医学工程学生 · AI 学习档案',
     en: 'Biomedical Engineering Student · AI Learning Archive',
@@ -163,11 +163,11 @@ export const resumeBlocks: ResumeBlock[] = [
     title: { zh: '我是谁', en: 'Who I Am' },
     items: {
       zh: [
-        '我是 Hunter，目前是生物医学工程大二学生。',
+        '我是 cagedsheep，目前是生物医学工程大二学生。',
         '我对深度学习、大模型和医学健康场景里的 AI 应用感兴趣。',
       ],
       en: [
-        "I'm Hunter, a sophomore studying biomedical engineering.",
+        "I'm cagedsheep, a sophomore studying biomedical engineering.",
         'I am interested in deep learning, LLMs, and AI applications in health contexts.',
       ],
     },

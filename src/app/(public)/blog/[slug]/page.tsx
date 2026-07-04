@@ -4,17 +4,19 @@ import { notFound } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { ArrowLeft, CalendarDays, Clock3, Link as LinkIcon, Eye } from 'lucide-react'
+import { ArrowLeft, CalendarDays, Clock3, Link as LinkIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Children, isValidElement } from 'react'
 
 import { getApprovedComments, getPublishedPostBySlug, getPublishedPosts } from '@/lib/blog'
-import { getPublicSupabaseClient } from '@/lib/supabase-public'
 import { siteConfig } from '@/content/site'
 import { getArticleSchema } from '@/lib/structured-data'
 import { formatDate, getReadingTimeLabel } from '@/lib/site-language'
 import { getCurrentLanguage } from '@/lib/site-language.server'
+import { createClient } from '@/lib/supabase-server'
+import { isSiteAdmin } from '@/lib/site-admin'
 import { CommentsSection } from '@/components/site/CommentsSection'
+import ViewCounter from '@/components/site/ViewCounter'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -180,14 +182,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
-  // 异步递增浏览量（不阻塞页面渲染）
-  try {
-    const supabase = getPublicSupabaseClient()
-    await supabase.rpc('increment_post_view_count', { post_slug: slug })
-  } catch {
-    // 递增失败不影响页面显示
-  }
-
   const articleSchema = getArticleSchema({
     title: post.title,
     description: post.summary || post.content.slice(0, 120),
@@ -202,7 +196,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         .filter((item) => item.id !== post.id && item.category === post.category)
         .slice(0, 3)
     : []
-  const comments = await getApprovedComments(post.id)
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const [comments, isAdmin] = await Promise.all([
+    getApprovedComments(post.id),
+    isSiteAdmin(supabase, user),
+  ])
 
   return (
     <div className="space-y-6">
@@ -239,10 +238,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <Clock3 className="h-4 w-4" />
               {getReadingTimeLabel(readingTime, lang)}
             </span>
-            <span className="inline-flex items-center gap-2">
-              <Eye className="h-4 w-4" />
-              {post.view_count ?? 0} {lang === 'zh' ? '次阅读' : 'views'}
-            </span>
+            <ViewCounter slug={slug} initialCount={post.view_count ?? 0} />
             <span>{lang === 'zh' ? '更新于 ' : 'Updated '}<span className="date-note">{formatDate(post.updated_at, lang)}</span></span>
           </div>
 
@@ -285,7 +281,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </article>
 
-      <CommentsSection postId={post.id} initialComments={comments} />
+      <CommentsSection postId={post.id} initialComments={comments} isSiteOwner={isAdmin} />
 
       {sameSeriesPosts.length > 0 ? (
         <section className="series-next">

@@ -11,6 +11,8 @@
 - `/blog/[slug]`：文章详情
 - `/dashboard/blog`：登录后的文章管理
 - `/dashboard/comments`：评论审核
+- `/guestbook`：访客留言和每日打卡
+- `/dashboard/guestbook`：留言和打卡审核
 - `/login`、`/register`、`/forgot-password`、`/reset-password`：后台登录与账户恢复
 
 ## 技术栈
@@ -40,6 +42,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 REVALIDATE_TOKEN=...
 SITE_OWNER_EMAIL=your@email.com
+NEXT_PUBLIC_UMAMI_SCRIPT_URL=https://cloud.umami.is/script.js
+NEXT_PUBLIC_UMAMI_WEBSITE_ID=...
 ```
 
 说明：
@@ -48,6 +52,7 @@ SITE_OWNER_EMAIL=your@email.com
 - `REVALIDATE_TOKEN` 用于 `/api/revalidate` 的内容主动刷新鉴权。
 - `SITE_OWNER_EMAIL` 用于后台站主识别。数据库权限仍以 `site_admins` 表为准。
 - Supabase Storage 需要一个公开的 `images` bucket，迁移文件会创建它。
+- Umami 两项变量都配置后才会加载统计脚本；留空则不采集任何访问统计。
 
 ### 3. 初始化数据库
 
@@ -83,6 +88,7 @@ src/content/site.ts
 ```
 
 文章内容来自 Supabase 的 `blog_posts` 表，登录后在 `/dashboard/blog` 管理。
+文章评论、访客留言和打卡均使用 Supabase，并在各自的后台审核页公开。执行 `005_add_guestbook_entries.sql` 后即可启用留言簿。
 
 ## 重要目录
 

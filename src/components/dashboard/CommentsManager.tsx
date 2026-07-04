@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Trash2, X } from 'lucide-react'
+import { Pin, PinOff, Trash2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import type { BlogComment } from '@/types'
 import { Button } from '@/components/ui/Button'
@@ -19,32 +19,32 @@ interface CommentsManagerProps {
   initialComments: ManagedComment[]
 }
 
-const statusLabels = {
-  pending: '待审核',
-  approved: '已通过',
-  rejected: '已拒绝',
-} as const
-
 export function CommentsManager({ initialComments }: CommentsManagerProps) {
   const [comments, setComments] = useState(initialComments)
   const { toast } = useToast()
   const { confirm, cancel, dialogState } = useConfirm()
 
-  const updateStatus = async (id: string, status: BlogComment['status']) => {
+  const togglePin = async (id: string, currentPinned: boolean) => {
     const { data, error } = await supabase
       .from('blog_comments')
-      .update({ status })
+      .update({ is_pinned: !currentPinned })
       .eq('id', id)
       .select('*, blog_posts(title, slug)')
       .single()
 
     if (error) {
-      toast('更新评论状态失败', 'error')
+      toast('更新置顶状态失败', 'error')
       return
     }
 
-    setComments((items) => items.map((item) => item.id === id ? data as ManagedComment : item))
-    toast('评论状态已更新', 'success')
+    setComments((items) => {
+      const updated = items.map((item) => (item.id === id ? (data as ManagedComment) : item))
+      return [...updated].sort((a, b) => {
+        if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+    })
+    toast(currentPinned ? '已取消置顶' : '已置顶', 'success')
   }
 
   const deleteComment = async (id: string) => {
@@ -74,9 +74,11 @@ export function CommentsManager({ initialComments }: CommentsManagerProps) {
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-3">
                   <strong style={{ color: 'var(--text-bright)' }}>{comment.author_name}</strong>
-                  <span className="rounded border px-2 py-0.5 text-xs" style={{ borderColor: 'var(--dash-border)', color: 'var(--text-muted)' }}>
-                    {statusLabels[comment.status]}
-                  </span>
+                  {comment.is_pinned ? (
+                    <span className="rounded px-2 py-0.5 text-xs font-medium" style={{ background: 'var(--accent)', color: 'var(--bg)' }}>
+                      置顶
+                    </span>
+                  ) : null}
                   <span className="date-note">{new Date(comment.created_at).toLocaleString('zh-CN')}</span>
                 </div>
 
@@ -92,13 +94,9 @@ export function CommentsManager({ initialComments }: CommentsManagerProps) {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={() => updateStatus(comment.id, 'approved')}>
-                  <Check className="mr-1 h-4 w-4" />
-                  通过
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => updateStatus(comment.id, 'rejected')}>
-                  <X className="mr-1 h-4 w-4" />
-                  拒绝
+                <Button size="sm" variant="outline" onClick={() => togglePin(comment.id, comment.is_pinned)}>
+                  {comment.is_pinned ? <PinOff className="mr-1 h-4 w-4" /> : <Pin className="mr-1 h-4 w-4" />}
+                  {comment.is_pinned ? '取消置顶' : '置顶'}
                 </Button>
                 <Button size="sm" variant="ghost" style={{ color: 'var(--dash-danger)' }} onClick={() => deleteComment(comment.id)}>
                   <Trash2 className="h-4 w-4" />

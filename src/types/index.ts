@@ -23,6 +23,17 @@ export interface BlogComment {
   website: string | null
   content: string
   status: 'pending' | 'approved' | 'rejected'
+  is_pinned: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface GuestbookEntry {
+  id: string
+  author_name: string
+  content: string
+  entry_type: 'message' | 'check_in'
+  status: 'pending' | 'approved' | 'rejected'
   created_at: string
   updated_at: string
 }

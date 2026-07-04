@@ -1,18 +1,31 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { supabase } from '@/lib/supabase'
 import { BlogPost } from '@/types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Card } from '@/components/ui/Card'
-import { Trash2, Edit2, Plus, Loader2, FileText, ImagePlus } from 'lucide-react'
+import { Trash2, Edit2, Plus, Loader2, FileText, ImagePlus, Eye, Edit3 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { ManagedImage } from '@/components/ui/ManagedImage'
 import { useToast } from '@/components/ui/Toast'
 import { useConfirm, ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { uploadImage } from '@/lib/upload'
+import remarkGfm from 'remark-gfm'
+
+// 写作时的实时预览：只在客户端加载 react-markdown，避免影响首屏
+const ReactMarkdown = dynamic(() => import('react-markdown'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center gap-2 py-8 text-sm" style={{ color: 'var(--text-muted)' }}>
+      <Loader2 className="w-4 h-4 animate-spin" />
+      预览加载中...
+    </div>
+  ),
+})
 
 interface BlogManagerProps {
   initialPosts: BlogPost[]
@@ -40,6 +53,17 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
   const [images, setImages] = useState<string[]>([])
   const [status, setStatus] = useState<'draft' | 'published'>('draft')
   const [uploadingInlineImage, setUploadingInlineImage] = useState(false)
+  const [previewMode, setPreviewMode] = useState(false)
+
+  // 写作时实时统计：字数、阅读时长（中英文混合估算）
+  const stats = useMemo(() => {
+    const text = content.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '').replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[[^\]]*\]\([^)]*\)/g, '').replace(/[#>*_~\-]/g, ' ')
+    const cjkChars = (text.match(/[一-鿿㐀-䶿]/g) || []).length
+    const englishWords = (text.match(/[A-Za-z]+/g) || []).length
+    // 中文 ~320 字/分钟，英文 ~200 词/分钟；按字符数 1:1 折算时间
+    const minutes = Math.max(1, Math.ceil((cjkChars / 320) + (englishWords / 200)))
+    return { cjkChars, englishWords, minutes }
+  }, [content])
 
   const resetForm = () => {
     setCurrentPostId(null)
@@ -276,33 +300,84 @@ export function BlogManager({ initialPosts, userId }: BlogManagerProps) {
             
             <div className="space-y-1">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
-                <label className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                  正文内容
-                </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => inlineImageInputRef.current?.click()}
-                  disabled={uploadingInlineImage}
-                >
-                  {uploadingInlineImage ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <ImagePlus className="w-4 h-4 mr-2" />
-                  )}
-                  插入图片
-                </Button>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+                    正文内容
+                  </label>
+                  <span className="text-xs" style={{ color: 'var(--text-dim)' }}>
+                    {stats.cjkChars} 字 · {stats.englishWords} 词 · 约 {stats.minutes} 分钟阅读
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex rounded-md border" style={{ borderColor: 'var(--dash-border)' }}>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewMode(false)}
+                      className="px-3 py-1.5 text-xs inline-flex items-center gap-1.5"
+                      style={{
+                        background: !previewMode ? 'var(--dash-card-soft)' : 'transparent',
+                        color: !previewMode ? 'var(--text-bright)' : 'var(--text-muted)',
+                      }}
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      编辑
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewMode(true)}
+                      className="px-3 py-1.5 text-xs inline-flex items-center gap-1.5"
+                      style={{
+                        background: previewMode ? 'var(--dash-card-soft)' : 'transparent',
+                        color: previewMode ? 'var(--text-bright)' : 'var(--text-muted)',
+                        borderLeft: '1px solid var(--dash-border)',
+                      }}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      预览
+                    </button>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => inlineImageInputRef.current?.click()}
+                    disabled={uploadingInlineImage || previewMode}
+                  >
+                    {uploadingInlineImage ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <ImagePlus className="w-4 h-4 mr-2" />
+                    )}
+                    插入图片
+                  </Button>
+                </div>
               </div>
-              <Textarea
-                ref={contentRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="开始写作..."
-                rows={18}
-                required
-                className="font-mono"
-              />
+              {previewMode ? (
+                <div
+                  className="prose-shell p-5 rounded-md border min-h-[400px] overflow-auto"
+                  style={{ borderColor: 'var(--dash-border)', background: 'var(--bg)' }}
+                >
+                  {content.trim() ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-sm" style={{ color: 'var(--text-dim)' }}>
+                      暂无内容。在「编辑」模式写一些 Markdown 吧。
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <Textarea
+                  ref={contentRef}
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="开始写作..."
+                  rows={18}
+                  required
+                  className="font-mono"
+                />
+              )}
               <input
                 ref={inlineImageInputRef}
                 type="file"

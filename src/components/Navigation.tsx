@@ -15,6 +15,7 @@ import {
   NotebookPen,
   FlaskConical,
   UserRound,
+  BarChart3,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { siteConfig } from '@/content/site'
@@ -51,7 +52,13 @@ const dashboardNavGroups: Array<{ title: string; items: DashboardNavItem[] }> = 
     title: '博客',
     items: [
       { href: '/dashboard/blog', label: '文章管理', icon: PenLine },
-      { href: '/dashboard/comments', label: '评论审核', icon: MessageCircle },
+      { href: '/dashboard/comments', label: '评论管理', icon: MessageCircle },
+    ],
+  },
+  {
+    title: '数据',
+    items: [
+      { href: '/dashboard/analytics', label: '访问统计', icon: BarChart3 },
     ],
   },
 ]
@@ -64,7 +71,7 @@ interface PublicNavigationProps {
 
 export function PublicNavigation({ lang }: PublicNavigationProps) {
   const pathname = usePathname()
-  const { user, signOut } = useAuth()
+  const { isAdmin, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const isActive = (href: string) =>
@@ -96,7 +103,7 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
 
         <div className="hidden items-center gap-5 lg:flex">
           <LanguageSwitch lang={lang} />
-          {user ? (
+          {isAdmin ? (
             <>
               <Link
                 href="/dashboard/blog"
@@ -155,7 +162,7 @@ export function PublicNavigation({ lang }: PublicNavigationProps) {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-3">
-            {user ? (
+            {isAdmin ? (
               <>
                 <Link
                   href="/dashboard/blog"
