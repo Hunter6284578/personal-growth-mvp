@@ -8,14 +8,11 @@ import { ArrowLeft, CalendarDays, Clock3, Link as LinkIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Children, isValidElement } from 'react'
 
-import { getApprovedComments, getPublishedPostBySlug, getPublishedPosts } from '@/lib/blog'
+import { getPublishedPostBySlug, getPublishedPosts } from '@/lib/blog'
 import { siteConfig } from '@/content/site'
 import { getArticleSchema } from '@/lib/structured-data'
 import { formatDate, getReadingTimeLabel } from '@/lib/site-language'
 import { getCurrentLanguage } from '@/lib/site-language.server'
-import { createClient } from '@/lib/supabase-server'
-import { isSiteAdmin } from '@/lib/site-admin'
-import { CommentsSection } from '@/components/site/CommentsSection'
 import ViewCounter from '@/components/site/ViewCounter'
 
 interface BlogPostPageProps {
@@ -196,13 +193,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         .filter((item) => item.id !== post.id && item.category === post.category)
         .slice(0, 3)
     : []
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const [comments, isAdmin] = await Promise.all([
-    getApprovedComments(post.id),
-    isSiteAdmin(supabase, user),
-  ])
-
   return (
     <div className="space-y-6">
       <Link
@@ -280,8 +270,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </ReactMarkdown>
         </div>
       </article>
-
-      <CommentsSection postId={post.id} initialComments={comments} isSiteOwner={isAdmin} />
 
       {sameSeriesPosts.length > 0 ? (
         <section className="series-next">

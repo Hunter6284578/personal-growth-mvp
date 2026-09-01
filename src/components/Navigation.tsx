@@ -10,7 +10,6 @@ import {
   LogOut,
   Home,
   PenLine,
-  MessageCircle,
   ChevronRight,
   NotebookPen,
   FlaskConical,
@@ -52,7 +51,6 @@ const dashboardNavGroups: Array<{ title: string; items: DashboardNavItem[] }> = 
     title: '博客',
     items: [
       { href: '/dashboard/blog', label: '文章管理', icon: PenLine },
-      { href: '/dashboard/comments', label: '评论管理', icon: MessageCircle },
     ],
   },
   {

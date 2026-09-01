@@ -1,5 +1,5 @@
 import { cache } from 'react'
-import type { BlogComment, BlogPost } from '@/types'
+import type { BlogPost } from '@/types'
 import { getPublicSupabaseClient } from '@/lib/supabase-public'
 
 export const getPublishedPosts = cache(async () => {
@@ -75,27 +75,4 @@ export async function getBlogCategories() {
         .filter((category): category is string => Boolean(category))
     )
   ).sort((a, b) => a.localeCompare(b, 'zh-CN'))
-}
-
-export async function getApprovedComments(postId: string) {
-  let supabase
-  try {
-    supabase = getPublicSupabaseClient()
-  } catch {
-    return [] as BlogComment[]
-  }
-
-  const { data, error } = await supabase
-    .from('blog_comments')
-    .select('*')
-    .eq('post_id', postId)
-    .eq('status', 'approved')
-    .order('is_pinned', { ascending: false })
-    .order('created_at', { ascending: true })
-
-  if (error) {
-    return [] as BlogComment[]
-  }
-
-  return (data ?? []) as BlogComment[]
 }
