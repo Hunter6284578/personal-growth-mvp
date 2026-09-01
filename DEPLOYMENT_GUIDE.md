@@ -62,11 +62,9 @@ values ('你的 auth.users.id')
 on conflict (user_id) do nothing;
 ```
 
-这样只有你能进入 `/dashboard`、发布文章、上传图片和审核评论。访客只能阅读文章并提交待审核评论。
+这样只有你能进入 `/dashboard`、发布文章和上传图片。访客只能阅读公开文章。
 
-## 3.1 启用留言簿与访问统计
-
-先在 Supabase SQL Editor 中执行 `supabase/migrations/005_add_guestbook_entries.sql`。部署后，访客可在 `/guestbook` 留言或打卡，你可在 `/dashboard/guestbook` 审核。
+## 3.1 启用访问统计
 
 访问统计推荐 Umami：在 Umami Cloud 或自托管 Umami 中添加 `https://cagedsheep.cn`，把生成的脚本地址和网站 ID 写入上面的两个环境变量。两项变量缺一时，站点不会加载统计脚本。
 

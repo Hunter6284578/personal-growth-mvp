@@ -22,7 +22,7 @@ export default function RegisterPage() {
             </div>
             <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--text-bright)' }}>注册已关闭</h1>
             <p className="leading-7" style={{ color: 'var(--text-muted)' }}>
-              这是个人网站的站主后台，不开放公共注册。访客可以阅读文章，评论功能会走公开提交和审核流程。
+              这是个人网站的站主后台，不开放公共注册。访客可以直接阅读公开文章。
             </p>
             <div className="mt-8 flex flex-col gap-3">
               <Link href="/login">

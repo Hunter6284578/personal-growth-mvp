@@ -355,37 +355,6 @@ pre,
     border-top: 1px solid var(--border);
   }
 
-  .comments-section {
-    border-top: 1px solid var(--border);
-    margin-top: 2rem;
-    max-width: 48rem;
-    padding-top: 2rem;
-  }
-
-  .comment-item {
-    border-bottom: 1px solid var(--border);
-    padding: 1rem 0;
-  }
-
-  .comment-item:last-child {
-    border-bottom: 0;
-  }
-
-  .guestbook-list {
-    border-top: 1px solid var(--border);
-  }
-
-  .guestbook-entry {
-    border-bottom: 1px solid var(--border);
-    padding: 1.25rem 0;
-  }
-
-  .guestbook-form {
-    max-width: 42rem;
-    border-top: 1px solid var(--border);
-    padding-top: 2rem;
-  }
-
   /* 空状态占位 */
   .empty-state {
     border: 1px dashed var(--border);

@@ -10,9 +10,6 @@
 - `/blog`：文章列表
 - `/blog/[slug]`：文章详情
 - `/dashboard/blog`：登录后的文章管理
-- `/dashboard/comments`：评论审核
-- `/guestbook`：访客留言和每日打卡
-- `/dashboard/guestbook`：留言和打卡审核
 - `/login`、`/register`、`/forgot-password`、`/reset-password`：后台登录与账户恢复
 
 ## 技术栈
@@ -56,7 +53,7 @@ NEXT_PUBLIC_UMAMI_WEBSITE_ID=...
 
 ### 3. 初始化数据库
 
-按顺序执行 `supabase/migrations` 下的 SQL。核心表是 `blog_posts`、`blog_comments` 和 `site_admins`，`002_drop_legacy_non_blog_tables.sql` 用来清理旧版成长/健身/AI 模块留下的表。
+按顺序执行 `supabase/migrations` 下的 SQL。核心表是 `blog_posts` 和 `site_admins`，`002_drop_legacy_non_blog_tables.sql` 用来清理旧版成长/健身/AI 模块留下的表。
 
 执行完迁移后，把你的 Supabase 用户 ID 加入站主表：
 
@@ -87,8 +84,7 @@ npm run build
 src/content/site.ts
 ```
 
-文章内容来自 Supabase 的 `blog_posts` 表，登录后在 `/dashboard/blog` 管理。
-文章评论、访客留言和打卡均使用 Supabase，并在各自的后台审核页公开。执行 `005_add_guestbook_entries.sql` 后即可启用留言簿。
+文章内容来自 Supabase 的 blog_posts 表，登录后在 /dashboard/blog 管理。网站不提供评论、留言或访客打卡功能。
 
 ## 重要目录
 
